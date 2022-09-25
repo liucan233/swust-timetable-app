@@ -33,7 +33,9 @@
     "build:mp-weixin": "uni build -p mp-weixin",
     "build:quickapp-webview": "uni build -p quickapp-webview",
     "build:quickapp-webview-huawei": "uni build -p quickapp-webview-huawei",
-    "build:quickapp-webview-union": "uni build -p quickapp-webview-union"
+    "build:quickapp-webview-union": "uni build -p quickapp-webview-union",
+    "prepare": "husky install",
+    "lint:script": "npx eslint --ext .js,.ts,.vue --fix --quiet ./src"
   },
   "dependencies": {
     "@dcloudio/uni-app": "3.0.0-alpha-3060320220917001",
@@ -48,17 +50,44 @@
     "@dcloudio/uni-mp-toutiao": "3.0.0-alpha-3060320220917001",
     "@dcloudio/uni-mp-weixin": "3.0.0-alpha-3060320220917001",
     "@dcloudio/uni-quickapp-webview": "3.0.0-alpha-3060320220917001",
+    "json5": "^2.2.1",
     "vue": "^3.2.39",
     "vue-i18n": "^9.1.9",
     "vuex": "^4.0.2"
   },
   "devDependencies": {
+    "@commitlint/cli": "^17.1.2",
+    "@commitlint/config-conventional": "^17.1.0",
     "@dcloudio/types": "^3.0.14",
     "@dcloudio/uni-automator": "3.0.0-alpha-3060320220917001",
     "@dcloudio/uni-cli-shared": "3.0.0-alpha-3060320220917001",
     "@dcloudio/uni-stacktracey": "3.0.0-alpha-3060320220917001",
     "@dcloudio/vite-plugin-uni": "3.0.0-alpha-3060320220917001",
+    "@types/node": "^18.7.20",
+    "@typescript-eslint/eslint-plugin": "^5.38.0",
+    "@typescript-eslint/parser": "^5.38.0",
+    "commitlint": "^17.1.2",
+    "eslint": "^8.24.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-vue": "^9.5.1",
+    "husky": "^8.0.1",
+    "lint-staged": "^13.0.3",
+    "prettier": "2.7.1",
     "typescript": "^4.8.3",
-    "vite": "^2.9.14"
+    "vite": "^2.9.14",
+    "vite-plugin-eslint": "^1.8.1",
+    "vue-eslint-parser": "^9.1.0"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown",
+    "**/*.{js,ts,vue}": [
+      "npm run lint:script",
+      "git add ."
+    ],
+    "**/*.{scss}": [
+      "npm run lint:style",
+      "git add ."
+    ]
   }
 }

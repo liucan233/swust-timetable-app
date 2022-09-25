@@ -1,14 +1,11 @@
 <template>
   <view class="content">
-    <Timetable class-name="timetable"/>
+    <Timetable class-name="timetable" />
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import Timetable from "@components/timetable";
-
-
+import Timetable from "@components/Timetable.vue";
 </script>
 
 <style scoped>

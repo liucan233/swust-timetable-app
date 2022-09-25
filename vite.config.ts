@@ -1,13 +1,15 @@
-import { defineConfig } from "vite";
-import uni from "@dcloudio/vite-plugin-uni";
 import path from "path";
+import uni from "@dcloudio/vite-plugin-uni";
+import viteEslint from "vite-plugin-eslint";
+import { defineConfig } from "vite";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [uni()],
+  plugins: [uni(), viteEslint()],
   resolve: {
-    alias:{
-      '@components': path.resolve('./src/components/')
-    }
-  }
+    alias: {
+      "@": path.resolve("./src"),
+      "@components": path.resolve("./src/components/"),
+    },
+  },
 });
