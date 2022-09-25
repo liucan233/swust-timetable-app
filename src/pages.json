@@ -3,6 +3,10 @@
     {
       "path": "pages/index/index",
       "style": {}
+    },
+    {
+      "path": "pages/table/table",
+      "style": {}
     }
   ],
   "globalStyle": {
