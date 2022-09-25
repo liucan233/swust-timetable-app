@@ -1,5 +1,5 @@
 <template>
-  <scroll-view :class="'wrap1'">这是首页（登录页）</scroll-view>
+  <scroll-view :class="'wrap1'">timetable</scroll-view>
 </template>
 <script lang="ts" setup>
 /**

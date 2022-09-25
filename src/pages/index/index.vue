@@ -1,21 +1,7 @@
 <template>
-  <view class="content">
-    <Timetable class-name="timetable" />
-  </view>
+  <div>home(login)</div>
 </template>
 
-<script setup lang="ts">
-import Timetable from "@components/Timetable.vue";
-</script>
+<script setup lang="ts"></script>
 
-<style scoped>
-.content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-.timetable {
-  height: 70vh;
-}
-</style>
+<style scoped></style>
