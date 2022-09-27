@@ -50,8 +50,8 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import ShapeDivider from "@components/ShapeDivider.vue";
-import ShapeDividerWarper from "@components/ShapeDividerWarper.vue";
+import ShapeDivider from "@components/ShapeDivider";
+import ShapeDividerWarper from "@components/ShapeDividerWarper";
 import LoginInput from "@components/LoginInput.vue";
 import { login } from "@/api";
 
