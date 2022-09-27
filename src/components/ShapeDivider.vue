@@ -2,7 +2,7 @@
  * @Author: LuoWei
  * @Date: 2022-09-25 21:12:56
  * @LastEditors: Luo Wei
- * @LastEditTime: 2022-09-26 13:32:48
+ * @LastEditTime: 2022-09-27 13:16:17
  * @Description: 矢量分割线组件
 -->
 <template>
@@ -25,12 +25,10 @@
 import { computed } from "vue";
 /**
  * @description: 组件必传placement和height
- * @placement top：直面在下,波浪面在上; bottom: 直面在上,波浪面在下
- * @height 图像高度
- * @width 图像波浪的密集程度(请使用百分比),默认100%
- * @color 图像填充颜色
- * @zIndex 层级
- * @return {*}
+ * @params {"top"|"bottom"} placement top：直面在下,波浪面在上; bottom: 直面在上,波浪面在下
+ * @params {string} height 图像高度
+ * @params {string} width 图像波浪的密集程度(请使用百分比),默认100%
+ * @params {string} color 图像填充颜色
  * @author: LuoWei
  */
 const props = defineProps<{
@@ -38,7 +36,6 @@ const props = defineProps<{
   height: string;
   width?: string;
   color?: string;
-  zIndex?: number;
   className?: string;
   [key: string]: unknown;
 }>();

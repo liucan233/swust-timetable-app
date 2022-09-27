@@ -1,7 +1,7 @@
 <template>
-  <div class="container" :class="{ [className]: className }">
-    <slot></slot>
-  </div>
+  <view class="container" :class="{ [className]: className }">
+    <slot />
+  </view>
 </template>
 
 <script setup lang="ts">
