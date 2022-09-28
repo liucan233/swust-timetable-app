@@ -46,7 +46,7 @@ const { rotate, width, height, color } = computed(() => {
     height,
     color: color || "#4a90e2",
     width: width || "100%",
-    rotate: `rotate(${placement === "top" ? 180 : 0})deg`,
+    rotate: placement === "top" ? `rotate(180deg)` : `rotate(0deg)`,
   };
 }).value;
 </script>
