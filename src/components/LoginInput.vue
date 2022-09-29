@@ -1,23 +1,49 @@
 <template>
   <view class="container">
     <view class="placeholder">{{ placeholder }}</view>
-    <input
-      @input="$emit('update:modelValue', ($event as any).detail?.value)"
-      :value="modelValue"
-      class="input"
-      :type="type || 'text'"
-    />
+    <input class="input" :type="type" v-model="text" />
     <view class="linear-gradient" />
   </view>
 </template>
 
 <script setup lang="ts">
-defineProps<{
+import { shallowRef, computed, watch } from "vue";
+
+/**接收父组件传参 */
+const props = defineProps<{
   type?: string;
-  placeholder: string;
-  modelValue?: string;
+  placeholder?: string;
+  defaultValue?: string;
+  onChange?: (v: string) => any;
 }>();
-defineEmits(["update:modelValue"]);
+
+const {
+  value: { type = "text", placeholder = "", onChange, defaultValue = "" },
+} = computed(() => {
+  const { type, placeholder, onChange, defaultValue } = props;
+  return {
+    type,
+    placeholder,
+    onChange,
+    defaultValue,
+  };
+});
+/**模拟事件 */
+const emit = defineEmits<{
+  (e: "chang", v: string): any;
+}>();
+
+/**用户输入的文本 */
+const text = shallowRef(defaultValue);
+
+/**监控输入 */
+watch(text, () => {
+  if (onChange) {
+    onChange(text.value);
+  } else {
+    emit("chang", text.value);
+  }
+});
 </script>
 
 <style scoped>

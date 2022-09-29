@@ -6,25 +6,30 @@
       </view>
       <view class="input-box">
         <LoginInput
-          v-model="username"
-          type="text"
           placeholder="一站式服务大厅账号"
+          @change="handleUsername"
+          ref="loginForm.usernameRef"
         />
-        <LoginInput v-model="password" type="password" placeholder="密码" />
+        <LoginInput type="password" placeholder="密码" @chang="handlePasswd" />
       </view>
+      <button @click="handleClear">清除</button>
       <view @click="handleClick" class="login-button">
         <svg
-          t="1664197977206"
           class="icon"
           style="transform: rotate(180deg)"
           viewBox="0 0 1024 1024"
-          version="1.1"
           xmlns="http://www.w3.org/2000/svg"
-          p-id="1061"
           data-spm-anchor-id="a313x.7781069.0.i1"
         >
           <path
-            d="M215.04 512l290.261333 290.282667a10.666667 10.666667 0 0 0 15.082667 0l30.186667-30.165334a10.666667 10.666667 0 0 0 0-15.104L337.536 544H650.666667a10.666667 10.666667 0 0 0 10.666666-10.666667v-42.666666a10.666667 10.666667 0 0 0-10.666666-10.666667H337.536l213.034667-213.013333a10.666667 10.666667 0 0 0 0-15.104l-30.186667-30.165334a10.666667 10.666667 0 0 0-15.082667 0L215.04 512zM725.333333 490.666667a10.666667 10.666667 0 0 1 10.666667-10.666667h64a10.666667 10.666667 0 0 1 10.666667 10.666667v42.666666a10.666667 10.666667 0 0 1-10.666667 10.666667h-64a10.666667 10.666667 0 0 1-10.666667-10.666667v-42.666666z"
+            d="M215.04 512l290.261333 290.282667a10.666667 10.666667 0 0 0 15.082667 
+            0l30.186667-30.165334a10.666667 10.666667 0 0 0 0-15.104L337.536 
+            544H650.666667a10.666667 10.666667 0 0 0 10.666666-10.666667v-42.666666a10.666667 
+            10.666667 0 0 0-10.666666-10.666667H337.536l213.034667-213.013333a10.666667 10.666667 
+            0 0 0 0-15.104l-30.186667-30.165334a10.666667 10.666667 0 0 0-15.082667 0L215.04 
+            512zM725.333333 490.666667a10.666667 10.666667 0 0 1 10.666667-10.666667h64a10.666667 
+            10.666667 0 0 1 10.666667 10.666667v42.666666a10.666667 10.666667 0 0 1-10.666667 
+            10.666667h-64a10.666667 10.666667 0 0 1-10.666667-10.666667v-42.666666z"
             fill="#fff"
             p-id="1062"
           ></path>
@@ -49,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import ShapeDivider from "@components/ShapeDivider";
 import ShapeDividerWarper from "@components/ShapeDividerWarper";
 import LoginInput from "@components/LoginInput.vue";
@@ -86,11 +91,34 @@ const shapeDividers = [
   },
 ];
 
-const username = ref<string>("");
-const password = ref<string>("");
+/**登陆表单数据 */
+const loginForm = ref({
+  username: "",
+  password: "",
+  captcha: "",
+  usernameRef: LoginInput,
+});
+
+const handleUsername = (v: string) => {
+  loginForm.value.username = v;
+};
+const handlePasswd = (v: string) => {
+  loginForm.value.password = v;
+};
+
+const handleClear = () => {
+  console.log(loginForm.value.usernameRef);
+};
+
+watch(loginForm.value, () => {
+  console.log(loginForm.value);
+});
+// const handleCaptcha = (v: string) => {
+//   loginForm.value.captcha = v;
+// };
 const handleClick = async () => {
   try {
-    await login(username.value, password.value);
+    await login(loginForm.value.username, loginForm.value.password);
     // eslint-disable-next-line no-undef
     uni.redirectTo({ url: "/pages/table/table" });
   } catch (error) {
