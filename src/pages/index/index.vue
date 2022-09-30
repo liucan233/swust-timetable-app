@@ -5,12 +5,8 @@
         <view class="logo">LOGO</view>
       </view>
       <view class="input-box">
-        <LoginInput
-          placeholder="一站式服务大厅账号"
-          @change="handleUsername"
-          ref="loginForm.usernameRef"
-        />
-        <LoginInput type="password" placeholder="密码" @chang="handlePasswd" />
+        <LoginInput placeholder="一站式服务大厅账号" ref="usernameRef" />
+        <LoginInput type="password" placeholder="密码" ref="passwordRef" />
       </view>
       <button @click="handleClear">清除</button>
       <view @click="handleClick" class="login-button">
@@ -54,10 +50,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, shallowRef, watch } from "vue";
 import ShapeDivider from "@components/ShapeDivider";
 import ShapeDividerWarper from "@components/ShapeDividerWarper";
-import LoginInput from "@components/LoginInput.vue";
+import LoginInput from "@components/LoginInput";
 import { login } from "@/api";
 
 const shapeDividers = [
@@ -91,35 +87,46 @@ const shapeDividers = [
   },
 ];
 
-/**登陆表单数据 */
-const loginForm = ref({
-  username: "",
-  password: "",
-  captcha: "",
-  usernameRef: LoginInput,
-});
+/**组件ref属性哒类型，T为组件类型 */
+type TLoginInputRef = InstanceType<typeof LoginInput> | null;
 
-const handleUsername = (v: string) => {
-  loginForm.value.username = v;
+const usernameRef = shallowRef<TLoginInputRef>(null);
+
+const passwordRef = ref<TLoginInputRef>(null);
+
+const getUserForm = () => {
+  return {
+    username: usernameRef.value?.getInputText(),
+    password: passwordRef.value?.getInputText(),
+  };
 };
-const handlePasswd = (v: string) => {
-  loginForm.value.password = v;
+
+const clearUsername = () => {
+  usernameRef.value?.clearInputText();
+};
+
+const clearPassword = () => {
+  passwordRef.value?.clearInputText();
 };
 
 const handleClear = () => {
-  console.log(loginForm.value.usernameRef);
+  console.log(usernameRef.value);
+  console.log(getUserForm());
+  clearUsername();
+  clearPassword();
 };
 
-watch(loginForm.value, () => {
-  console.log(loginForm.value);
-});
-// const handleCaptcha = (v: string) => {
-//   loginForm.value.captcha = v;
-// };
 const handleClick = async () => {
+  const userForm = getUserForm();
+  if (!userForm.username) {
+    return;
+  }
+  if (!userForm.password) {
+    return;
+  }
   try {
-    await login(loginForm.value.username, loginForm.value.password);
-    // eslint-disable-next-line no-undef
+    await login(userForm.username, userForm.password);
+
     uni.redirectTo({ url: "/pages/table/table" });
   } catch (error) {
     console.error(error);

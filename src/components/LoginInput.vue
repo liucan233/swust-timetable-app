@@ -1,48 +1,42 @@
 <template>
   <view class="container">
-    <view class="placeholder">{{ placeholder }}</view>
+    <text class="placeholder">{{ placeholder }}</text>
     <input class="input" :type="type" v-model="text" />
     <view class="linear-gradient" />
   </view>
 </template>
 
 <script setup lang="ts">
-import { shallowRef, computed, watch } from "vue";
+import { shallowRef, computed } from "vue";
 
-/**接收父组件传参 */
+/**输入框的类型，占位文字和默认值等*/
 const props = defineProps<{
   type?: string;
   placeholder?: string;
   defaultValue?: string;
-  onChange?: (v: string) => any;
 }>();
 
 const {
-  value: { type = "text", placeholder = "", onChange, defaultValue = "" },
+  type = "text",
+  placeholder = "",
+  defaultValue = "",
 } = computed(() => {
-  const { type, placeholder, onChange, defaultValue } = props;
-  return {
-    type,
-    placeholder,
-    onChange,
-    defaultValue,
-  };
-});
-/**模拟事件 */
-const emit = defineEmits<{
-  (e: "chang", v: string): any;
-}>();
+  return props;
+}).value;
 
 /**用户输入的文本 */
 const text = shallowRef(defaultValue);
 
-/**监控输入 */
-watch(text, () => {
-  if (onChange) {
-    onChange(text.value);
-  } else {
-    emit("chang", text.value);
-  }
+const clearInputText = () => {
+  text.value = "";
+};
+const getInputText = () => {
+  return text.value;
+};
+
+defineExpose({
+  clearInputText,
+  getInputText,
 });
 </script>
 
