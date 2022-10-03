@@ -1,5 +1,5 @@
 <template>
-  <scroll-view :class="'wrap1'">timetable</scroll-view>
+  <scroll-view :class="'wrap1'">这是table界面</scroll-view>
 </template>
 <script lang="ts" setup>
 /**
