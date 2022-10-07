@@ -6,9 +6,39 @@
     },
     {
       "path": "pages/table/table",
-      "style": {}
+      "style": {
+        "navigationBarTitleText": "课表",
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/about/about",
+      "style": {
+        "navigationBarTitleText": "关于我们",
+        "navigationStyle": "custom"
+      }
     }
   ],
+  "tabBar": {
+    "color": "#7A7E83",
+    "selectedColor": "#1296db",
+    "borderStyle": "black",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/table/table",
+        "text": "课表",
+        "iconPath": "static/image/table.png",
+        "selectedIconPath": "static/image/table_onSelected.png"
+      },
+      {
+        "pagePath": "pages/about/about",
+        "text": "关于",
+        "iconPath": "static/image/about.png",
+        "selectedIconPath": "static/image/about_onSelected.png"
+      }
+    ]
+  },
   "globalStyle": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "uni-app",
