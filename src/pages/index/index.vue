@@ -18,13 +18,13 @@
           data-spm-anchor-id="a313x.7781069.0.i1"
         >
           <path
-            d="M215.04 512l290.261333 290.282667a10.666667 10.666667 0 0 0 15.082667 
-            0l30.186667-30.165334a10.666667 10.666667 0 0 0 0-15.104L337.536 
-            544H650.666667a10.666667 10.666667 0 0 0 10.666666-10.666667v-42.666666a10.666667 
-            10.666667 0 0 0-10.666666-10.666667H337.536l213.034667-213.013333a10.666667 10.666667 
-            0 0 0 0-15.104l-30.186667-30.165334a10.666667 10.666667 0 0 0-15.082667 0L215.04 
-            512zM725.333333 490.666667a10.666667 10.666667 0 0 1 10.666667-10.666667h64a10.666667 
-            10.666667 0 0 1 10.666667 10.666667v42.666666a10.666667 10.666667 0 0 1-10.666667 
+            d="M215.04 512l290.261333 290.282667a10.666667 10.666667 0 0 0 15.082667
+            0l30.186667-30.165334a10.666667 10.666667 0 0 0 0-15.104L337.536
+            544H650.666667a10.666667 10.666667 0 0 0 10.666666-10.666667v-42.666666a10.666667
+            10.666667 0 0 0-10.666666-10.666667H337.536l213.034667-213.013333a10.666667 10.666667
+            0 0 0 0-15.104l-30.186667-30.165334a10.666667 10.666667 0 0 0-15.082667 0L215.04
+            512zM725.333333 490.666667a10.666667 10.666667 0 0 1 10.666667-10.666667h64a10.666667
+            10.666667 0 0 1 10.666667 10.666667v42.666666a10.666667 10.666667 0 0 1-10.666667
             10.666667h-64a10.666667 10.666667 0 0 1-10.666667-10.666667v-42.666666z"
             fill="#fff"
             p-id="1062"
@@ -50,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, watch } from "vue";
+import { ref, shallowRef } from "vue";
 import ShapeDivider from "@components/ShapeDivider";
 import ShapeDividerWarper from "@components/ShapeDividerWarper";
 import LoginInput from "@components/LoginInput";
@@ -110,23 +110,27 @@ const clearPassword = () => {
 };
 
 const handleClear = () => {
-  console.log(usernameRef.value);
-  console.log(getUserForm());
+  // console.log(usernameRef.value);
+  // console.log(getUserForm());
   clearUsername();
   clearPassword();
 };
 
 const handleClick = async () => {
-  const userForm = getUserForm();
-  if (!userForm.username) {
-    return;
-  }
-  if (!userForm.password) {
+  const { username, password } = getUserForm();
+  if (!(username && password)) {
+    uni.showToast({
+      icon: "error",
+      title: "请正确填写信息",
+    });
     return;
   }
   try {
-    await login(userForm.username, userForm.password);
-
+    uni.showLoading({
+      title: "loading",
+    });
+    await login(username, password);
+    uni.hideLoading();
     uni.redirectTo({ url: "/pages/table/table" });
   } catch (error) {
     console.error(error);

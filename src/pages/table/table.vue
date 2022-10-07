@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import Timetable from "@components/Timetable.vue";
+import Timetable from "@components/Timetable";
 </script>
 
 <style scoped>
