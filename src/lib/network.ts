@@ -13,9 +13,8 @@ interface TNetworkRes<T>
   data: T;
 }
 
-
 /**网络请求错误 */
-export class RequestError extends Error{}
+export class RequestError extends Error {}
 
 /**请求错误时的回调函数 */
 let onErrorCb: null | ((msg: RequestError) => any) = null;
@@ -28,8 +27,8 @@ export const network = <IRes>(config: TNetworkConfig) => {
   const promise = new Promise<TOnFulfilled>((resolve, reject) => {
     const task = uni.request({
       ...config,
-      fail: ({errMsg}) => {
-        const err=new RequestError(errMsg);
+      fail: ({ errMsg }) => {
+        const err = new RequestError(errMsg);
         reject(err);
         onErrorCb?.(err);
       },
@@ -48,5 +47,5 @@ export const network = <IRes>(config: TNetworkConfig) => {
 
 /**监听网络请求的错误事件 */
 export const onRequestError = (cb: typeof onErrorCb) => {
-    onErrorCb=cb;
+  onErrorCb = cb;
 };

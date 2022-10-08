@@ -1,50 +1,16 @@
 <template>
   <view>
     <view class="main-container">
-      <view class="logo-warper">
-        <view class="logo">LOGO</view>
-      </view>
-      <view class="input-box">
-        <LoginInput placeholder="一站式服务大厅账号" ref="usernameRef" />
-        <LoginInput type="password" placeholder="密码" ref="passwordRef" />
-      </view>
-      <button @click="handleClear">清除</button>
-      <view @click="handleClick" class="login-button">
-        <svg
-          class="icon"
-          style="transform: rotate(180deg)"
-          viewBox="0 0 1024 1024"
-          xmlns="http://www.w3.org/2000/svg"
-          data-spm-anchor-id="a313x.7781069.0.i1"
-        >
-          <path
-            d="M215.04 512l290.261333 290.282667a10.666667 10.666667 0 0 0 15.082667
-            0l30.186667-30.165334a10.666667 10.666667 0 0 0 0-15.104L337.536
-            544H650.666667a10.666667 10.666667 0 0 0 10.666666-10.666667v-42.666666a10.666667
-            10.666667 0 0 0-10.666666-10.666667H337.536l213.034667-213.013333a10.666667 10.666667
-            0 0 0 0-15.104l-30.186667-30.165334a10.666667 10.666667 0 0 0-15.082667 0L215.04
-            512zM725.333333 490.666667a10.666667 10.666667 0 0 1 10.666667-10.666667h64a10.666667
-            10.666667 0 0 1 10.666667 10.666667v42.666666a10.666667 10.666667 0 0 1-10.666667
-            10.666667h-64a10.666667 10.666667 0 0 1-10.666667-10.666667v-42.666666z"
-            fill="#fff"
-            p-id="1062"
-          ></path>
-        </svg>
-      </view>
+      <view class="greeting-text1">同学你好</view>
+      <view class="greeting-text2">欢迎使用有课么APP</view>
+      <LoginInput placeholder="一站式服务大厅账号" ref="usernameRef" />
+      <LoginInput type="password" placeholder="密码" ref="passwordRef" />
+      <!-- <button @click="handleClear">清除</button> -->
+      <view @click="handleClick" class="login-button">Login</view>
     </view>
     <view class="background">
-      <ShapeDividerWarper className="divider-warper">
-        <ShapeDivider
-          v-for="(item, index) in shapeDividers"
-          :class="item.className"
-          :placement="item.placement"
-          :height="item.height"
-          :width="item.width"
-          :color="item.color"
-          :key="index"
-        />
-      </ShapeDividerWarper>
-      <view class="bottom-background"> </view>
+      <ShapeDivider />
+      <view class="bottom-background"></view>
     </view>
   </view>
 </template>
@@ -52,40 +18,8 @@
 <script setup lang="ts">
 import { ref, shallowRef } from "vue";
 import ShapeDivider from "@components/ShapeDivider";
-import ShapeDividerWarper from "@components/ShapeDividerWarper";
 import LoginInput from "@components/LoginInput";
 import { login } from "@/api";
-
-const shapeDividers = [
-  {
-    className: "divider-1-top",
-    placement: "top",
-    height: "50px",
-    width: "100%",
-    color: "#01af7e",
-  },
-  {
-    className: "divider-2-top",
-    placement: "top",
-    height: "100px",
-    width: "190%",
-    color: "#4a90e2",
-  },
-  {
-    className: "divider-2-bottom",
-    placement: "bottom",
-    height: "100px",
-    width: "120%",
-    color: "#4a90e2",
-  },
-  {
-    className: "divider-3-top",
-    placement: "top",
-    height: "100px",
-    width: "100%",
-    color: "#0176c3",
-  },
-];
 
 /**组件ref属性哒类型，T为组件类型 */
 type TLoginInputRef = InstanceType<typeof LoginInput> | null;
@@ -101,20 +35,20 @@ const getUserForm = () => {
   };
 };
 
-const clearUsername = () => {
-  usernameRef.value?.clearInputText();
-};
+// const clearUsername = () => {
+//   usernameRef.value?.clearInputText();
+// };
 
-const clearPassword = () => {
-  passwordRef.value?.clearInputText();
-};
+// const clearPassword = () => {
+//   passwordRef.value?.clearInputText();
+// };
 
-const handleClear = () => {
-  // console.log(usernameRef.value);
-  // console.log(getUserForm());
-  clearUsername();
-  clearPassword();
-};
+// const handleClear = () => {
+//   // console.log(usernameRef.value);
+//   // console.log(getUserForm());
+//   clearUsername();
+//   clearPassword();
+// };
 
 const handleClick = async () => {
   const { username, password } = getUserForm();
@@ -129,7 +63,7 @@ const handleClick = async () => {
     uni.showLoading({
       title: "loading",
     });
-    await login(username, password);
+    login(username, password);
     uni.hideLoading();
     uni.redirectTo({ url: "/pages/table/table" });
   } catch (error) {
@@ -140,31 +74,8 @@ const handleClick = async () => {
 
 <style scoped>
 .main-container {
-  height: 70vh;
-}
-
-.logo-warper {
-  position: relative;
-  height: 60%;
-}
-
-.logo {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-image: linear-gradient(to top, #48c6ef 0%, #6f86d6 100%);
-  height: 5rem;
-  width: 5rem;
-  text-align: center;
-  color: #fff;
-  font-weight: bold;
-  line-height: 5rem;
-  border-radius: 100%;
-}
-
-.input-box {
   display: flex;
+  height: 80vh;
   width: 100%;
   flex-direction: column;
   justify-content: center;
@@ -172,46 +83,40 @@ const handleClick = async () => {
   align-items: center;
 }
 
-.login-button {
-  background-image: linear-gradient(to top, #48c6ef 0%, #6f86d6 100%);
-  margin: 10px auto;
-  padding: 10px;
-  border-radius: 100%;
-}
-
-.login-button,
-.icon {
-  height: 2rem;
-  width: 2rem;
-}
-
 .background {
-  height: 30%;
+  height: 20vh;
+  overflow: hidden;
 }
 
-.divider-warper {
-  height: 130px;
+.greeting-text1,
+.greeting-text2 {
+  width: 85%;
+  height: 3rem;
+  line-height: 3rem;
+  color: #142431;
+  font-weight: bold;
 }
 
-.divider-1-top,
-.divider-2-top,
-.divider-2-bottom,
-.divider-3-top {
-  position: absolute;
+.greeting-text1 {
+  font-size: 1.2rem;
 }
 
-.divider-1-top {
-  bottom: 70px;
+.greeting-text2 {
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
 }
 
-.divider-2-top {
-  bottom: 68px;
-}
-.divider-2-bottom {
-  bottom: -30px;
-}
-.divider-3-top {
-  bottom: 0px;
+.login-button {
+  width: 80%;
+  height: 1.2rem;
+  background-image: linear-gradient(60deg, #76b632 0%, #64b3f4 100%);
+  margin: 1.5rem auto 0;
+  padding: 0.6rem;
+  border-radius: 5px;
+  color: rgb(241, 234, 234);
+  font-weight: bold;
+  line-height: 1.2rem;
+  text-align: center;
 }
 
 .bottom-background {

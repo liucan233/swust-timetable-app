@@ -1,8 +1,10 @@
 <template>
-  <view class="container">
+  <view class="container" :class="props?.className">
     <text class="placeholder">{{ placeholder }}</text>
-    <input class="input" :type="type" v-model="text" />
-    <view class="linear-gradient" />
+    <label>
+      <input class="input" :type="type" v-model="text" />
+      <view class="linear-gradient" />
+    </label>
   </view>
 </template>
 
@@ -14,6 +16,7 @@ const props = defineProps<{
   type?: string;
   placeholder?: string;
   defaultValue?: string;
+  className?: string;
 }>();
 
 const {
@@ -44,7 +47,7 @@ defineExpose({
 .container {
   display: flow-root;
   width: 85%;
-  margin: 5px 0;
+  margin: 0.4rem 0;
 }
 
 .placeholder {
@@ -63,8 +66,8 @@ defineExpose({
   width: 100%;
   min-width: 0;
   margin-top: 5px;
-  padding: 4px 11px;
-  color: #206ed4;
+  padding: 0.3rem 0rem;
+  color: #142431;
   font-size: 1.15rem;
   font-weight: 600;
   line-height: 1rem;
@@ -76,8 +79,12 @@ defineExpose({
 
 .linear-gradient {
   width: 100%;
-  height: 3px;
-  background-image: linear-gradient(to top, #48c6ef 0%, #6f86d6 100%);
+  height: 2px;
+  background-image: linear-gradient(to top, #afafaf 0%, #c4c4c4 100%);
   border-radius: 10px;
+}
+
+.input:hover ~ .linear-gradient {
+  background-image: linear-gradient(60deg, #76b632 0%, #64b3f4 100%);
 }
 </style>
