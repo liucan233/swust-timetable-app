@@ -1,11 +1,11 @@
 <template>
   <view
     class="container"
-    :class="{ shake: disabled, [props?.className as string]: true }"
+    :class="{ shake: disabled, [props?.className as string]: props?.className }"
   >
-    <text class="placeholder">{{ inputPlaceholder }}</text>
+    <text class="placeholder">{{ placeholder }}</text>
     <input class="input" :type="type" v-model="text" />
-    <view class="linear-gradient" />
+    <text class="warning-text">{{ warningText }}</text>
   </view>
 </template>
 
@@ -30,17 +30,17 @@ const {
 
 /**用户输入的文本 */
 const text = shallowRef(defaultValue);
-const inputPlaceholder = shallowRef(placeholder);
 const disabled = ref(false);
+const warningText = ref("");
 
-const lintWarning = (newPlaceholder: string) => {
+const lintWarning = (text: string) => {
   disabled.value = true;
-  inputPlaceholder.value = newPlaceholder;
+  warningText.value = text;
 };
 
 const clearLintWarning = () => {
   disabled.value = false;
-  inputPlaceholder.value = placeholder;
+  warningText.value = "";
 };
 
 const getInputText = () => {
@@ -60,49 +60,34 @@ defineExpose({
 </script>
 
 <style scoped>
-.container {
-  display: flow-root;
-  width: 85%;
-  margin: 0.4rem 0;
-}
-
 .placeholder {
   font-size: 0.8rem;
   color: rgba(61, 56, 56, 0.521);
 }
+
 .input {
-  box-sizing: border-box;
+  display: block;
   width: 100%;
-  height: 2rem;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
+  height: 2.5rem;
+  margin-top: 0.5rem;
+  padding-left: 0.5rem;
+  box-sizing: border-box;
   font-variant: tabular-nums;
   text-overflow: ellipsis;
   touch-action: manipulation;
   list-style: none;
   position: relative;
-  display: inline-block;
-  padding: 0.3rem 0rem;
   color: #142431;
-  font-size: 1.15rem;
-  font-weight: 600;
-  line-height: 1rem;
-  background-color: #fff;
-  background-image: none;
-  border-radius: 2px;
-  transition: all 0.3s;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #e4dede;
 }
 
-.linear-gradient {
-  width: 100%;
-  height: 2px;
-  background-image: linear-gradient(to top, #afafaf 0%, #c4c4c4 100%);
-  border-radius: 10px;
-}
-
-.input:hover ~ .linear-gradient {
-  background-image: linear-gradient(60deg, #76b632 0%, #64b3f4 100%);
+.warning-text {
+  display: block;
+  min-height: 0.5rem;
+  font-size: 0.6rem;
+  color: rgba(61, 56, 56, 0.521);
 }
 
 .shake {
@@ -110,7 +95,11 @@ defineExpose({
   transform: translate3d(0, 0, 0);
 }
 
-.shake > text {
+.shake > input {
+  border: 1px solid red;
+}
+
+.shake > .warning-text {
   color: red;
 }
 
