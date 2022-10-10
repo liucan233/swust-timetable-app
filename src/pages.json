@@ -2,20 +2,35 @@
   "pages": [
     {
       "path": "pages/index/index",
-      "style": {}
+      "style": {
+        "app-plus": {
+          "navigationBarTitleText": "登录",
+          "navigationStyle": "custom",
+          "animationType": "slide-in-right",
+          "animationDuration": 1000
+        }
+      }
     },
     {
       "path": "pages/table/table",
       "style": {
         "navigationBarTitleText": "课表",
-        "navigationStyle": "custom"
+        "navigationStyle": "custom",
+        "app-plus": {
+          "animationType": "slide-in-right",
+          "animationDuration": 1000
+        }
       }
     },
     {
-      "path": "pages/about/about",
+      "path": "pages/personal/personal",
       "style": {
-        "navigationBarTitleText": "关于我们",
-        "navigationStyle": "custom"
+        "navigationBarTitleText": "个人中心",
+        "navigationStyle": "custom",
+        "app-plus": {
+          "animationType": "slide-in-right",
+          "animationDuration": 1000
+        }
       }
     }
   ],
@@ -32,8 +47,8 @@
         "selectedIconPath": "static/image/table_onSelected.png"
       },
       {
-        "pagePath": "pages/about/about",
-        "text": "关于",
+        "pagePath": "pages/personal/personal",
+        "text": "个人中心",
         "iconPath": "static/image/about.png",
         "selectedIconPath": "static/image/about_onSelected.png"
       }
