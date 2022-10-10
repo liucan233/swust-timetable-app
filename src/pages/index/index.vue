@@ -1,31 +1,31 @@
 <template>
-  <view>
-    <view class="main-container">
-      <view class="greeting-text2 slide-top2">{{ Text.title }}</view>
+  <view class="main-container slide-top">
+    <view class="greeting-text">{{ Text.title }}</view>
+    <LoginInput
+      defaultValue="5120205917"
+      :placeholder="Text.username.default"
+      className="login-input"
+      ref="usernameRef"
+    />
+    <LoginInput
+      defaultValue="123456789"
+      type="password"
+      :placeholder="Text.password.default"
+      className="login-input"
+      ref="passwordRef"
+    />
+    <view class="verify-warper">
       <LoginInput
-        defaultValue="5120205917"
-        :placeholder="Text.username.default"
-        ref="usernameRef"
+        defaultValue="1234"
+        className="verify-input"
+        :placeholder="Text.code.default"
+        ref="verifyRef"
       />
-      <LoginInput
-        defaultValue="123456789"
-        type="password"
-        :placeholder="Text.password.default"
-        ref="passwordRef"
-      />
-      <view class="verify-warper">
-        <LoginInput
-          defaultValue="1234"
-          className="verify-input"
-          :placeholder="Text.code.default"
-          ref="verifyRef"
-        />
-        <view class="verify-img-warper">
-          <image :src="imageURL" alt="点击刷新" />
-        </view>
+      <view class="verify-img-warper">
+        <image :src="imageURL" alt="点击刷新" />
       </view>
-      <view @click="handleClick" class="login-button">登录</view>
     </view>
+    <view @click="handleClick" class="login-button">登录</view>
   </view>
 </template>
 
@@ -68,9 +68,9 @@ const getUserForm = () => {
 
 const formLint = () => {
   const { username = "", password = "", code = "" } = getUserForm();
-  const usernameRegExp = /.{10}/;
-  const passwordRegExp = /.+/;
-  const codeRegExp = /.{4}/;
+  const usernameRegExp = /^.{10}$/;
+  const passwordRegExp = /^.+$/;
+  const codeRegExp = /^.{4}$/;
   let flag = true;
   if (!usernameRegExp.test(username)) {
     usernameRef.value?.lintWarning(Text.username.warning);
@@ -130,31 +130,36 @@ const handleClick = async () => {
   box-sizing: border-box;
   flex-direction: column;
   align-items: center;
+  background-image: url("../../static/image/illustration.png");
+  background-repeat: no-repeat;
+  background-position: 0rem 32rem;
+  background-size: 100%;
 }
 
-.greeting-text1,
-.greeting-text2 {
-  width: 85%;
+.greeting-text {
+  width: 90%;
   height: 3rem;
-  line-height: 3rem;
-  color: #142431;
+  color: transparent;
+  font-size: 1.8rem;
   font-weight: bold;
+  line-height: 3rem;
+  background-image: linear-gradient(60deg, #76b632 0%, #64b3f4 100%);
+  background-clip: text;
 }
 
-.greeting-text1 {
-  font-size: 1.1rem;
+.greeting-text {
 }
 
-.greeting-text2 {
-  font-size: 2.4rem;
-  margin-bottom: 3rem;
+.login-input {
+  width: 90%;
+  margin: 0.4rem 0 0;
 }
 
 .verify-warper {
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 85%;
+  width: 90%;
 }
 
 .verify-input,
@@ -171,37 +176,27 @@ const handleClick = async () => {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
-  height: 70%;
-  width: 70%;
+  transform: translate(-50%, -25%);
+  height: 50%;
+  width: 50%;
 }
 
 .login-button {
   font-size: 1rem;
-  width: 80%;
-  height: 1.2rem;
+  width: 85%;
+  height: 1.5rem;
   background-image: linear-gradient(60deg, #76b632 0%, #64b3f4 100%);
-  margin: 1.5rem auto 0;
+  margin-top: 0.5rem;
   padding: 0.6rem;
   border-radius: 5px;
   color: #fff;
   font-weight: bold;
-  line-height: 1.2rem;
+  line-height: 1.5rem;
   text-align: center;
 }
 
-.bottom-background {
-  height: calc(30vh - 130px);
-  background-color: #0176c3;
-  margin-top: -1px;
-}
-
-.slide-top1 {
+.slide-top {
   animation: slide-top 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-}
-
-.slide-top2 {
-  animation: slide-top 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
 }
 
 @keyframes slide-top {
