@@ -130,9 +130,9 @@ const handleClick = async () => {
   box-sizing: border-box;
   flex-direction: column;
   align-items: center;
-  background-image: url("../../static/image/illustration.png");
+  background-image: url("../../static/image/swust.png");
   background-repeat: no-repeat;
-  background-position: 0rem 32rem;
+  background-position: 0rem 35rem;
   background-size: 100%;
 }
 
