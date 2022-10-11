@@ -7,7 +7,7 @@
           "navigationBarTitleText": "登录",
           "navigationStyle": "custom",
           "animationType": "slide-in-right",
-          "animationDuration": 1000
+          "animationDuration": 500
         }
       }
     },
@@ -18,7 +18,7 @@
         "navigationStyle": "custom",
         "app-plus": {
           "animationType": "slide-in-right",
-          "animationDuration": 1000
+          "animationDuration": 500
         }
       }
     },
@@ -29,7 +29,7 @@
         "navigationStyle": "custom",
         "app-plus": {
           "animationType": "slide-in-right",
-          "animationDuration": 1000
+          "animationDuration": 500
         }
       }
     }
@@ -44,13 +44,13 @@
         "pagePath": "pages/table/table",
         "text": "课表",
         "iconPath": "static/image/table.png",
-        "selectedIconPath": "static/image/table_onSelected.png"
+        "selectedIconPath": "static/image/table_selected.png"
       },
       {
         "pagePath": "pages/personal/personal",
         "text": "个人中心",
-        "iconPath": "static/image/about.png",
-        "selectedIconPath": "static/image/about_onSelected.png"
+        "iconPath": "static/image/personal.png",
+        "selectedIconPath": "static/image/personal_selected.png"
       }
     ]
   },
@@ -58,9 +58,6 @@
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "uni-app",
     "navigationBarBackgroundColor": "#F8F8F8",
-    "backgroundColor": "#F8F8F8",
-    "h5": {
-      "titleNView": false
-    }
+    "backgroundColor": "#F8F8F8"
   }
 }
