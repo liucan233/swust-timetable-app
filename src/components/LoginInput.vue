@@ -4,7 +4,7 @@
     :class="{ shake: disabled, [props?.className as string]: props?.className }"
   >
     <text class="placeholder">{{ placeholder }}</text>
-    <input class="input" :type="type" v-model="text" />
+    <input class="input" :type="type" :auto-blur="true" v-model="text" />
     <text class="warning-text">{{ warningText }}</text>
   </view>
 </template>

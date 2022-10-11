@@ -94,7 +94,7 @@ const formLint = () => {
 };
 
 const handleClick = async () => {
-  const { username = "", password = "", code = "" } = getUserForm();
+  // const { username = "", password = "", code = "" } = getUserForm();
   if (!formLint()) {
     uni.showToast({
       icon: "error",
@@ -102,22 +102,23 @@ const handleClick = async () => {
     });
     return;
   }
-  uni.showLoading({
-    title: "登陆中",
-  });
-  login(username, password, code)
-    .promise.then(() => {
-      uni.switchTab({ url: TABLE });
-    })
-    .catch(err => {
-      uni.showToast({
-        icon: "error",
-        title: err.message,
-      });
-    })
-    .finally(() => {
-      uni.hideLoading();
-    });
+  uni.switchTab({ url: TABLE });
+  // uni.showLoading({
+  //   title: "登陆中",
+  // });
+  // login(username, password, code)
+  //   .promise.then(() => {
+  //     uni.switchTab({ url: TABLE });
+  //   })
+  //   .catch(err => {
+  //     uni.showToast({
+  //       icon: "error",
+  //       title: err.message,
+  //     });
+  //   })
+  //   .finally(() => {
+  //     uni.hideLoading();
+  //   });
 };
 </script>
 
