@@ -1,6 +1,6 @@
 import path from "path";
 import uni from "@dcloudio/vite-plugin-uni";
-import viteEslint from "vite-plugin-eslint";
+import viteEslint from "@nabla/vite-plugin-eslint";
 import { defineConfig } from "vite";
 
 // https://vitejs.dev/config/

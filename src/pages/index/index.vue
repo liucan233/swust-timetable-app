@@ -120,8 +120,8 @@ const handleClick = async () => {
   });
   loginTest(username, password, code)
     .promise.then(response => {
-      uni.setStorageSync("cookie", response.data.data.cookie);
       if (response.data.code === 200) {
+        uni.setStorageSync("cookie", response.data.data.cookie);
         uni.switchTab({ url: TABLE });
       }
     })

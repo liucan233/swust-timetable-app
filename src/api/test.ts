@@ -12,14 +12,14 @@ export function loginTest(username: string, password: string, code: string) {
   return network<BaseResponse<{ cookie: string }>>({
     url: "https://swust.hanyue.xyz/api/swust/loginCas",
     method: "POST",
-    data: encodeURI(
-      `user=${username}&cookie=${cookie.replaceAll(
-        "=",
-        "%3D"
-      )}&passwd=${password}&captcha=${code}`
-    ),
+    data: {
+      user: username,
+      passwd: password,
+      captcha: code,
+      cookie,
+    },
     header: {
-      "content-type": "x-www-form-urlencoded",
+      "content-type": "application/json",
     },
   });
 }
