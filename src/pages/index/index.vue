@@ -1,39 +1,43 @@
 <template>
-  <view class="main-container slide-top">
-    <view class="greeting-text">{{ Text.title }}</view>
-    <LoginInput
-      defaultValue="5120205917"
-      :placeholder="Text.username.default"
-      className="login-input"
-      ref="usernameRef"
-    />
-    <LoginInput
-      defaultValue="123456789"
-      type="password"
-      :placeholder="Text.password.default"
-      className="login-input"
-      ref="passwordRef"
-    />
-    <view class="verify-warper">
+  <view>
+    <view class="main-container slide-top">
+      <view class="greeting-text">{{ Text.title }}</view>
       <LoginInput
-        defaultValue="1234"
-        className="verify-input"
-        :placeholder="Text.code.default"
-        ref="verifyRef"
+        defaultValue="5120205917"
+        :placeholder="Text.username.default"
+        className="login-input"
+        ref="usernameRef"
       />
-      <view class="verify-img-warper">
-        <image :src="imageURL" alt="点击刷新" />
+      <LoginInput
+        defaultValue="Lw13708137873"
+        type="password"
+        :placeholder="Text.password.default"
+        className="login-input"
+        ref="passwordRef"
+      />
+      <view class="verify-warper">
+        <LoginInput
+          className="verify-input"
+          :placeholder="Text.code.default"
+          ref="verifyRef"
+        />
+        <view class="verify-img-warper">
+          <image :src="imageURL" alt="点击刷新" />
+        </view>
       </view>
+      <view @click="handleClick" class="login-button">登录</view>
     </view>
-    <view @click="handleClick" class="login-button">登录</view>
   </view>
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef } from "vue";
+import { onMounted, ref, shallowRef } from "vue";
+
 import LoginInput from "@components/LoginInput";
-import { login } from "@/api";
+
 import { TABLE } from "@/enums/pages";
+import { getCookieAndCaptchaUrlTest, loginTest } from "@/api";
+import { setCookieSync } from "@/utils/cookie";
 
 /**组件ref属性哒类型，T为组件类型 */
 type TLoginInputRef = InstanceType<typeof LoginInput> | null;
@@ -41,7 +45,7 @@ type TLoginInputRef = InstanceType<typeof LoginInput> | null;
 const usernameRef = shallowRef<TLoginInputRef>(null);
 const passwordRef = ref<TLoginInputRef>(null);
 const verifyRef = ref<TLoginInputRef>(null);
-const imageURL = ref<string>("http://cas.swust.edu.cn/authserver/captcha");
+const imageURL = ref<string>("");
 const Text = {
   title: "欢迎使用有课么",
   username: {
@@ -57,6 +61,15 @@ const Text = {
     warning: "请输入正确的验证码",
   },
 };
+
+onMounted(async () => {
+  // 获取cookie和验证码
+  getCookieAndCaptchaUrlTest().promise.then(response => {
+    console.log(response);
+    imageURL.value = response.data.data.captcha;
+    setCookieSync(response.data.data.cookie);
+  });
+});
 
 const getUserForm = () => {
   return {
@@ -94,7 +107,7 @@ const formLint = () => {
 };
 
 const handleClick = async () => {
-  // const { username = "", password = "", code = "" } = getUserForm();
+  const { username = "", password = "", code = "" } = getUserForm();
   if (!formLint()) {
     uni.showToast({
       icon: "error",
@@ -102,10 +115,25 @@ const handleClick = async () => {
     });
     return;
   }
-  uni.switchTab({ url: TABLE });
-  // uni.showLoading({
-  //   title: "登陆中",
-  // });
+  uni.showLoading({
+    title: "登陆中",
+  });
+  loginTest(username, password, code)
+    .promise.then(response => {
+      uni.setStorageSync("cookie", response.data.data.cookie);
+      if (response.data.code === 200) {
+        uni.switchTab({ url: TABLE });
+      }
+    })
+    .catch(err => {
+      uni.showToast({
+        icon: "error",
+        title: err.message,
+      });
+    })
+    .finally(() => {
+      uni.hideLoading();
+    });
   // login(username, password, code)
   //   .promise.then(() => {
   //     uni.switchTab({ url: TABLE });
@@ -127,9 +155,12 @@ const handleClick = async () => {
   display: flex;
   height: 100vh;
   width: 100%;
-  padding: 40% 0 0;
+  max-width: 30rem;
+  padding: 0 0 10%;
+  margin: 0 auto;
   box-sizing: border-box;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
   background-image: url("../../static/image/swust.png");
   background-repeat: no-repeat;
