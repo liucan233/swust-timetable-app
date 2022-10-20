@@ -1,6 +1,6 @@
 {
-  "name": "",
-  "appid": "",
+  "name": "有课么APP",
+  "appid": "__UNI__377429A",
   "description": "",
   "versionName": "1.0.0",
   "versionCode": "100",
@@ -41,9 +41,13 @@
         ]
       },
       /* ios打包配置 */
-      "ios": {},
+      "ios": {
+        "dSYMs": false
+      },
       /* SDK配置 */
-      "sdkConfigs": {}
+      "sdkConfigs": {
+        "ad": {}
+      }
     }
   },
   /* 快应用特有相关 */
