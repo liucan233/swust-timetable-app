@@ -36,7 +36,7 @@ import { onMounted, ref, shallowRef } from "vue";
 import LoginInput from "@components/LoginInput";
 
 import { TABLE } from "@/enums/pages";
-import { getCookieAndCaptchaUrlTest, loginTest } from "@/api";
+import { getCookieAndCaptchaUrl, login } from "@/api";
 import { setCookieSync } from "@/utils/cookie";
 
 /**组件ref属性哒类型，T为组件类型 */
@@ -62,9 +62,9 @@ const Text = {
   },
 };
 
-onMounted(async () => {
+onMounted(() => {
   // 获取cookie和验证码
-  getCookieAndCaptchaUrlTest().promise.then(response => {
+  getCookieAndCaptchaUrl().promise.then(response => {
     console.log(response);
     imageURL.value = response.data.data.captcha;
     setCookieSync(response.data.data.cookie);
@@ -118,35 +118,25 @@ const handleClick = async () => {
   uni.showLoading({
     title: "登陆中",
   });
-  loginTest(username, password, code)
-    .promise.then(response => {
-      if (response.data.code === 200) {
-        uni.setStorageSync("cookie", response.data.data.cookie);
-        uni.switchTab({ url: TABLE });
-      }
-    })
-    .catch(err => {
-      uni.showToast({
-        icon: "error",
-        title: err.message,
-      });
-    })
-    .finally(() => {
-      uni.hideLoading();
+  try {
+    const {
+      data: { cookie },
+      code: statusCode,
+    } = await login(username, password, code).promise.then(
+      response => response.data
+    );
+    uni.hideLoading();
+    if (statusCode === 200) {
+      setCookieSync(cookie);
+      uni.switchTab({ url: TABLE });
+    }
+  } catch (error) {
+    uni.hideLoading();
+    uni.showToast({
+      icon: "error",
+      title: `request:fail ${error}`,
     });
-  // login(username, password, code)
-  //   .promise.then(() => {
-  //     uni.switchTab({ url: TABLE });
-  //   })
-  //   .catch(err => {
-  //     uni.showToast({
-  //       icon: "error",
-  //       title: err.message,
-  //     });
-  //   })
-  //   .finally(() => {
-  //     uni.hideLoading();
-  //   });
+  }
 };
 </script>
 

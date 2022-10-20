@@ -1,4 +1,4 @@
-interface BaseResponse<T> {
+interface IBaseResponse<T> {
   code: number;
   message: string;
   data: T;

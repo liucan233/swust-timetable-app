@@ -17,7 +17,7 @@ interface TNetworkRes<T>
 export class RequestError extends Error {}
 
 /**请求错误时的回调函数 */
-let onErrorCb: null | ((msg: RequestError) => any) = null;
+let onErrorCb: null | ((msg: RequestError) => unknown) = null;
 
 /**将uni app的回调式网络请求方式promise化 */
 export const network = <IRes>(config: TNetworkConfig) => {
