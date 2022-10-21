@@ -1,28 +1,30 @@
 <template>
   <view>
     <view class="main-container slide-top">
-      <view class="greeting-text">{{ Text.title }}</view>
+      <view class="greeting-text">{{ text.title }}</view>
       <LoginInput
-        defaultValue="5120205917"
-        :placeholder="Text.username.default"
+        :placeholder="text.username.default"
         className="login-input"
         ref="usernameRef"
       />
       <LoginInput
-        defaultValue="Lw13708137873"
         type="password"
-        :placeholder="Text.password.default"
+        :placeholder="text.password.default"
         className="login-input"
         ref="passwordRef"
       />
       <view class="verify-warper">
         <LoginInput
           className="verify-input"
-          :placeholder="Text.code.default"
+          :placeholder="text.code.default"
           ref="verifyRef"
         />
         <view class="verify-img-warper">
-          <image :src="imageURL" alt="点击刷新" />
+          <image
+            :src="imageURL"
+            alt="点击刷新"
+            @click="refreshCookieAndCaptchaUrl"
+          />
         </view>
       </view>
       <view @click="handleClick" class="login-button">登录</view>
@@ -31,47 +33,63 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, shallowRef } from "vue";
+import { onBeforeMount, onMounted, shallowRef } from "vue";
 
 import LoginInput from "@components/LoginInput";
 
-import { TABLE } from "@/enums/pages";
-import { getCookieAndCaptchaUrlTest, loginTest } from "@/api";
-import { setCookieSync } from "@/utils/cookie";
+import { TABLE } from "@enums/pages";
+import { Cookie } from "@enums/storage";
+import { getCookieSync, setCookieSync } from "@utils/cookie";
+import { getCookieAndCaptchaUrl, login } from "@api";
 
-/**组件ref属性哒类型，T为组件类型 */
+/**组件ref属性的类型，T为组件类型 */
 type TLoginInputRef = InstanceType<typeof LoginInput> | null;
 
 const usernameRef = shallowRef<TLoginInputRef>(null);
-const passwordRef = ref<TLoginInputRef>(null);
-const verifyRef = ref<TLoginInputRef>(null);
-const imageURL = ref<string>("");
-const Text = {
+const passwordRef = shallowRef<TLoginInputRef>(null);
+const verifyRef = shallowRef<TLoginInputRef>(null);
+const imageURL = shallowRef<string>("");
+const text = {
   title: "欢迎使用有课么",
   username: {
     default: "一站式服务大厅账号",
-    warning: "请输入正确的账号",
+    lintWarningText: "请输入十位学号",
+    errorText: "用户名或密码错误",
   },
   password: {
     default: "一站式服务大厅密码",
-    warning: "请输入正确的密码",
+    lintWarningText: "",
+    errorText: "用户名或密码错误",
   },
   code: {
     default: "验证码",
-    warning: "请输入正确的验证码",
+    lintWarningText: "请输入四位验证码",
+    errorText: "验证码错误",
   },
 };
 
-onMounted(async () => {
-  // 获取cookie和验证码
-  getCookieAndCaptchaUrlTest().promise.then(response => {
-    console.log(response);
-    imageURL.value = response.data.data.captcha;
-    setCookieSync(response.data.data.cookie);
-  });
+onBeforeMount(() => {
+  const cookie = getCookieSync(Cookie.CAS_COOKIE);
+  if (cookie) {
+    uni.switchTab({ url: TABLE });
+  }
 });
 
-const getUserForm = () => {
+onMounted(() => {
+  refreshCookieAndCaptchaUrl();
+});
+
+/** 刷新cookie和重新获取验证码 */
+const refreshCookieAndCaptchaUrl = () => {
+  /** 获取cookie和验证码 */
+  getCookieAndCaptchaUrl().promise.then(response => {
+    imageURL.value = response.data.data.captcha;
+    setCookieSync(Cookie.LOGIN_COOKIE, response.data.data.cookie);
+  });
+};
+
+/** 获取用户输入 */
+const getUserInput = () => {
   return {
     username: usernameRef.value?.getInputText(),
     password: passwordRef.value?.getInputText(),
@@ -79,35 +97,36 @@ const getUserForm = () => {
   };
 };
 
+/** 表单检测 */
 const formLint = () => {
-  const { username = "", password = "", code = "" } = getUserForm();
+  const { username = "", password = "", code = "" } = getUserInput();
   const usernameRegExp = /^.{10}$/;
   const passwordRegExp = /^.+$/;
   const codeRegExp = /^.{4}$/;
   let flag = true;
   if (!usernameRegExp.test(username)) {
-    usernameRef.value?.lintWarning(Text.username.warning);
+    usernameRef.value?.warning(text.username.lintWarningText);
     flag = false;
   } else {
-    usernameRef.value?.clearLintWarning();
+    usernameRef.value?.clearWarning();
   }
   if (!passwordRegExp.test(password)) {
-    passwordRef.value?.lintWarning(Text.password.warning);
+    passwordRef.value?.warning(text.password.lintWarningText);
     flag = false;
   } else {
-    passwordRef.value?.clearLintWarning();
+    passwordRef.value?.clearWarning();
   }
   if (!codeRegExp.test(code)) {
-    verifyRef.value?.lintWarning(Text.code.warning);
+    verifyRef.value?.warning(text.code.lintWarningText);
     flag = false;
   } else {
-    verifyRef.value?.clearLintWarning();
+    verifyRef.value?.clearWarning();
   }
   return flag;
 };
 
 const handleClick = async () => {
-  const { username = "", password = "", code = "" } = getUserForm();
+  const { username = "", password = "", code = "" } = getUserInput();
   if (!formLint()) {
     uni.showToast({
       icon: "error",
@@ -118,35 +137,39 @@ const handleClick = async () => {
   uni.showLoading({
     title: "登陆中",
   });
-  loginTest(username, password, code)
-    .promise.then(response => {
-      uni.setStorageSync("cookie", response.data.data.cookie);
-      if (response.data.code === 200) {
-        uni.switchTab({ url: TABLE });
+  try {
+    const {
+      data: { cookie },
+      code: statusCode,
+      msg,
+    } = await login(username, password, code).promise.then(
+      response => response.data
+    );
+    uni.hideLoading();
+    if (statusCode === 200) {
+      setCookieSync(Cookie.CAS_COOKIE, cookie);
+      uni.switchTab({ url: TABLE });
+    } else {
+      if (statusCode === 401) {
+        // 返回的msg有两种，"验证码错误" "用户名或密码错误"
+        if (msg.length === 8) {
+          usernameRef.value?.warning(text.username.errorText);
+          passwordRef.value?.warning(text.password.errorText);
+        } else if (msg.length === 5) {
+          verifyRef.value?.warning(text.password.errorText);
+        }
       }
-    })
-    .catch(err => {
-      uni.showToast({
-        icon: "error",
-        title: err.message,
-      });
-    })
-    .finally(() => {
-      uni.hideLoading();
+      /** 登录失败需要重新获取cookie和验证码 */
+      refreshCookieAndCaptchaUrl();
+      throw Error(msg);
+    }
+  } catch (error) {
+    uni.hideLoading();
+    uni.showToast({
+      icon: "error",
+      title: `${error}`,
     });
-  // login(username, password, code)
-  //   .promise.then(() => {
-  //     uni.switchTab({ url: TABLE });
-  //   })
-  //   .catch(err => {
-  //     uni.showToast({
-  //       icon: "error",
-  //       title: err.message,
-  //     });
-  //   })
-  //   .finally(() => {
-  //     uni.hideLoading();
-  //   });
+  }
 };
 </script>
 

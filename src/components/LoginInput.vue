@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { shallowRef, computed, ref } from "vue";
+import { shallowRef, computed } from "vue";
 
 /**输入框的类型，占位文字和默认值等*/
 const props = defineProps<{
@@ -30,31 +30,36 @@ const {
 
 /**用户输入的文本 */
 const text = shallowRef(defaultValue);
-const disabled = ref(false);
-const warningText = ref("");
+const disabled = shallowRef(false);
+const warningText = shallowRef("");
 
-const lintWarning = (text: string) => {
+/**
+ * 输入框下方红字警告
+ * @param text 警告文本
+ */
+const warning = (text: string) => {
   disabled.value = true;
   warningText.value = text;
 };
 
-const clearLintWarning = () => {
+/**
+ * 清除警告
+ */
+const clearWarning = () => {
   disabled.value = false;
   warningText.value = "";
 };
 
+/**
+ * 获取输入框内容
+ */
 const getInputText = () => {
   return text.value;
 };
 
-/**
- * @lintWarning lint警告，传入警告字符
- * @clearLintWarning 清除lint警告
- * @getInputText 获取input内容
- */
 defineExpose({
-  lintWarning,
-  clearLintWarning,
+  warning,
+  clearWarning,
   getInputText,
 });
 </script>
