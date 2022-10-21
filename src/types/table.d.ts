@@ -10,13 +10,15 @@ type CommonCourse = {
   jw_task_book_no: string;
   /**课程名字 */
   jw_course_name: string;
+  /**课程开结束时间 节数 */
   section_end: string;
   /**课程时间 星期数 */
   week_day: string;
-  /**课程时间 节数 */
+  /**课程时间 讲数 */
   section: string;
   /**老师工号 */
   base_teacher_no: string;
+  /**课程开始时间 节数 */
   section_start: string;
 };
 
