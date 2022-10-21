@@ -4,3 +4,8 @@ export enum Cookie {
   /**一站式服务大厅cookie */
   CAS_COOKIE = "CAS_COOKIE",
 }
+
+export enum TimetableData {
+  COMMON_TIMETABLE = "COMMON_TIMETABLE",
+  LAB_TIMETABLE = "LAB_TIMETABLE",
+}

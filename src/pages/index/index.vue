@@ -1,5 +1,5 @@
 <template>
-  <div>首屏加载页</div>
+  <div></div>
 </template>
 
 <script setup lang="ts">
