@@ -1,3 +1,4 @@
-export const INDEX = "/pages/table/table";
-export const TABLE = "/pages/table/table";
-export const PERSONAL = "/pages/personal/personal";
+export const INDEX = "/pages/table/index";
+export const LOGIN = "/pages/login/index";
+export const TABLE = "/pages/table/index";
+export const PERSONAL = "/pages/personal/index";

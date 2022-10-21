@@ -4,6 +4,17 @@
       "path": "pages/index/index",
       "style": {
         "app-plus": {
+          "navigationBarTitleText": "首屏加载页",
+          "navigationStyle": "custom",
+          "animationType": "slide-in-right",
+          "animationDuration": 500
+        }
+      }
+    },
+    {
+      "path": "pages/login/index",
+      "style": {
+        "app-plus": {
           "navigationBarTitleText": "登录",
           "navigationStyle": "custom",
           "animationType": "slide-in-right",
@@ -12,7 +23,7 @@
       }
     },
     {
-      "path": "pages/table/table",
+      "path": "pages/table/index",
       "style": {
         "navigationBarTitleText": "课表",
         "navigationStyle": "custom",
@@ -23,7 +34,7 @@
       }
     },
     {
-      "path": "pages/personal/personal",
+      "path": "pages/personal/index",
       "style": {
         "navigationBarTitleText": "个人中心",
         "navigationStyle": "custom",
@@ -41,13 +52,13 @@
     "backgroundColor": "#ffffff",
     "list": [
       {
-        "pagePath": "pages/table/table",
+        "pagePath": "pages/table/index",
         "text": "课表",
         "iconPath": "static/image/table.png",
         "selectedIconPath": "static/image/table_selected.png"
       },
       {
-        "pagePath": "pages/personal/personal",
+        "pagePath": "pages/personal/index",
         "text": "个人中心",
         "iconPath": "static/image/personal.png",
         "selectedIconPath": "static/image/personal_selected.png"
