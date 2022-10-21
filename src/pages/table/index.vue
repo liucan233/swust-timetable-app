@@ -17,12 +17,12 @@ const commonTimetable = ref("");
 const labTimetable = ref("");
 
 onMounted(async () => {
+  // 同步读取缓存
   const commonTimetableCache = uni.getStorageSync(
     TimetableData.COMMON_TIMETABLE
   );
   const labTimetableCache = uni.getStorageSync(TimetableData.LAB_TIMETABLE);
   if (commonTimetableCache && labTimetableCache) {
-    // 有缓存时读取缓存
     commonTimetable.value = commonTimetableCache;
     labTimetable.value = labTimetableCache;
   } else {
@@ -37,6 +37,34 @@ onMounted(async () => {
     uni.setStorageSync(TimetableData.COMMON_TIMETABLE, commonTimetableData);
     uni.setStorageSync(TimetableData.LAB_TIMETABLE, labTimetableData);
   }
+
+  // // 异步读取缓存
+  // uni.getStorage({
+  //   key: TimetableData.COMMON_TIMETABLE,
+  //   success: res => {
+  //     commonTimetable.value = res as unknown as string;
+  //   },
+  //   fail: async () => {
+  //     const { data: commonTimetableData } = await (
+  //       await getCommonTimetableData()
+  //     ).promise.then(response => response.data);
+  //     commonTimetable.value = commonTimetableData as unknown as string;
+  //     uni.setStorageSync(TimetableData.COMMON_TIMETABLE, commonTimetableData);
+  //   },
+  // });
+  // uni.getStorage({
+  //   key: TimetableData.LAB_TIMETABLE,
+  //   success: res => {
+  //     labTimetable.value = res as unknown as string;
+  //   },
+  //   fail: async () => {
+  //     const { data: labTimetableData } = await (
+  //       await getLabTimetableData()
+  //     ).promise.then(response => response.data);
+  //     labTimetable.value = labTimetableData as unknown as string;
+  //     uni.setStorageSync(TimetableData.LAB_TIMETABLE, labTimetableData);
+  //   },
+  // });
 });
 </script>
 
