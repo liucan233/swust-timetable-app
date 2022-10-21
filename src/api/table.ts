@@ -1,13 +1,13 @@
-import { getCookieSync } from "@/utils/cookie";
+import { getCookieSync } from "@utils/cookie";
+import { Cookie } from "@enums/storage";
 import { network } from "@/lib/network";
-import _qs from "@/utils/_qs";
 
 /**
  * 获取教务处课表
  * @returns 教务处课表数组
  */
 export async function getCommonTimetableData() {
-  const cookie = getCookieSync();
+  const cookie = getCookieSync(Cookie.CAS_COOKIE);
   const {
     data: {
       tickets: [ticket],
@@ -18,19 +18,19 @@ export async function getCommonTimetableData() {
     data: { cookie, targets: ["http://202.115.175.175/swust/"] },
   }).promise.then(response => response.data);
 
+  let urlSearchParams = new URLSearchParams();
+  urlSearchParams.set("ticket", ticket);
   const {
     data: { cookie: subCookie },
   } = await network<IBaseResponse<{ cookie: string }>>({
-    url: `https://swust.hanyue.xyz/api/timetable/cookie?${_qs.parse({
-      ticket: ticket,
-    })}`,
+    url: `https://swust.hanyue.xyz/api/timetable/cookie?${urlSearchParams.toString()}`,
     method: "GET",
   }).promise.then(response => response.data);
 
-  return network<IBaseResponse<unknown>>({
-    url: `https://swust.hanyue.xyz/api/timetable/commonTimeTable?${_qs.parse({
-      cookie: subCookie,
-    })}`,
+  urlSearchParams = new URLSearchParams();
+  urlSearchParams.set("cookie", subCookie);
+  return network<IBaseResponse<TGetCommonTimetableDataDto>>({
+    url: `https://swust.hanyue.xyz/api/timetable/commonTimeTable?${urlSearchParams.toString()}`,
     method: "GET",
   });
 }
@@ -40,7 +40,7 @@ export async function getCommonTimetableData() {
  * @returns 实践综合管理系统课表数组
  */
 export async function getLabTimetableData() {
-  const cookie = getCookieSync();
+  const cookie = getCookieSync(Cookie.CAS_COOKIE);
   const {
     data: {
       tickets: [ticket],
@@ -51,19 +51,19 @@ export async function getLabTimetableData() {
     data: { cookie, targets: ["http://202.115.175.175/swust/"] },
   }).promise.then(response => response.data);
 
+  let urlSearchParams = new URLSearchParams();
+  urlSearchParams.set("ticket", ticket);
   const {
     data: { cookie: subCookie },
   } = await network<IBaseResponse<{ cookie: string }>>({
-    url: `https://swust.hanyue.xyz/api/timetable/cookie?${_qs.parse({
-      ticket,
-    })}`,
+    url: `https://swust.hanyue.xyz/api/timetable/cookie?${urlSearchParams.toString()}`,
     method: "GET",
   }).promise.then(response => response.data);
 
-  return network<IBaseResponse<unknown>>({
-    url: `https://swust.hanyue.xyz/api/timetable/labTimeTable?${_qs.parse({
-      cookie: subCookie,
-    })}`,
+  urlSearchParams = new URLSearchParams();
+  urlSearchParams.set("cookie", subCookie);
+  return network<IBaseResponse<TGetLabTimetableDataDto>>({
+    url: `https://swust.hanyue.xyz/api/timetable/labTimeTable?${urlSearchParams.toString()}`,
     method: "GET",
   });
 }

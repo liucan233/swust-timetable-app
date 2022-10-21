@@ -10,6 +10,9 @@ export default defineConfig({
     alias: {
       "@": path.resolve("./src"),
       "@components": path.resolve("./src/components/"),
+      "@api": path.resolve("./src/api/index.ts"),
+      "@enums": path.resolve("./src/enums/"),
+      "@utils": path.resolve("./src/utils/"),
     },
   },
 });

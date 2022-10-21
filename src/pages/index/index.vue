@@ -3,13 +3,11 @@
     <view class="main-container slide-top">
       <view class="greeting-text">{{ text.title }}</view>
       <LoginInput
-        defaultValue="5120205917"
         :placeholder="text.username.default"
         className="login-input"
         ref="usernameRef"
       />
       <LoginInput
-        defaultValue="Lw13708137873"
         type="password"
         :placeholder="text.password.default"
         className="login-input"
@@ -35,21 +33,22 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, shallowRef } from "vue";
+import { onBeforeMount, onMounted, shallowRef } from "vue";
 
 import LoginInput from "@components/LoginInput";
 
-import { TABLE } from "@/enums/pages";
-import { getCookieAndCaptchaUrl, login } from "@/api";
-import { setCookieSync } from "@/utils/cookie";
+import { TABLE } from "@enums/pages";
+import { Cookie } from "@enums/storage";
+import { getCookieSync, setCookieSync } from "@utils/cookie";
+import { getCookieAndCaptchaUrl, login } from "@api";
 
 /**组件ref属性的类型，T为组件类型 */
 type TLoginInputRef = InstanceType<typeof LoginInput> | null;
 
 const usernameRef = shallowRef<TLoginInputRef>(null);
-const passwordRef = ref<TLoginInputRef>(null);
-const verifyRef = ref<TLoginInputRef>(null);
-const imageURL = ref<string>("");
+const passwordRef = shallowRef<TLoginInputRef>(null);
+const verifyRef = shallowRef<TLoginInputRef>(null);
+const imageURL = shallowRef<string>("");
 const text = {
   title: "欢迎使用有课么",
   username: {
@@ -69,6 +68,13 @@ const text = {
   },
 };
 
+onBeforeMount(() => {
+  const cookie = getCookieSync(Cookie.CAS_COOKIE);
+  if (cookie) {
+    uni.switchTab({ url: TABLE });
+  }
+});
+
 onMounted(() => {
   refreshCookieAndCaptchaUrl();
 });
@@ -77,9 +83,8 @@ onMounted(() => {
 const refreshCookieAndCaptchaUrl = () => {
   /** 获取cookie和验证码 */
   getCookieAndCaptchaUrl().promise.then(response => {
-    console.log(response);
     imageURL.value = response.data.data.captcha;
-    setCookieSync(response.data.data.cookie);
+    setCookieSync(Cookie.LOGIN_COOKIE, response.data.data.cookie);
   });
 };
 
@@ -142,7 +147,7 @@ const handleClick = async () => {
     );
     uni.hideLoading();
     if (statusCode === 200) {
-      setCookieSync(cookie);
+      setCookieSync(Cookie.CAS_COOKIE, cookie);
       uni.switchTab({ url: TABLE });
     } else {
       if (statusCode === 401) {

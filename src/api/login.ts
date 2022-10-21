@@ -1,12 +1,13 @@
+import { Cookie } from "@enums/storage";
+import { getCookieSync } from "@utils/cookie";
 import { network } from "@/lib/network";
-import { getCookieSync } from "@/utils/cookie";
 
 /**
  * 获取当前cookie和验证码
  * @returns
  */
 export function getCookieAndCaptchaUrl() {
-  return network<IBaseResponse<{ cookie: string; captcha: string }>>({
+  return network<IBaseResponse<TGetCookieAndCaptchaUrlDto>>({
     url: "https://swust.hanyue.xyz/api/swust/loginCas",
   });
 }
@@ -19,8 +20,8 @@ export function getCookieAndCaptchaUrl() {
  * @returns 一站式服务大厅cookie(CAS_COOKIE)
  */
 export function login(username: string, password: string, code: string) {
-  const cookie = getCookieSync();
-  return network<IBaseResponse<{ cookie: string }>>({
+  const cookie = getCookieSync(Cookie.LOGIN_COOKIE);
+  return network<IBaseResponse<TLoginDto>>({
     url: "https://swust.hanyue.xyz/api/swust/loginCas",
     method: "POST",
     data: {

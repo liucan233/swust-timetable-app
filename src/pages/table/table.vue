@@ -8,9 +8,9 @@
 </template>
 
 <script setup lang="ts">
-import { getLabTimetableData, getCommonTimetableData } from "@/api";
-import Timetable from "@/components/TimeTable.vue";
 import { onMounted, ref } from "vue";
+import Timetable from "@components/TimeTable.vue";
+import { getLabTimetableData, getCommonTimetableData } from "@api";
 
 const commonTimetable = ref("");
 const labTimetable = ref("");

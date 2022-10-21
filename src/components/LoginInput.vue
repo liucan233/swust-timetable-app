@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { shallowRef, computed, ref } from "vue";
+import { shallowRef, computed } from "vue";
 
 /**输入框的类型，占位文字和默认值等*/
 const props = defineProps<{
@@ -30,8 +30,8 @@ const {
 
 /**用户输入的文本 */
 const text = shallowRef(defaultValue);
-const disabled = ref(false);
-const warningText = ref("");
+const disabled = shallowRef(false);
+const warningText = shallowRef("");
 
 /**
  * 输入框下方红字警告
