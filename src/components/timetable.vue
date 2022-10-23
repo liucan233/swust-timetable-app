@@ -1,20 +1,19 @@
 <template>
-  <scroll-view :class="'wrap'" scroll-x>
-		<view class="scroll-table">
-			<view class="data-list">
-				<view v-for="date in schoolDays" class="date-item">
-					<view><text>{{date.day}}</text></view>
-				</view>
-			</view>
-			<view class="course-list-wrap">
-				<scroll-view class="course-list" scroll-y>
-					<view v-for="(course,index) in schoolDays" class="course-item" :key="index">
-						<text>课程</text>
-					</view>
-				</scroll-view>
-			</view>
-		</view>
-	</scroll-view>
+  <scroll-view class="scroll-container" scroll-y>
+    <view class="container">
+      <view class="section-wrap">
+        <text class="table-time">10月</text>
+        <text v-for="(_, index) in sectionTextArr" key="index" class="section-time">
+          第 {{ index + 1 }} 讲
+        </text>
+      </view>
+      <swiper class="table-swiper" :indicator-dots="false">
+        <swiper-item v-for="c in props.weekCourse">
+          <WeekTable :course="c"></WeekTable>
+        </swiper-item>
+      </swiper>
+    </view>
+  </scroll-view>
 </template>
 <script lang="ts" setup>
 /**
@@ -25,13 +24,28 @@
  *  3. 用户手指移动时判断运动方向（水平or竖直），事件穿透给对应滚动内容
  */
 // import { shallowRef } from "vue";
-import {getDaysInfo} from '@/utils/common'
+import { getDaysInfo} from "@/utils/common";
+import WeekTable from "./WeekTable.vue";
 
+interface IAppCourse {
+  code: string;
+  name: string;
+  teacher: string;
+  place: string;
+  week: number;
+  begin: number;
+  over: number;
+  task: string;
+  day:number
+}
 const props = defineProps<{
   className: string;
-  startTime: Date
-  endTime: Date
+  startTime: Date;
+  endTime: Date;
+  weekCourse: IAppCourse[][]
 }>();
+
+const sectionTextArr = new Array(6).fill(null);
 
 /**同一平面显示的日期数 */
 // const $columns = shallowRef<UniApp.SelectorQuery | null>(null);
@@ -39,38 +53,54 @@ const props = defineProps<{
 // onMounted(() => {});
 // onUpdated(() => {});
 
-const schoolDays=getDaysInfo(props.startTime,props.endTime);
+const course = [
+  {
+    code: "MY190017",
+    name: "形势与政策7(四年制）",
+    teacher: "林绍森",
+    place: ["东2112"],
+    week: ["5-8"],
+    section: ["7-8"],
+  },
+];
+
+const schoolDays = getDaysInfo(props.startTime, props.endTime);
 </script>
 
 <style scoped>
-.wrap {
+.scroll-container {
+  width: 100%;
+  height: 100%;
+}
+.container {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  height: 100%;
+}
+.section-wrap {
+  width: 20px;
+  text-align: center;
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  height: 100%;
+}
+.table-swiper {
   width: calc(100% - 40px);
   height: 100%;
-	touch-action: pan-x;
-	white-space: nowrap;
-	overscroll-behavior: contain;
+  flex: 0 0 auto;
+  touch-action: pan-x;
+  white-space: nowrap;
+  overscroll-behavior: contain;
 }
-.hour-line {
+.table-time{
+	height: 60px;
+	flex: 0 0 60px;
 }
-.date-list,.course-list{
-	white-space: nowrap;
-}
-.date-item,.course-item{
-	display: inline-block;
-	width: 80px;
-}
-.course-list{
-	width: 100%;
-	height: 100%;
-}
-.course-list-wrap{
-	display: block;
-	height: 30vh;
-	width: v-bind("schoolDays.length*80+'px'");
-}
-.course-item{
-	width: 80px;
-	height: 50vh;
-	background-color: antiquewhite;
+.section-time{
+	height: 100px;
+	vertical-align: middle;
 }
 </style>
