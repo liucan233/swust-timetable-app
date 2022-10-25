@@ -13,6 +13,14 @@ type TPartialUniRequestOptionsOmit = Partial<TUniRequestOptionsOmit>;
 /**uni请求的body */
 type TUniBody = TUniRequestOptions["data"];
 
+/**调用请求方法的返回结构 */
+type TRequestTask<T>={
+  /**请求的promise */
+  promise:PromiseLike<T>
+  /**uni原始的方法 */
+  request:UniNamespace.RequestTask
+};
+
 /**
  * 网络请求类，类似axios
  * 构造函数url属性为请求的base url
@@ -40,8 +48,9 @@ export class Network {
     }
   }
   /**调用uni发送请求 */
-  private request<T>(config: TUniRequestOptions) {
-    return new Promise<T>((resolve, reject) => {
+  private request<T>(config: TUniRequestOptions):TRequestTask<T> {
+    let task:TRequestTask<T>={} as TRequestTask<T>
+    task.promise= new Promise<T>((resolve, reject) => {
       let newConfig = config;
       if (this.onReq) {
         try {
@@ -68,12 +77,13 @@ export class Network {
           resolve(v);
         }
       };
-      uni.request({
+      task.request=uni.request({
         ...newConfig,
         fail,
         success,
-      });
+      })
     });
+    return task
   }
 
   private getAbsoluteUrl(url: string) {
@@ -104,7 +114,7 @@ export class Network {
   get<T = unknown>(
     url: string,
     config?: Omit<TUniRequestOptionsOmit, "method">
-  ) {
+  ):TRequestTask<T> {
     return this.request<T>(this.getUniConfig({ config, url }));
   }
 
@@ -122,7 +132,7 @@ export class Network {
     url: string,
     body: TUniBody,
     config?: Omit<TUniRequestOptionsOmit, "method">
-  ) {
+  ):TRequestTask<T> {
     return this.request<T>(
       this.getUniConfig({ config, url, method: "PUT", data: body })
     );
@@ -132,7 +142,7 @@ export class Network {
     url: string,
     body: TUniBody,
     config?: Omit<TUniRequestOptionsOmit, "method">
-  ) {
+  ):TRequestTask<T> {
     return this.request<T>(
       this.getUniConfig({ config, url, method: "DELETE", data: body })
     );
@@ -142,7 +152,7 @@ export class Network {
     url: string,
     body: TUniBody,
     config?: Omit<TUniRequestOptionsOmit, "method">
-  ) {
+  ):TRequestTask<T> {
     return this.request<T>(
       this.getUniConfig({ config, url, method: "OPTIONS", data: body })
     );
