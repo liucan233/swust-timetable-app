@@ -7,6 +7,12 @@ type TUniRequestOptionsOmit = Omit<
   "success" | "fail" | "complete" | "data"
 >;
 
+/**无"success、fail、complete、method、url和data的网络请求参数 */
+type TNetworkRequestOptions = Omit<
+  TUniRequestOptions,
+  "success" | "fail" | "complete" | "data" | "url" | "method"
+>;
+
 /**无success、fail、complete和data的部分网络请求参数 */
 type TPartialUniRequestOptionsOmit = Partial<TUniRequestOptionsOmit>;
 
@@ -14,12 +20,10 @@ type TPartialUniRequestOptionsOmit = Partial<TUniRequestOptionsOmit>;
 type TUniBody = TUniRequestOptions["data"];
 
 /**调用请求方法的返回结构 */
-type TRequestTask<T>={
-  /**请求的promise */
-  promise:PromiseLike<T>
+interface IRequestTask<T> extends PromiseLike<T> {
   /**uni原始的方法 */
-  request:UniNamespace.RequestTask
-};
+  task: UniNamespace.RequestTask;
+}
 
 /**
  * 网络请求类，类似axios
@@ -48,9 +52,9 @@ export class Network {
     }
   }
   /**调用uni发送请求 */
-  private request<T>(config: TUniRequestOptions):TRequestTask<T> {
-    let task:TRequestTask<T>={} as TRequestTask<T>
-    task.promise= new Promise<T>((resolve, reject) => {
+  private request<T>(config: TUniRequestOptions): IRequestTask<T> {
+    let task: IRequestTask<T>["task"] = {} as IRequestTask<T>["task"];
+    const request = new Promise<T>((resolve, reject) => {
       let newConfig = config;
       if (this.onReq) {
         try {
@@ -62,28 +66,30 @@ export class Network {
           );
         }
       }
-      const fail = (e: any) => {
+      const fail = (e: unknown) => {
         this.tryResolveErr(reject, e);
       };
-      const success = (v: any) => {
+      const success = (v: UniApp.RequestSuccessCallbackResult) => {
         if (this.onRes) {
           try {
-            let result = this.onRes(v) as T;
+            const result = this.onRes(v) as T;
             resolve(result);
           } catch (error) {
             this.tryResolveErr(reject, error);
           }
         } else {
-          resolve(v);
+          resolve(v as T);
         }
       };
-      task.request=uni.request({
+      task = uni.request({
         ...newConfig,
         fail,
         success,
-      })
-    });
-    return task
+      });
+    }) as unknown as IRequestTask<T>;
+
+    request.task = task;
+    return request;
   }
 
   private getAbsoluteUrl(url: string) {
@@ -113,15 +119,15 @@ export class Network {
 
   get<T = unknown>(
     url: string,
-    config?: Omit<TUniRequestOptionsOmit, "method">
-  ):TRequestTask<T> {
+    config?: TNetworkRequestOptions
+  ): IRequestTask<T> {
     return this.request<T>(this.getUniConfig({ config, url }));
   }
 
   post<T = unknown>(
     url: string,
     body: TUniBody,
-    config?: Omit<TUniRequestOptionsOmit, "method">
+    config?: TNetworkRequestOptions
   ) {
     return this.request<T>(
       this.getUniConfig({ config, url, method: "POST", data: body })
@@ -131,8 +137,8 @@ export class Network {
   put<T = unknown>(
     url: string,
     body: TUniBody,
-    config?: Omit<TUniRequestOptionsOmit, "method">
-  ):TRequestTask<T> {
+    config?: TNetworkRequestOptions
+  ): IRequestTask<T> {
     return this.request<T>(
       this.getUniConfig({ config, url, method: "PUT", data: body })
     );
@@ -141,8 +147,8 @@ export class Network {
   delete<T = unknown>(
     url: string,
     body: TUniBody,
-    config?: Omit<TUniRequestOptionsOmit, "method">
-  ):TRequestTask<T> {
+    config?: TNetworkRequestOptions
+  ): IRequestTask<T> {
     return this.request<T>(
       this.getUniConfig({ config, url, method: "DELETE", data: body })
     );
@@ -151,8 +157,8 @@ export class Network {
   options<T = unknown>(
     url: string,
     body: TUniBody,
-    config?: Omit<TUniRequestOptionsOmit, "method">
-  ):TRequestTask<T> {
+    config?: TNetworkRequestOptions
+  ): IRequestTask<T> {
     return this.request<T>(
       this.getUniConfig({ config, url, method: "OPTIONS", data: body })
     );
