@@ -10,12 +10,11 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "lib": ["esnext", "dom"],
-    "types": ["@dcloudio/types"],
     "baseUrl": "./",
     "paths": {
       "@*": ["./src*"],
-      "@components*": ["./src/components*.vue"]
+      "@components*": ["./src/components*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"]
+  "include": ["src/**/*.ts", "src/**/*.vue"]
 }
