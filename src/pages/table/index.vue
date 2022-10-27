@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import Timetable from "@components/Timetable";
+import Timetable from "@components/timetable.vue";
 import { getDateFromWeek } from "@/utils/common";
 import { flatCourse, fixCourseArr, covertToWeek } from "@/utils/timetable";
 

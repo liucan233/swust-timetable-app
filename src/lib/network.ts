@@ -32,7 +32,7 @@ interface IRequestTask<T> extends PromiseLike<T> {
 export class Network {
   private defaultConfig: TPartialUniRequestOptionsOmit = {};
   onReq: undefined | ((config: TUniRequestOptions) => TUniRequestOptions);
-  onRes: undefined | TUniRequestOptions["success"];
+  onRes: undefined | ((data:UniNamespace.RequestSuccessCallbackResult)=>unknown);
   onErr: undefined | ((v: unknown) => unknown);
   constructor(config?: TPartialUniRequestOptionsOmit) {
     if (config) {
