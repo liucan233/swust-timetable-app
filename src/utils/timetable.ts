@@ -17,12 +17,12 @@ export interface IAppCourse {
 const parseNumbers = (s: string): number[] | null => {
   const result = s.match(/\d+/g);
   if (result?.length === 2) {
-    return result.map(n => Number(n));
+    return [Number(result[0]),Number(result[1])];
   }
   return null;
 };
 
-/**压平后端返回的课表数据 */
+/**压平后端返回的课表数据，若周为1-3，则会生成3个IAppCourse */
 export const flatCourse = (arr: ICommonCourse[]) => {
   const res: IAppCourse[] = [];
   for (let i = 0; i < arr.length; i++) {
@@ -88,8 +88,10 @@ export const flatCourse = (arr: ICommonCourse[]) => {
 interface IConflictCourse {
   begin: number;
   over: number;
+  /**[begin, over]区间内冲突的课程，例如1-2 3-4 1-4，则list仅包含1-4 */
   list: IAppCourse[];
 }
+
 /**分析一天内课程冲突情况，返回[不冲突课程，冲突课程] */
 const getDayCourseConflict = (
   arr: IAppCourse[]
@@ -141,7 +143,7 @@ const getDayCourseConflict = (
 
   const result: IConflictCourse[] = [tmp];
 
-  // 若冲突课程为1-2 3-4 1-4，则合并为1-4节课有3个课程冲突
+  // 若冲突课程为1-2 3-4 1-4，则合并为1-4节课有1个课程冲突
   for (let i = 1; i < conflictArr.length; i++) {
     const { begin, over } = conflictArr[i];
     if (begin < curOver) {
@@ -211,7 +213,7 @@ export const fixCourseArr = (arr: IAppCourse[], currentWeek: number) => {
   return ans;
 };
 
-/**将课程表拆分为周 */
+/**将课程表拆分为周，返回数据data[i]表示第i周的课程 */
 export const covertToWeek = (arr: IAppCourse[]): IAppCourse[][] => {
   let maxWeekNum = -1;
   for (const course of arr) {
@@ -232,7 +234,7 @@ export const covertToWeek = (arr: IAppCourse[]): IAppCourse[][] => {
 
 /**一天的课程 */
 type TDayCourse = {
-  /**一天的所以课程 */
+  /**一天内不冲突的课程 */
   list: IAppCourse[];
   /**冲突的课程 */
   conflict: IConflictCourse[];
