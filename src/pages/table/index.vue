@@ -1,62 +1,79 @@
 <template>
   <view class="table-header">
-    <text class="table-time">大三下 第 {{ currentWeek }} 周</text>
-    <text class="table-time">2022年 10月</text>
+    <text class="table-time">第 {{ $termInfo.weekNum }} 周</text>
+    <text class="table-time">{{ $termInfo.termName }}</text>
     <button class="table-add">添加课程</button>
   </view>
-  <view class="table-preview"> </view>
+  <scroll-view class="table-preview" scroll-x>
+    <CoursePreview v-for="week in $courseData" />
+  </scroll-view>
   <view class="table-main">
-    <!-- <Timetable
+    <Timetable
       class-name="timetable"
-      :start-time="dayOne"
-      :end-time="dayLast"
-      :week-course="weekCourse"
-    /> -->
+      :start-time="$termInfo.beginTime"
+      :end-time="$termInfo.overTime"
+      :course="$courseData"
+    />
   </view>
 </template>
 
 <script setup lang="ts">
 import Timetable from "@components/timetable.vue";
+import CoursePreview from "@components/CoursePreview.vue";
 import { getDateFromWeek } from "@/utils/common";
-import { putCourseInOrder } from "@/utils/timetable";
+import { putCourseInOrder, TOrganizedCourse } from "@/utils/timetable";
+import { onMounted, ref, shallowRef } from "vue";
+import {
+  getLabTimetable,
+  getCommonTimetable,
+  ICommonCourse,
+  getTermInfo,
+} from "@/api/timetable";
 
-const currentWeek = 6;
+const $termInfo = ref({
+  weekNum: 1,
+  termName: "",
+  beginTime: new Date("2022/9/1"),
+  overTime: new Date("2023/1/1"),
+});
 
-const course = putCourseInOrder(
-  [
-    {
-      code: "MY190017",
-      name: "四年制",
-      teacher: "林绍森",
-      place: ["东2112"],
-      week: ["1-2"],
-      section: ["1-2"],
-      day: ["2"],
-    },
-    {
-      code: "zzzz",
-      name: "形势",
-      teacher: "林绍森",
-      place: ["东2112"],
-      week: ["1-3"],
-      section: ["1-4"],
-      day: ["2"],
-    },
-    {
-      code: "zzzz",
-      name: "冲突",
-      teacher: "林绍森",
-      place: ["东2112"],
-      week: ["1-3"],
-      section: ["3-4"],
-      day: ["2"],
-    },
-  ],
-  currentWeek
-);
-console.log(course)
-const dayOne = getDateFromWeek(2),
-  dayLast = getDateFromWeek(course.length);
+const $courseData = shallowRef<TOrganizedCourse>([]);
+
+const handleUpdateCourse = () => {
+  const labCookie = "development";
+  const commonCookie = labCookie;
+
+  Promise.all([
+    getLabTimetable(labCookie),
+    getCommonTimetable(commonCookie),
+    getTermInfo(commonCookie),
+  ]).then(arr => {
+    let courseArr: ICommonCourse[] = [];
+
+    if (arr[0]) {
+      courseArr = arr[0].data.courses;
+    }
+    if (arr[1]) {
+      courseArr = arr[1].data.courses.concat(courseArr);
+    }
+
+    if (arr[2]) {
+      const curWeekNum = Number(arr[2].data.weeks);
+      $termInfo.value.weekNum = curWeekNum;
+      $termInfo.value.termName = arr[2].data.time;
+      $termInfo.value.beginTime = getDateFromWeek(curWeekNum);
+      $termInfo.value.overTime = getDateFromWeek(courseArr.length - curWeekNum);
+    }
+
+    $courseData.value = putCourseInOrder(courseArr, $termInfo.value.weekNum);
+
+    console.log($courseData);
+  });
+};
+
+onMounted(() => {
+  handleUpdateCourse();
+});
 </script>
 
 <style scoped>
@@ -77,8 +94,8 @@ const dayOne = getDateFromWeek(2),
 }
 
 .table-preview {
-  height: 100px;
   width: 100%;
+  white-space: nowrap;
 }
 
 .table-add::after {

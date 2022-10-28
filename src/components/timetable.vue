@@ -8,8 +8,8 @@
         </text>
       </view>
       <swiper class="table-swiper" :indicator-dots="false">
-        <swiper-item v-for="c in props.weekCourse">
-          <WeekTable :course="c"></WeekTable>
+        <swiper-item v-for="c in props.course">
+          <WeekTable :course="c??emptyCourseWeek"></WeekTable>
         </swiper-item>
       </swiper>
     </view>
@@ -26,24 +26,16 @@
 // import { shallowRef } from "vue";
 import { getDaysInfo} from "@/utils/common";
 import WeekTable from "./WeekTable.vue";
+import { TOrganizedCourse, TWeekCourse} from '@/utils/timetable'
 
-interface IAppCourse {
-  code: string;
-  name: string;
-  teacher: string;
-  place: string;
-  week: number;
-  begin: number;
-  over: number;
-  task: string;
-  day:number
-}
 const props = defineProps<{
   className: string;
   startTime: Date;
   endTime: Date;
-  weekCourse: IAppCourse[][]
+  course: TOrganizedCourse
 }>();
+
+const emptyCourseWeek=new Array(7) as TWeekCourse
 
 const sectionTextArr = new Array(6).fill(null);
 
@@ -52,17 +44,6 @@ const sectionTextArr = new Array(6).fill(null);
 
 // onMounted(() => {});
 // onUpdated(() => {});
-
-const course = [
-  {
-    code: "MY190017",
-    name: "形势与政策7(四年制）",
-    teacher: "林绍森",
-    place: ["东2112"],
-    week: ["5-8"],
-    section: ["7-8"],
-  },
-];
 
 const schoolDays = getDaysInfo(props.startTime, props.endTime);
 </script>

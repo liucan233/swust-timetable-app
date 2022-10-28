@@ -2,7 +2,7 @@
   <view class="week-container">
     <view v-for="text,index in dayArr" class="day-wrap">
       <text  class="day-name">周{{ text }}</text>
-      <view v-for="c in dayCourse[index+1]" class="course-item" :style="getPosition(c.begin,c.over)">
+      <view v-for="c in props.course[index]?.list??[]" class="course-item" :style="getPosition(c.begin,c.over)">
         <text>
             {{c.name}}
         </text>
@@ -12,34 +12,17 @@
 </template>
 <script lang="ts" setup>
 import { computed, CSSProperties, onMounted, shallowRef, watch } from "vue";
+import {TWeekCourse } from '@/utils/timetable'
 
-interface IAppCourse {
-  code: string;
-  name: string;
-  teacher: string;
-  place: string;
-  week: number;
-  begin: number;
-  over: number;
-  task: string;
-  day: number;
-}
 interface IProps {
-  course: IAppCourse[];
+  course: TWeekCourse;
 }
 const props = defineProps<IProps>();
-const dayCourse = computed(() => {
-  const arr: IAppCourse[][] = new Array(7).fill(0).map(() => []);
-  props.course.forEach(c => {
-    if (arr[c.day]) {
-      arr[c.day].push(c);
-    } else {
-      arr[c.day] = [c];
-    }
-  });
-  return arr;
-});
-console.log(dayCourse.value);
+
+console.log(props.course)
+
+
+
 let rowHeight = 100,base=60,
   dayArr = ["一", "二", "三", "四", "五", "六", "日"];
 
