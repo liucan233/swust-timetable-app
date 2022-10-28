@@ -28,7 +28,6 @@ export const getDateFromWeek = (currentWeek: number) => {
   // 除以10s防止计算时天数加1
   const now = new Date((Date.now() / 10000) * 10000);
   const div = 6-((now.getDay() + 6) % 7) + currentWeek * 7;
-  console.log(div);
   now.setDate(now.getDate() + div);
   return now;
 };

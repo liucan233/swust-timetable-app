@@ -233,7 +233,7 @@ export const covertToWeek = (arr: IAppCourse[]): IAppCourse[][] => {
 };
 
 /**一天的课程 */
-type TDayCourse = {
+export type TDayCourse = {
   /**一天内不冲突的课程 */
   list: IAppCourse[];
   /**冲突的课程 */
@@ -241,7 +241,7 @@ type TDayCourse = {
 };
 
 /**一周七天的课程 */
-type TWeekCourse = [
+export type TWeekCourse = [
   TDayCourse | null | undefined,
   TDayCourse | null | undefined,
   TDayCourse | null | undefined,
@@ -254,7 +254,7 @@ type TWeekCourse = [
 /**一个学期的课表，一维是周课表，
  * 二维是天课表，包含冲突情况和当天的所有课
  */
-type TOrganizedCourse = Array<TWeekCourse>;
+export type TOrganizedCourse = Array<TWeekCourse|null|undefined>;
 
 /**使用桶排序将课程按天放到数组内，参数arr[i]表示第i+1周的所有课程 */
 export const organizeCourse = (arr: IAppCourse[][]): TOrganizedCourse => {
