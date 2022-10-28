@@ -84,6 +84,86 @@ export const flatCourse = (arr: ICommonCourse[]) => {
   return res;
 };
 
+/**冲突的课程 */
+interface IConflictCourse {
+  begin: number;
+  over: number;
+  list: IAppCourse[];
+}
+/**分析一天内课程冲突情况，返回[不冲突课程，冲突课程] */
+const getDayCourseConflict = (
+  arr: IAppCourse[]
+): [IAppCourse[], IConflictCourse[]] => {
+  if (arr.length < 2) {
+    return [arr, []];
+  }
+  /**按上课时间排序的课表 */
+  const orderedCourse = Array.from(arr);
+  // 将一天内到课程按开始时间早和结束时间早在前排序
+  orderedCourse.sort((a, b) => {
+    if (a.begin !== b.begin) {
+      return a.begin < b.begin ? -1 : 1;
+    }
+    return a.over < b.over ? -1 : 1;
+  });
+  /**当天有冲突的课表 */
+  let conflictArr: IAppCourse[] = [],
+    curBegin = orderedCourse[0].begin,
+    curOver = orderedCourse[0].over;
+
+  /**不存在冲突的课程列表 */
+  const normalArr: IAppCourse[] = [orderedCourse[0]];
+  // 找出当天存在冲突的课程
+  for (let i = 1; i < orderedCourse.length; i++) {
+    const { begin, over } = orderedCourse[i];
+    if (begin < curOver) {
+      conflictArr.push(orderedCourse[i]);
+    } else {
+      curBegin = begin;
+      curOver = over;
+      normalArr.push(orderedCourse[i]);
+    }
+  }
+
+  // 如果不冲突，则返回空
+  if (conflictArr.length < 1) {
+    return [arr, []];
+  }
+  curBegin = conflictArr[0].begin;
+  curOver = conflictArr[0].over;
+
+  /**某个时间段内冲突的课程集合 */
+  let tmp: IConflictCourse = {
+    begin: curBegin,
+    over: curOver,
+    list: [conflictArr[0]],
+  };
+
+  const result: IConflictCourse[] = [tmp];
+
+  // 若冲突课程为1-2 3-4 1-4，则合并为1-4节课有3个课程冲突
+  for (let i = 1; i < conflictArr.length; i++) {
+    const { begin, over } = conflictArr[i];
+    if (begin < curOver) {
+      if (curOver < over) {
+        curOver = over;
+        tmp.over = over;
+      }
+      tmp.list.push(conflictArr[i]);
+    } else {
+      curBegin = begin;
+      curOver = over;
+      result.push(tmp);
+      tmp = {
+        begin: curBegin,
+        over: curOver,
+        list: [conflictArr[i]],
+      };
+    }
+  }
+  return [normalArr, result];
+};
+
 /**验证并修复课表数据类型 */
 export const fixCourseArr = (arr: IAppCourse[], currentWeek: number) => {
   const ans: IAppCourse[] = [],
@@ -133,17 +213,18 @@ export const fixCourseArr = (arr: IAppCourse[], currentWeek: number) => {
 
 /**将课程表拆分为周 */
 export const covertToWeek = (arr: IAppCourse[]): IAppCourse[][] => {
-  let maxWeekNum=-1;
-  for(const course of arr){
-    if(maxWeekNum<course.week){
-      maxWeekNum=course.week;
+  let maxWeekNum = -1;
+  for (const course of arr) {
+    if (maxWeekNum < course.week) {
+      maxWeekNum = course.week;
     }
   }
-  const ans: IAppCourse[][] = new Array(maxWeekNum+1).fill(null).map(()=>[]);
-  
-  for(const course of arr){
-    console.log(course.week-1)
-    ans[course.week-1].push(course)
+  const ans: IAppCourse[][] = new Array(maxWeekNum + 1)
+    .fill(null)
+    .map(() => []);
+
+  for (const course of arr) {
+    ans[course.week - 1].push(course);
   }
 
   return ans;
@@ -154,14 +235,7 @@ type TDayCourse = {
   /**一天的所以课程 */
   list: IAppCourse[];
   /**冲突的课程 */
-  conflict: [
-    IAppCourse[] | null | undefined,
-    IAppCourse[] | null | undefined,
-    IAppCourse[] | null | undefined,
-    IAppCourse[] | null | undefined,
-    IAppCourse[] | null | undefined,
-    IAppCourse[] | null | undefined
-  ];
+  conflict: IConflictCourse[];
 };
 
 /**一周七天的课程 */
@@ -182,48 +256,46 @@ type TOrganizedCourse = Array<TWeekCourse>;
 
 /**使用桶排序将课程按天放到数组内，参数arr[i]表示第i+1周的所有课程 */
 export const organizeCourse = (arr: IAppCourse[][]): TOrganizedCourse => {
-  const result: TOrganizedCourse = [];
+  const result: TOrganizedCourse = new Array(arr.length);
   for (const disorderWeek of arr) {
     const orderedWeek: TWeekCourse = [] as any;
     if (!disorderWeek || disorderWeek.length < 1) {
-      result.push(orderedWeek);
       continue;
     }
+
+    // 使用桶排序思路将一周的课放到对应的day上
     for (let j = 0; j < disorderWeek.length; j++) {
       const curCourse = disorderWeek[j];
       const curDayNum = curCourse.day;
 
-      //如果该周当天的课程为空
+      //如果该周当天的课程为空则放置一个空的
       if (!orderedWeek[curDayNum]) {
         orderedWeek[curDayNum] = {
-          conflict: [] as any,
+          conflict: [],
           list: [],
         };
       }
 
-      const curDayCourse = orderedWeek[curDayNum] as TDayCourse;
-
       //将当前课程加到本周对应的那一天
-      curDayCourse.list.push(curCourse);
-
-      //更新该天课程的冲突情况
-      for (let k = curCourse.begin; k <= curCourse.over; k++) {
-        if (curDayCourse.conflict[k]) {
-          curDayCourse.conflict[k]?.push(curCourse);
-        } else {
-          curDayCourse.conflict[k] = [curCourse];
-        }
+      (orderedWeek[curDayNum] as TDayCourse).list.push(curCourse);
+    }
+    // 计算该周每天的课程的冲突情况
+    for (const dayCourse of orderedWeek) {
+      if (dayCourse) {
+        [dayCourse.list, dayCourse.conflict] = getDayCourseConflict(
+          dayCourse.list
+        );
       }
     }
-    result.push(orderedWeek);
+    result[disorderWeek[0].week]=orderedWeek
   }
   return result;
 };
 
 /**整理将服务端返回的课程 */
-export const putCourseInOrder=(arr:ICommonCourse[],currentWeek:number)=>{
-  const flattedCourse=flatCourse(arr);
+export const putCourseInOrder = (arr: ICommonCourse[], currentWeek: number) => {
+  const flattedCourse = flatCourse(arr);
   const correctCourse = fixCourseArr(flattedCourse, currentWeek);
   const weekCourse = covertToWeek(correctCourse);
-  return organizeCourse(weekCourse)
-}
+  return organizeCourse(weekCourse);
+};
