@@ -1,8 +1,11 @@
 <template>
-  <view class="container">
+  <view
+    class="container"
+    :class="{ shake: disabled, [props?.className as string]: props?.className }"
+  >
     <text class="placeholder">{{ placeholder }}</text>
-    <input class="input" :type="type" v-model="text" />
-    <view class="linear-gradient" />
+    <input class="input" :type="type" :auto-blur="true" v-model="text" />
+    <text class="warning-text">{{ warningText }}</text>
   </view>
 </template>
 
@@ -14,6 +17,7 @@ const props = defineProps<{
   type?: string;
   placeholder?: string;
   defaultValue?: string;
+  className?: string;
 }>();
 
 const {
@@ -26,58 +30,101 @@ const {
 
 /**用户输入的文本 */
 const text = shallowRef(defaultValue);
+const disabled = shallowRef(false);
+const warningText = shallowRef("");
 
-const clearInputText = () => {
-  text.value = "";
+/**
+ * 输入框下方红字警告
+ * @param text 警告文本
+ */
+const warning = (text: string) => {
+  disabled.value = true;
+  warningText.value = text;
 };
+
+/**
+ * 清除警告
+ */
+const clearWarning = () => {
+  disabled.value = false;
+  warningText.value = "";
+};
+
+/**
+ * 获取输入框内容
+ */
 const getInputText = () => {
   return text.value;
 };
 
 defineExpose({
-  clearInputText,
+  warning,
+  clearWarning,
   getInputText,
 });
 </script>
 
 <style scoped>
-.container {
-  display: flow-root;
-  width: 85%;
-  margin: 5px 0;
-}
-
 .placeholder {
-  font-size: 1rem;
+  font-size: 0.8rem;
   color: rgba(61, 56, 56, 0.521);
 }
+
 .input {
+  display: block;
+  width: 100%;
+  height: 2.5rem;
+  margin-top: 0.5rem;
+  padding-left: 0.5rem;
   box-sizing: border-box;
-  margin: 0;
   font-variant: tabular-nums;
   text-overflow: ellipsis;
   touch-action: manipulation;
   list-style: none;
   position: relative;
-  display: inline-block;
-  width: 100%;
-  min-width: 0;
-  margin-top: 5px;
-  padding: 4px 11px;
-  color: #206ed4;
-  font-size: 1.15rem;
-  font-weight: 600;
-  line-height: 1rem;
-  background-color: #fff;
-  background-image: none;
-  border-radius: 2px;
-  transition: all 0.3s;
+  color: #142431;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #e4dede;
 }
 
-.linear-gradient {
-  width: 100%;
-  height: 3px;
-  background-image: linear-gradient(to top, #48c6ef 0%, #6f86d6 100%);
-  border-radius: 10px;
+.warning-text {
+  display: block;
+  min-height: 0.5rem;
+  font-size: 0.6rem;
+  color: rgba(61, 56, 56, 0.521);
+}
+
+.shake {
+  animation: shake 0.82s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  transform: translate3d(0, 0, 0);
+}
+
+.shake > input {
+  border: 1px solid red;
+}
+
+.shake > .warning-text {
+  color: red;
+}
+
+@keyframes shake {
+  10%,
+  90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+  20%,
+  80% {
+    transform: translate3d(2px, 0, 0);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+  40%,
+  60% {
+    transform: translate3d(4px, 0, 0);
+  }
 }
 </style>

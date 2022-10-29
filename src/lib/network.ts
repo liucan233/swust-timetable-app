@@ -13,6 +13,7 @@ type TNetworkRequestOptions = Omit<
   "success" | "fail" | "complete" | "data" | "url" | "method"
 >;
 
+
 /**无success、fail、complete和data的部分网络请求参数 */
 type TPartialUniRequestOptionsOmit = Partial<TUniRequestOptionsOmit>;
 

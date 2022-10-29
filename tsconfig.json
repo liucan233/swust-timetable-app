@@ -13,8 +13,10 @@
     "baseUrl": "./",
     "paths": {
       "@*": ["./src*"],
-      "@components/*": ["./src/components/*"],
       "@api/*": ["./src/api/*"]
+      "@components*": ["./src/components*.vue"],
+      "@enums*": ["./src/enums*"],
+      "@utils*": ["./src/utils*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.vue"]

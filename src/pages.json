@@ -2,17 +2,74 @@
   "pages": [
     {
       "path": "pages/index/index",
-      "style": {}
+      "style": {
+        "app-plus": {
+          "navigationBarTitleText": "首屏加载页",
+          "navigationStyle": "custom",
+          "animationType": "slide-in-right",
+          "animationDuration": 500
+        }
+      }
+    },
+    {
+      "path": "pages/login/index",
+      "style": {
+        "app-plus": {
+          "navigationBarTitleText": "登录",
+          "navigationStyle": "custom",
+          "animationType": "slide-in-right",
+          "animationDuration": 500
+        }
+      }
     },
     {
       "path": "pages/table/index",
-      "style": {}
+      "style": {
+        "navigationBarTitleText": "课表",
+        "navigationStyle": "custom",
+        "app-plus": {
+          "animationType": "slide-in-right",
+          "animationDuration": 500
+        }
+      }
+    },
+    {
+      "path": "pages/personal/index",
+      "style": {
+        "navigationBarTitleText": "个人中心",
+        "navigationStyle": "custom",
+        "app-plus": {
+          "animationType": "slide-in-right",
+          "animationDuration": 500
+        }
+      }
     }
   ],
+  "tabBar": {
+    "color": "#7A7E83",
+    "selectedColor": "#1296db",
+    "borderStyle": "black",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/table/index",
+        "text": "课表",
+        "iconPath": "static/image/table.png",
+        "selectedIconPath": "static/image/table_selected.png"
+      },
+      {
+        "pagePath": "pages/personal/index",
+        "text": "个人中心",
+        "iconPath": "static/image/personal.png",
+        "selectedIconPath": "static/image/personal_selected.png"
+      }
+    ]
+  },
   "globalStyle": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "uni-app",
     "navigationBarBackgroundColor": "#F8F8F8",
+
     "backgroundColor": "#F8F8F8",
     "h5": {
       "titleNView": false

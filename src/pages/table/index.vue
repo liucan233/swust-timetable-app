@@ -84,6 +84,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
+
 .table-header {
   display: flex;
   justify-content: space-between;
