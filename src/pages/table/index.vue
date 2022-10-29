@@ -1,6 +1,6 @@
 <template>
   <view class="table-header">
-    <text class="table-time">第 {{ $termInfo.weekNum }} 周</text>
+    <text class="table-time">第 {{ $termInfo.viewWeekNum }} 周</text>
     <text class="table-time">{{ $termInfo.termName }}</text>
     <button class="table-add">添加课程</button>
   </view>
@@ -13,6 +13,9 @@
       :start-time="$termInfo.beginTime"
       :end-time="$termInfo.overTime"
       :course="$courseData"
+      :week-num="$termInfo.weekNum"
+      @week-change="handleWeekChange"
+      
     />
   </view>
 </template>
@@ -35,6 +38,7 @@ const $termInfo = ref({
   termName: "",
   beginTime: new Date("2022/9/1"),
   overTime: new Date("2023/1/1"),
+  viewWeekNum: 0
 });
 
 const $courseData = shallowRef<TOrganizedCourse>([]);
@@ -60,16 +64,19 @@ const handleUpdateCourse = () => {
     if (arr[2]) {
       const curWeekNum = Number(arr[2].data.weeks);
       $termInfo.value.weekNum = curWeekNum;
+      $termInfo.value.viewWeekNum=curWeekNum
       $termInfo.value.termName = arr[2].data.time;
       $termInfo.value.beginTime = getDateFromWeek(curWeekNum);
       $termInfo.value.overTime = getDateFromWeek(courseArr.length - curWeekNum);
     }
 
     $courseData.value = putCourseInOrder(courseArr, $termInfo.value.weekNum);
-
-    console.log($courseData);
   });
 };
+
+const handleWeekChange=(w:number)=>{
+  $termInfo.value.viewWeekNum=w;
+}
 
 onMounted(() => {
   handleUpdateCourse();

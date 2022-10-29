@@ -2,14 +2,26 @@
   <scroll-view class="scroll-container" scroll-y>
     <view class="container">
       <view class="section-wrap">
-        <text class="table-time">10月</text>
-        <text v-for="(_, index) in sectionTextArr" key="index" class="section-time">
+        <text class="table-time">{{ $mouthNum }}月</text>
+        <text
+          v-for="(_, index) in sectionTextArr"
+          key="index"
+          class="section-time"
+        >
           第 {{ index + 1 }} 讲
         </text>
       </view>
-      <swiper class="table-swiper" :indicator-dots="false">
-        <swiper-item v-for="c in props.course">
-          <WeekTable :course="c??emptyCourseWeek"></WeekTable>
+      <swiper
+        class="table-swiper"
+        :indicator-dots="false"
+        @change="handleWeekChange"
+        :current="props.weekNum"
+      >
+        <swiper-item v-for="(c, index) in props.course.slice(1)">
+          <WeekTable
+            :course="c ?? emptyCourseWeek"
+            :day-num="dayInfoArr[index+1]"
+          ></WeekTable>
         </swiper-item>
       </swiper>
     </view>
@@ -23,29 +35,67 @@
  *  2. 一个竖直（上下）滚动的小时刻度轴；
  *  3. 用户手指移动时判断运动方向（水平or竖直），事件穿透给对应滚动内容
  */
-// import { shallowRef } from "vue";
-import { getDaysInfo} from "@/utils/common";
+import { shallowRef } from "vue";
+import { getDaysInfo, IDayInfo } from "@/utils/common";
 import WeekTable from "./WeekTable.vue";
-import { TOrganizedCourse, TWeekCourse} from '@/utils/timetable'
+import { TOrganizedCourse, TWeekCourse } from "@/utils/timetable";
+import { computed, onUpdated } from "vue";
 
 const props = defineProps<{
   className: string;
   startTime: Date;
   endTime: Date;
-  course: TOrganizedCourse
+  course: TOrganizedCourse;
+  weekNum:number
 }>();
 
-const emptyCourseWeek=new Array(7) as TWeekCourse
+const emit=defineEmits<{
+  (e:'weekChange',current:number):any
+}>()
+
+const $mouthNum = shallowRef(9);
+
+const emptyCourseWeek = new Array(7) as TWeekCourse;
 
 const sectionTextArr = new Array(6).fill(null);
 
-/**同一平面显示的日期数 */
-// const $columns = shallowRef<UniApp.SelectorQuery | null>(null);
+onUpdated(() => {
+  // 输出学期信息
+  if (props.course.length) {
+    const begin = props.startTime.toLocaleDateString(),
+      over = props.endTime.toLocaleDateString();
+    console.log("本学期上课时间约为：" + begin + " - " + over);
+  }
+});
 
-// onMounted(() => {});
-// onUpdated(() => {});
+const dayInfoArr = computed<IDayInfo[][]>(() => {
+  if (!props.course.length) {
+    return [];
+  }
+  const dayArr = getDaysInfo(props.startTime, props.endTime),
+    result: IDayInfo[][] = [];
+  $mouthNum.value = dayArr[0].month;
+  let dayStart = 0,
+    dayEnd = 7;
+  for (let i = 0; i < props.course.length; i++) {
+    result.push(dayArr.slice(dayStart, dayEnd));
+    dayStart = dayEnd;
+    dayEnd += 7;
+  }
+  return result;
+});
 
-const schoolDays = getDaysInfo(props.startTime, props.endTime);
+const handleWeekChange = (e: {
+  detail: {
+    current: number;
+    currentItemId: string;
+    source: string;
+  };
+}) => {
+  const curWeekNum=e.detail.current+1
+  $mouthNum.value = dayInfoArr.value[curWeekNum][0].month;
+  emit('weekChange',curWeekNum)
+};
 </script>
 
 <style scoped>
@@ -76,12 +126,12 @@ const schoolDays = getDaysInfo(props.startTime, props.endTime);
   white-space: nowrap;
   overscroll-behavior: contain;
 }
-.table-time{
-	height: 60px;
-	flex: 0 0 60px;
+.table-time {
+  height: 60px;
+  flex: 0 0 60px;
 }
-.section-time{
-	height: 100px;
-	vertical-align: middle;
+.section-time {
+  height: 100px;
+  vertical-align: middle;
 }
 </style>
