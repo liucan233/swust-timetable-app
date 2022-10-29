@@ -78,14 +78,6 @@
     "vue-eslint-parser": "^9.1.0"
   },
   "lint-staged": {
-    "**/*": "prettier --write --ignore-unknown",
-    "**/*.{js,ts,vue}": [
-      "npm run lint:script",
-      "git add ."
-    ],
-    "**/*.{scss}": [
-      "npm run lint:style",
-      "git add ."
-    ]
+    "**/*": "prettier --write --ignore-unknown"
   }
 }

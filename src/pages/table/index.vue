@@ -15,7 +15,6 @@
       :course="$courseData"
       :week-num="$termInfo.weekNum"
       @week-change="handleWeekChange"
-      
     />
   </view>
 </template>
@@ -38,7 +37,7 @@ const $termInfo = ref({
   termName: "",
   beginTime: new Date("2022/9/1"),
   overTime: new Date("2023/1/1"),
-  viewWeekNum: 0
+  viewWeekNum: 0,
 });
 
 const $courseData = shallowRef<TOrganizedCourse>([]);
@@ -64,7 +63,7 @@ const handleUpdateCourse = () => {
     if (arr[2]) {
       const curWeekNum = Number(arr[2].data.weeks);
       $termInfo.value.weekNum = curWeekNum;
-      $termInfo.value.viewWeekNum=curWeekNum
+      $termInfo.value.viewWeekNum = curWeekNum;
       $termInfo.value.termName = arr[2].data.time;
       $termInfo.value.beginTime = getDateFromWeek(curWeekNum);
       $termInfo.value.overTime = getDateFromWeek(courseArr.length - curWeekNum);
@@ -74,9 +73,9 @@ const handleUpdateCourse = () => {
   });
 };
 
-const handleWeekChange=(w:number)=>{
-  $termInfo.value.viewWeekNum=w;
-}
+const handleWeekChange = (w: number) => {
+  $termInfo.value.viewWeekNum = w;
+};
 
 onMounted(() => {
   handleUpdateCourse();
@@ -84,7 +83,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-
 .table-header {
   display: flex;
   justify-content: space-between;

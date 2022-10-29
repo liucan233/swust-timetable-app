@@ -13,7 +13,6 @@ type TNetworkRequestOptions = Omit<
   "success" | "fail" | "complete" | "data" | "url" | "method"
 >;
 
-
 /**无success、fail、complete和data的部分网络请求参数 */
 type TPartialUniRequestOptionsOmit = Partial<TUniRequestOptionsOmit>;
 
@@ -21,7 +20,7 @@ type TPartialUniRequestOptionsOmit = Partial<TUniRequestOptionsOmit>;
 type TUniBody = TUniRequestOptions["data"];
 
 /**调用请求方法的返回结构 */
-interface IRequestTask<T> extends PromiseLike<T|null> {
+interface IRequestTask<T> extends PromiseLike<T | null> {
   /**uni原始的方法 */
   task: UniNamespace.RequestTask;
 }
@@ -33,7 +32,9 @@ interface IRequestTask<T> extends PromiseLike<T|null> {
 export class Network {
   private defaultConfig: TPartialUniRequestOptionsOmit = {};
   onReq: undefined | ((config: TUniRequestOptions) => TUniRequestOptions);
-  onRes: undefined | ((data:UniNamespace.RequestSuccessCallbackResult)=>unknown);
+  onRes:
+    | undefined
+    | ((data: UniNamespace.RequestSuccessCallbackResult) => unknown);
   onErr: undefined | ((v: unknown) => unknown);
   constructor(config?: TPartialUniRequestOptionsOmit) {
     if (config) {
@@ -44,11 +45,12 @@ export class Network {
   private tryResolveErr(
     reject: (v: unknown) => unknown,
     resolve: (v: null) => any,
-     error: unknown) {
+    error: unknown
+  ) {
     if (this.onErr) {
       try {
         this.onErr(error);
-        resolve(null)
+        resolve(null);
       } catch (e) {
         reject(e);
       }
@@ -59,7 +61,7 @@ export class Network {
   /**调用uni发送请求 */
   private request<T>(config: TUniRequestOptions): IRequestTask<T> {
     let task: IRequestTask<T>["task"] = {} as IRequestTask<T>["task"];
-    const request = new Promise<T|null>((resolve, reject) => {
+    const request = new Promise<T | null>((resolve, reject) => {
       let newConfig = config;
       if (this.onReq) {
         try {
@@ -73,7 +75,7 @@ export class Network {
         }
       }
       const fail = (e: unknown) => {
-        this.tryResolveErr(reject,resolve, e);
+        this.tryResolveErr(reject, resolve, e);
       };
       const success = (v: UniApp.RequestSuccessCallbackResult) => {
         if (this.onRes) {
@@ -81,7 +83,7 @@ export class Network {
             const result = this.onRes(v) as T;
             resolve(result);
           } catch (error) {
-            this.tryResolveErr(reject,resolve, error);
+            this.tryResolveErr(reject, resolve, error);
           }
         } else {
           resolve(v as T);

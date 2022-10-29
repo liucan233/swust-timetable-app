@@ -1,15 +1,17 @@
 import { Cookie } from "@enums/storage";
 import { getCookieSync } from "@utils/cookie";
-import { network } from "@/lib/network";
+import { Network } from "@/lib/network";
+
+const network = new Network();
 
 /**
  * 获取当前cookie和验证码
  * @returns
  */
 export function getCookieAndCaptchaUrl() {
-  return network<IBaseResponse<TGetCookieAndCaptchaUrlDto>>({
-    url: "https://swust.hanyue.xyz/api/swust/loginCas",
-  });
+  return network.get<IBaseResponse<TGetCookieAndCaptchaUrlDto>>(
+    "https://swust.hanyue.xyz/api/swust/loginCas"
+  );
 }
 
 /**
@@ -21,14 +23,13 @@ export function getCookieAndCaptchaUrl() {
  */
 export function login(username: string, password: string, code: string) {
   const cookie = getCookieSync(Cookie.LOGIN_COOKIE);
-  return network<IBaseResponse<TLoginDto>>({
-    url: "https://swust.hanyue.xyz/api/swust/loginCas",
-    method: "POST",
-    data: {
+  return network.post<IBaseResponse<TLoginDto>>(
+    "https://swust.hanyue.xyz/api/swust/loginCas",
+    {
       user: username,
       passwd: password,
       captcha: code,
       cookie,
-    },
-  });
+    }
+  );
 }

@@ -1,11 +1,11 @@
 import { BACKEND_PREFIX } from "@/config";
 import { Network } from "@/lib/network";
 
-export type TBaseRes<T>={
-    code:number
-    msg:string
-    data:T
-}
+export type TBaseRes<T> = {
+  code: number;
+  msg: string;
+  data: T;
+};
 
 export const network = new Network({
   url: BACKEND_PREFIX,
@@ -22,7 +22,7 @@ network.onErr = err => {
   uni.showToast({
     title: msg,
     duration: 1500,
-    icon: 'error'
+    icon: "error",
   });
 };
 

@@ -17,7 +17,7 @@ export interface IAppCourse {
 const parseNumbers = (s: string): number[] | null => {
   const result = s.match(/\d+/g);
   if (result?.length === 2) {
-    return [Number(result[0]),Number(result[1])];
+    return [Number(result[0]), Number(result[1])];
   }
   return null;
 };
@@ -254,7 +254,7 @@ export type TWeekCourse = [
 /**一个学期的课表，一维是周课表，
  * 二维是天课表，包含冲突情况和当天的所有课
  */
-export type TOrganizedCourse = Array<TWeekCourse|null|undefined>;
+export type TOrganizedCourse = Array<TWeekCourse | null | undefined>;
 
 /**使用桶排序将课程按天放到数组内，参数arr[i]表示第i+1周的所有课程 */
 export const organizeCourse = (arr: IAppCourse[][]): TOrganizedCourse => {
@@ -289,7 +289,7 @@ export const organizeCourse = (arr: IAppCourse[][]): TOrganizedCourse => {
         );
       }
     }
-    result[disorderWeek[0].week]=orderedWeek
+    result[disorderWeek[0].week] = orderedWeek;
   }
   return result;
 };

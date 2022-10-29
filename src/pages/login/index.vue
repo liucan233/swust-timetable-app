@@ -40,7 +40,7 @@ import LoginInput from "@components/LoginInput";
 import { TABLE } from "@enums/pages";
 import { Cookie } from "@enums/storage";
 import { setCookieSync } from "@utils/cookie";
-import { getCookieAndCaptchaUrl, login } from "@api";
+import { getCookieAndCaptchaUrl, login } from "@/api/login";
 
 /**组件ref属性的类型，T为组件类型 */
 type TLoginInputRef = InstanceType<typeof LoginInput> | null;
@@ -75,9 +75,9 @@ onMounted(() => {
 /** 刷新cookie和重新获取验证码 */
 const refreshCookieAndCaptchaUrl = () => {
   /** 获取cookie和验证码 */
-  getCookieAndCaptchaUrl().promise.then(response => {
-    imageURL.value = response.data.data.captcha;
-    setCookieSync(Cookie.LOGIN_COOKIE, response.data.data.cookie);
+  getCookieAndCaptchaUrl().then(response => {
+    imageURL.value = response?.data.captcha || "";
+    setCookieSync(Cookie.LOGIN_COOKIE, response?.data.cookie || "");
   });
 };
 
@@ -130,39 +130,35 @@ const handleClick = async () => {
   uni.showLoading({
     title: "登陆中",
   });
-  try {
-    const {
-      data: { cookie },
-      code: statusCode,
-      msg,
-    } = await login(username, password, code).promise.then(
-      response => response.data
-    );
-    uni.hideLoading();
-    if (statusCode === 200) {
-      setCookieSync(Cookie.CAS_COOKIE, cookie);
-      uni.switchTab({ url: TABLE });
-    } else {
-      if (statusCode === 401) {
-        // 返回的msg有两种，"验证码错误" "用户名或密码错误"
-        if (msg.length === 8) {
-          usernameRef.value?.warning(text.username.errorText);
-          passwordRef.value?.warning(text.password.errorText);
-        } else if (msg.length === 5) {
-          verifyRef.value?.warning(text.password.errorText);
+  login(username, password, code).then(
+    response => {
+      uni.hideLoading();
+      if (response?.code === 200) {
+        setCookieSync(Cookie.CAS_COOKIE, response.data.cookie);
+        uni.switchTab({ url: TABLE });
+      } else {
+        if (response?.code === 401) {
+          // 返回的msg有两种，"验证码错误" "用户名或密码错误"
+          if (response.msg.length === 8) {
+            usernameRef.value?.warning(text.username.errorText);
+            passwordRef.value?.warning(text.password.errorText);
+          } else if (response.msg.length === 5) {
+            verifyRef.value?.warning(text.password.errorText);
+          }
         }
+        /** 登录失败需要重新获取cookie和验证码 */
+        refreshCookieAndCaptchaUrl();
+        throw Error(response?.msg);
       }
-      /** 登录失败需要重新获取cookie和验证码 */
-      refreshCookieAndCaptchaUrl();
-      throw Error(msg);
+    },
+    error => {
+      uni.hideLoading();
+      uni.showToast({
+        icon: "error",
+        title: `${error}`,
+      });
     }
-  } catch (error) {
-    uni.hideLoading();
-    uni.showToast({
-      icon: "error",
-      title: `${error}`,
-    });
-  }
+  );
 };
 </script>
 

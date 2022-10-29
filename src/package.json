@@ -1,15 +1,15 @@
 {
-    "id": "xc-virtual-list",
-    "name": "虚拟列表，长列表优化",
-    "version": "2.2.2",
-    "description": "针对APP、H5超长列表的优化",
-    "keywords": [
-        "虚拟列表，优化"
-    ],
-    "dcloudext": {
-        "category": [
-            "前端组件",
-            "通用组件"
-        ]
-    }
+  "id": "xc-virtual-list",
+  "name": "虚拟列表，长列表优化",
+  "version": "2.2.2",
+  "description": "针对APP、H5超长列表的优化",
+  "keywords": [
+    "虚拟列表，优化"
+  ],
+  "dcloudext": {
+    "category": [
+      "前端组件",
+      "通用组件"
+    ]
+  }
 }

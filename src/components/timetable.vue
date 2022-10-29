@@ -20,7 +20,7 @@
         <swiper-item v-for="(c, index) in props.course.slice(1)">
           <WeekTable
             :course="c ?? emptyCourseWeek"
-            :day-num="dayInfoArr[index+1]"
+            :day-num="dayInfoArr[index + 1]"
           ></WeekTable>
         </swiper-item>
       </swiper>
@@ -46,12 +46,12 @@ const props = defineProps<{
   startTime: Date;
   endTime: Date;
   course: TOrganizedCourse;
-  weekNum:number
+  weekNum: number;
 }>();
 
-const emit=defineEmits<{
-  (e:'weekChange',current:number):any
-}>()
+const emit = defineEmits<{
+  (e: "weekChange", current: number): any;
+}>();
 
 const $mouthNum = shallowRef(9);
 
@@ -92,9 +92,9 @@ const handleWeekChange = (e: {
     source: string;
   };
 }) => {
-  const curWeekNum=e.detail.current+1
+  const curWeekNum = e.detail.current + 1;
   $mouthNum.value = dayInfoArr.value[curWeekNum][0].month;
-  emit('weekChange',curWeekNum)
+  emit("weekChange", curWeekNum);
 };
 </script>
 
