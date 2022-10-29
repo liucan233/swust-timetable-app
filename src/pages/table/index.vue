@@ -1,75 +1,122 @@
 <template>
-  <view class="content">
-    <text>
-      {{ commonTimetable }}
-      <br />
-      {{ labTimetable }}
-    </text>
+  <view class="table-header">
+    <text class="table-time">第 {{ $termInfo.viewWeekNum }} 周</text>
+    <text class="table-time">{{ $termInfo.termName }}</text>
+    <button class="table-add">添加课程</button>
+  </view>
+  <scroll-view class="table-preview" scroll-x>
+    <CoursePreview v-for="week in $courseData" />
+  </scroll-view>
+  <view class="table-main">
+    <Timetable
+      class-name="timetable"
+      :start-time="$termInfo.beginTime"
+      :end-time="$termInfo.overTime"
+      :course="$courseData"
+      :week-num="$termInfo.weekNum"
+      @week-change="handleWeekChange"
+      
+    />
   </view>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import { TimetableData } from "@enums/storage";
-import { getLabTimetableData, getCommonTimetableData } from "@api";
+import Timetable from "@components/timetable.vue";
+import CoursePreview from "@components/CoursePreview.vue";
+import { getDateFromWeek } from "@/utils/common";
+import { putCourseInOrder, TOrganizedCourse } from "@/utils/timetable";
+import { onMounted, ref, shallowRef } from "vue";
+import {
+  getLabTimetable,
+  getCommonTimetable,
+  ICommonCourse,
+  getTermInfo,
+} from "@/api/timetable";
 
-const commonTimetable = ref("");
-const labTimetable = ref("");
+const $termInfo = ref({
+  weekNum: 1,
+  termName: "",
+  beginTime: new Date("2022/9/1"),
+  overTime: new Date("2023/1/1"),
+  viewWeekNum: 0
+});
 
-onMounted(async () => {
-  // 同步读取缓存
-  const commonTimetableCache = uni.getStorageSync(
-    TimetableData.COMMON_TIMETABLE
-  );
-  const labTimetableCache = uni.getStorageSync(TimetableData.LAB_TIMETABLE);
-  if (commonTimetableCache && labTimetableCache) {
-    commonTimetable.value = commonTimetableCache;
-    labTimetable.value = labTimetableCache;
-  } else {
-    const { data: commonTimetableData } = await (
-      await getCommonTimetableData()
-    ).promise.then(response => response.data);
-    const { data: labTimetableData } = await (
-      await getLabTimetableData()
-    ).promise.then(response => response.data);
-    commonTimetable.value = commonTimetableData as unknown as string;
-    labTimetable.value = labTimetableData as unknown as string;
-    uni.setStorageSync(TimetableData.COMMON_TIMETABLE, commonTimetableData);
-    uni.setStorageSync(TimetableData.LAB_TIMETABLE, labTimetableData);
-  }
+const $courseData = shallowRef<TOrganizedCourse>([]);
 
-  // // 异步读取缓存
-  // uni.getStorage({
-  //   key: TimetableData.COMMON_TIMETABLE,
-  //   success: res => {
-  //     commonTimetable.value = res as unknown as string;
-  //   },
-  //   fail: async () => {
-  //     const { data: commonTimetableData } = await (
-  //       await getCommonTimetableData()
-  //     ).promise.then(response => response.data);
-  //     commonTimetable.value = commonTimetableData as unknown as string;
-  //     uni.setStorageSync(TimetableData.COMMON_TIMETABLE, commonTimetableData);
-  //   },
-  // });
-  // uni.getStorage({
-  //   key: TimetableData.LAB_TIMETABLE,
-  //   success: res => {
-  //     labTimetable.value = res as unknown as string;
-  //   },
-  //   fail: async () => {
-  //     const { data: labTimetableData } = await (
-  //       await getLabTimetableData()
-  //     ).promise.then(response => response.data);
-  //     labTimetable.value = labTimetableData as unknown as string;
-  //     uni.setStorageSync(TimetableData.LAB_TIMETABLE, labTimetableData);
-  //   },
-  // });
+const handleUpdateCourse = () => {
+  const labCookie = "development";
+  const commonCookie = labCookie;
+
+  Promise.all([
+    getLabTimetable(labCookie),
+    getCommonTimetable(commonCookie),
+    getTermInfo(commonCookie),
+  ]).then(arr => {
+    let courseArr: ICommonCourse[] = [];
+
+    if (arr[0]) {
+      courseArr = arr[0].data.courses;
+    }
+    if (arr[1]) {
+      courseArr = arr[1].data.courses.concat(courseArr);
+    }
+
+    if (arr[2]) {
+      const curWeekNum = Number(arr[2].data.weeks);
+      $termInfo.value.weekNum = curWeekNum;
+      $termInfo.value.viewWeekNum=curWeekNum
+      $termInfo.value.termName = arr[2].data.time;
+      $termInfo.value.beginTime = getDateFromWeek(curWeekNum);
+      $termInfo.value.overTime = getDateFromWeek(courseArr.length - curWeekNum);
+    }
+
+    $courseData.value = putCourseInOrder(courseArr, $termInfo.value.weekNum);
+  });
+};
+
+const handleWeekChange=(w:number)=>{
+  $termInfo.value.viewWeekNum=w;
+}
+
+onMounted(() => {
+  handleUpdateCourse();
 });
 </script>
 
 <style scoped>
-.content {
-  padding: 1rem;
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.table-time {
+  font-size: 20px;
+}
+
+.table-add {
+  border: none;
+  outline: none;
+  margin: 0;
+}
+
+.table-preview {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.table-add::after {
+  content: none;
+}
+
+.table-main {
+  width: 100%;
+  height: calc(100vh - 150px);
+}
+
+.timetable {
+  height: 70vh;
+  width: 100%;
 }
 </style>

@@ -1,51 +1,172 @@
 /**网络请求参数 */
-type TNetworkConfig = Omit<
-  UniNamespace.RequestOptions,
-  "success" | "fail" | "complete"
+type TUniRequestOptions = UniNamespace.RequestOptions;
+
+/**无"success、fail、complete和data的网络请求参数 */
+type TUniRequestOptionsOmit = Omit<
+  TUniRequestOptions,
+  "success" | "fail" | "complete" | "data"
 >;
 
-/**响应数据格式 */
-interface TNetworkRes<T>
-  extends Omit<UniNamespace.RequestSuccessCallbackResult, "data"> {
-  /**
-   * 开发者服务器返回的数据
-   */
-  data: T;
+/**无"success、fail、complete、method、url和data的网络请求参数 */
+type TNetworkRequestOptions = Omit<
+  TUniRequestOptions,
+  "success" | "fail" | "complete" | "data" | "url" | "method"
+>;
+
+
+/**无success、fail、complete和data的部分网络请求参数 */
+type TPartialUniRequestOptionsOmit = Partial<TUniRequestOptionsOmit>;
+
+/**uni请求的body */
+type TUniBody = TUniRequestOptions["data"];
+
+/**调用请求方法的返回结构 */
+interface IRequestTask<T> extends PromiseLike<T|null> {
+  /**uni原始的方法 */
+  task: UniNamespace.RequestTask;
 }
 
-/**网络请求错误 */
-export class RequestError extends Error {}
+/**
+ * 网络请求类，类似axios
+ * 构造函数url属性为请求的base url
+ */
+export class Network {
+  private defaultConfig: TPartialUniRequestOptionsOmit = {};
+  onReq: undefined | ((config: TUniRequestOptions) => TUniRequestOptions);
+  onRes: undefined | ((data:UniNamespace.RequestSuccessCallbackResult)=>unknown);
+  onErr: undefined | ((v: unknown) => unknown);
+  constructor(config?: TPartialUniRequestOptionsOmit) {
+    if (config) {
+      this.defaultConfig = config;
+    }
+  }
+  /**发生错误时执行onErr */
+  private tryResolveErr(
+    reject: (v: unknown) => unknown,
+    resolve: (v: null) => any,
+     error: unknown) {
+    if (this.onErr) {
+      try {
+        this.onErr(error);
+        resolve(null)
+      } catch (e) {
+        reject(e);
+      }
+    } else {
+      reject(error);
+    }
+  }
+  /**调用uni发送请求 */
+  private request<T>(config: TUniRequestOptions): IRequestTask<T> {
+    let task: IRequestTask<T>["task"] = {} as IRequestTask<T>["task"];
+    const request = new Promise<T|null>((resolve, reject) => {
+      let newConfig = config;
+      if (this.onReq) {
+        try {
+          newConfig = this.onReq(config);
+        } catch (error) {
+          this.tryResolveErr(
+            reject,
+            resolve,
+            new Error("执行请求拦截器时拦截器抛出错误")
+          );
+        }
+      }
+      const fail = (e: unknown) => {
+        this.tryResolveErr(reject,resolve, e);
+      };
+      const success = (v: UniApp.RequestSuccessCallbackResult) => {
+        if (this.onRes) {
+          try {
+            const result = this.onRes(v) as T;
+            resolve(result);
+          } catch (error) {
+            this.tryResolveErr(reject,resolve, error);
+          }
+        } else {
+          resolve(v as T);
+        }
+      };
+      task = uni.request({
+        ...newConfig,
+        fail,
+        success,
+      });
+    }) as unknown as IRequestTask<T>;
 
-/**请求错误时的回调函数 */
-let onErrorCb: null | ((msg: RequestError) => unknown) = null;
+    request.task = task;
+    return request;
+  }
 
-/**将uni app的回调式网络请求方式promise化 */
-export const network = <IRes>(config: TNetworkConfig) => {
-  type TOnFulfilled = TNetworkRes<IRes>;
+  private getAbsoluteUrl(url: string) {
+    const httpFlag = /^http:\/\//.test(url);
+    return (httpFlag ? "" : this.defaultConfig.url || "") + url;
+  }
 
-  let abort: unknown = null;
-  const promise = new Promise<TOnFulfilled>((resolve, reject) => {
-    const task = uni.request({
+  private getUniConfig({
+    config,
+    data,
+    url,
+    method,
+  }: {
+    config?: Omit<TUniRequestOptionsOmit, "url">;
+    url: string;
+    method?: TUniRequestOptions["method"];
+    data?: TUniBody;
+  }): TUniRequestOptions {
+    return {
+      ...this.defaultConfig,
       ...config,
-      fail: ({ errMsg }) => {
-        const err = new RequestError(errMsg);
-        reject(err);
-        onErrorCb?.(err);
-      },
-      success: result => {
-        resolve(result as TOnFulfilled);
-      },
-    });
+      url: this.getAbsoluteUrl(url),
+      method,
+      data,
+    };
+  }
 
-    abort = task.abort;
-  });
-  return {
-    promise,
-    abort: abort as () => void,
-  };
-};
+  get<T = unknown>(
+    url: string,
+    config?: TNetworkRequestOptions
+  ): IRequestTask<T> {
+    return this.request<T>(this.getUniConfig({ config, url }));
+  }
 
-/**监听网络请求的错误事件 */
-export const onRequestError = (cb: typeof onErrorCb) => {
-  onErrorCb = cb;
-};
+  post<T = unknown>(
+    url: string,
+    body: TUniBody,
+    config?: TNetworkRequestOptions
+  ) {
+    return this.request<T>(
+      this.getUniConfig({ config, url, method: "POST", data: body })
+    );
+  }
+
+  put<T = unknown>(
+    url: string,
+    body: TUniBody,
+    config?: TNetworkRequestOptions
+  ): IRequestTask<T> {
+    return this.request<T>(
+      this.getUniConfig({ config, url, method: "PUT", data: body })
+    );
+  }
+
+  delete<T = unknown>(
+    url: string,
+    body: TUniBody,
+    config?: TNetworkRequestOptions
+  ): IRequestTask<T> {
+    return this.request<T>(
+      this.getUniConfig({ config, url, method: "DELETE", data: body })
+    );
+  }
+
+  options<T = unknown>(
+    url: string,
+    body: TUniBody,
+    config?: TNetworkRequestOptions
+  ): IRequestTask<T> {
+    return this.request<T>(
+      this.getUniConfig({ config, url, method: "OPTIONS", data: body })
+    );
+  }
+}
