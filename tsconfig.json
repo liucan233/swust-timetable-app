@@ -10,11 +10,14 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "lib": ["esnext", "dom"],
-    "baseUrl": "./",
+    "baseUrl": "src",
     "paths": {
-      "@*": ["./src*"],
-      "@components/*": ["./src/components/*"],
-      "@api/*": ["./src/api/*"]
+      "@src/*": ["*"],
+      "@api/*": ["api/*"],
+      "@lib/*": ["lib/*"],
+      "@components/*": ["components/*"],
+      "@enums/*": ["enums/*"],
+      "@utils/*": ["utils/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.vue"]

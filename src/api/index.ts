@@ -1,5 +1,5 @@
-import { BACKEND_PREFIX } from "@/config";
-import { Network } from "@/lib/network";
+import { BACKEND_PREFIX } from "@src/config";
+import { Network } from "@lib/network";
 
 export type TBaseRes<T>={
     code:number

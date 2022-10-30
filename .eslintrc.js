@@ -25,6 +25,7 @@ module.exports = {
     "prettier/prettier": 1,
     "@typescript-eslint/no-explicit-any": 1,
     "vue/multi-word-component-names": 1,
-    "vue/multi-word-component-names":0
+    "vue/multi-word-component-names":0,
+    "prefer-const":1
   },
 };

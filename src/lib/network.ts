@@ -98,7 +98,7 @@ export class Network {
   }
 
   private getAbsoluteUrl(url: string) {
-    const httpFlag = /^http:\/\//.test(url);
+    const httpFlag = /^http/.test(url);
     return (httpFlag ? "" : this.defaultConfig.url || "") + url;
   }
 
