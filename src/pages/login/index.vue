@@ -21,7 +21,7 @@
         />
         <view class="verify-img-warper">
           <image
-            :src="imageURL"
+            :src="remoteData.captcha"
             alt="点击刷新"
             @click="refreshCookieAndCaptchaUrl"
           />
@@ -48,7 +48,11 @@ type TLoginInputRef = InstanceType<typeof LoginInput> | null;
 const usernameRef = shallowRef<TLoginInputRef>(null);
 const passwordRef = shallowRef<TLoginInputRef>(null);
 const verifyRef = shallowRef<TLoginInputRef>(null);
-const imageURL = shallowRef<string>("");
+const remoteData = shallowRef({
+  cookie: "",
+  captcha: "",
+});
+
 const text = {
   title: "欢迎使用有课么",
   username: {
@@ -74,11 +78,9 @@ onMounted(() => {
 
 /** 刷新cookie和重新获取验证码 */
 const refreshCookieAndCaptchaUrl = () => {
-  /** 获取cookie和验证码 */
   getCookieAndCaptchaUrl().then(response => {
     if (response) {
-      imageURL.value = response.data.captcha;
-      setCookieSync(Cookie.LOGIN_COOKIE, response?.data.cookie || "");
+      remoteData.value = response.data;
     }
   });
 };
@@ -132,10 +134,11 @@ const handleClick = async () => {
   uni.showLoading({
     title: "登陆中",
   });
-  login(username, password, code).then(
+  login(username, password, code, remoteData.value.cookie).then(
     response => {
       uni.hideLoading();
       if (response?.code === 200) {
+        /**登录成功后存储到uni storage中 */
         setCookieSync(Cookie.CAS_COOKIE, response.data.cookie);
         uni.switchTab({ url: TABLE });
       } else {
@@ -145,12 +148,11 @@ const handleClick = async () => {
             usernameRef.value?.warning(text.username.errorText);
             passwordRef.value?.warning(text.password.errorText);
           } else if (response.msg.length === 5) {
-            verifyRef.value?.warning(text.password.errorText);
+            verifyRef.value?.warning(text.code.errorText);
           }
         }
         /** 登录失败需要重新获取cookie和验证码 */
         refreshCookieAndCaptchaUrl();
-        throw Error(response?.msg);
       }
     },
     error => {
@@ -159,6 +161,7 @@ const handleClick = async () => {
         icon: "error",
         title: `${error}`,
       });
+      refreshCookieAndCaptchaUrl();
     }
   );
 };

@@ -1,7 +1,5 @@
-import { Cookie } from "@enums/storage";
+import { network, TBaseRes } from ".";
 import { TGetCookieAndCaptchaUrlDto, TLoginDto } from "@src/types/login";
-import { getCookieSync } from "@utils/cookie";
-import { network } from ".";
 
 // const network = new Network();
 
@@ -10,27 +8,29 @@ import { network } from ".";
  * @returns
  */
 export function getCookieAndCaptchaUrl() {
-  return network.get<IBaseResponse<TGetCookieAndCaptchaUrlDto>>(
-    "https://swust.hanyue.xyz/api/swust/loginCas"
+  return network.get<TBaseRes<TGetCookieAndCaptchaUrlDto>>(
+    "/api/swust/loginCas"
   );
 }
 
 /**
  *  登录
- * @param username '
- * @param password
- * @param code
+ * @param user
+ * @param passwd
+ * @param captcha
+ * @param cookie
  * @returns 一站式服务大厅cookie(CAS_COOKIE)
  */
-export function login(username: string, password: string, code: string) {
-  const cookie = getCookieSync(Cookie.LOGIN_COOKIE);
-  return network.post<IBaseResponse<TLoginDto>>(
-    "https://swust.hanyue.xyz/api/swust/loginCas",
-    {
-      user: username,
-      passwd: password,
-      captcha: code,
-      cookie,
-    }
-  );
+export function login(
+  user: string,
+  passwd: string,
+  captcha: string,
+  cookie: string
+) {
+  return network.post<TBaseRes<TLoginDto>>("/api/swust/loginCas", {
+    user,
+    passwd,
+    captcha,
+    cookie,
+  });
 }

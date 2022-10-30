@@ -4,17 +4,10 @@
 
 <script setup lang="ts">
 import { onBeforeMount } from "vue";
-import { getCookieSync } from "@utils/cookie";
-import { LOGIN, TABLE } from "@enums/pages";
-import { Cookie } from "@enums/storage";
+import { TABLE } from "@enums/pages";
 
 onBeforeMount(() => {
-  const cookie = getCookieSync(Cookie.CAS_COOKIE);
-  if (cookie) {
-    uni.switchTab({ url: TABLE });
-  } else {
-    uni.redirectTo({ url: LOGIN });
-  }
+  uni.switchTab({ url: TABLE });
 });
 </script>
 
