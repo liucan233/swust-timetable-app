@@ -1,17 +1,45 @@
 <template>
-  <view class="week-container">
-    <view v-for="(text, index) in dayArr" :key="index" class="day-wrap">
-      <text class="day-name">周{{ text }}</text>
-      <text class="day-num">{{ dayNum[index].day }}</text>
-      <view
-        v-for="(c, index2) in props.course[index + 1]?.list ?? []"
-        class="course-item"
-        :style="getPosition(c.begin, c.over)"
-        :key="index2"
-      >
-        <text> {{ c.place }} {{ c.name }} </text>
+  <view class="swiper-item">
+    <view class="table-header">
+      <view class="table-time">
+        <text>{{ props.dayNum[0]?.month || -1 }}</text>
+        <text>月</text>
+      </view>
+      <view class="table-date">
+        <view v-for="(d, index) in dayNum" key="d.day" class="table-date-item">
+          <text class="day-name">周{{ props.dayName[index] }}</text>
+          <text class="day-num">{{ d.day }}</text>
+        </view>
       </view>
     </view>
+    <scroll-view class="scroll-view" scroll-y :show-scrollbar="false">
+      <view class="week-container">
+        <view class="section-time">
+          <text
+            v-for="(_, index) in sectionTextArr"
+            :key="index"
+            class="time-name"
+          >
+            第 {{ index + 1 }} 讲
+          </text>
+        </view>
+        <view
+          v-for="(text, index) in props.dayName"
+          :key="index"
+          class="day-wrap"
+        >
+          <view
+            v-for="(c, index2) in props.course[index + 1]?.list ?? []"
+            class="course-item"
+            :style="getPosition(c.begin, c.over)"
+            :key="index2"
+          >
+            <text>@{{ c.place }}</text>
+            <text>{{ c.name }}</text>
+          </view>
+        </view>
+      </view>
+    </scroll-view>
   </view>
 </template>
 <script lang="ts" setup>
@@ -22,37 +50,80 @@ import { IDayInfo } from "@utils/common";
 interface IProps {
   course: TWeekCourse;
   dayNum: IDayInfo[];
+  dayName: string[];
+  courseHeight: number;
 }
 const props = defineProps<IProps>();
 
-effect(()=>{
+/**每天有6讲12节课 */
+const sectionTextArr = new Array(6).fill(null);
+
+effect(() => {
   props.course.forEach(d => {
     if (d?.conflict.length) {
       console.log("冲突课程: ", d.conflict);
     }
   });
-})
+});
 
-const rowHeight = 100,
-  base = 60,
-  dayArr = ["一", "二", "三", "四", "五", "六", "日"];
+const rowHeight = 140,
+  gapHeight = 6;
 
 // onMounted(() => {});
 
 const getPosition = (s: number, e: number): CSSProperties => {
   return {
-    top: base + (rowHeight / 2) * (s - 1) + "px",
-    height: `calc(${e - s} * 8.33%)`,
+    top: (s >> 1) * rowHeight + "px",
+    height: ((e - s + 1) * rowHeight) / 2 - gapHeight + "px",
   };
 };
 </script>
 
 <style scoped>
-.week-container {
+.swiper-item {
+  height: calc(100% - 50px);
   width: 100%;
-  height: 100%;
+}
+.table-header {
+  width: calc(100% - 5px);
+  text-align: center;
   display: flex;
   justify-content: space-between;
+}
+.table-time {
+  width: 40px;
+  flex: 0 0 40px;
+  padding:0 10px;
+  box-sizing: border-box;
+}
+.table-date {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: space-between;
+}
+.table-date-item{
+  flex: 1 1 100px;
+}
+.scroll-view {
+  height: 100%;
+  width: 100%;
+}
+.week-container {
+  width: calc(100% - 5px);
+  height: v-bind("rowHeight*6+'px'");
+  display: flex;
+  justify-content: space-between;
+}
+.section-time {
+  padding: 0 10px;
+  height: 100%;
+  flex: 0 0 40px;
+  box-sizing: border-box;
+}
+.time-name {
+  display: block;
+  height: v-bind("rowHeight+'px'");
+  line-height: v-bind("Math.floor(rowHeight/3)+'px'");
 }
 .day-wrap {
   flex: 1 1 auto;
@@ -61,17 +132,33 @@ const getPosition = (s: number, e: number): CSSProperties => {
   position: relative;
   text-align: center;
 }
-.day-name {
+.day-name,
+.day-num {
   width: 100%;
-  text-align: center;
+  height: 25px;
+  display: block;
+  /* text-align: center; */
 }
 .course-item {
-  width: 100%;
+  width: 95%;
+
   position: absolute;
   left: 0;
   border: 1px solid;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  line-height: 1.5;
+  font-size: 15px;
+  box-sizing: border-box;
 }
-.day-course {
-  width: 100%;
+.course-item > text {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+  vertical-align: baseline;
 }
 </style>

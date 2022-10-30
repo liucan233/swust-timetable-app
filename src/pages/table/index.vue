@@ -1,7 +1,7 @@
 <template>
   <view class="table-header">
-    <text class="table-time">第 {{ $termInfo.viewWeekNum }} 周</text>
     <text class="table-time">{{ $termInfo.termName }}</text>
+    <text class="table-time">第 {{ $termInfo.viewWeekNum }} / {{$courseData.length}} 周</text>
     <button class="table-add">添加课程</button>
   </view>
   <scroll-view class="table-preview" scroll-x>
@@ -50,9 +50,9 @@ const handleUpdateCourse = () => {
     "JSESSIONID=578804F86B7CA1639AFB975105879A92.node1; Path=/";
 
   Promise.all([
-    getLabTimetable("development"),
-    getCommonTimetable("development"),
-    getTermInfo("development"),
+    getLabTimetable(labCookie),
+    getCommonTimetable(commonCookie),
+    getTermInfo(labCookie),
   ]).then(arr => {
     let courseArr: ICommonCourse[] = [];
 
@@ -108,6 +108,7 @@ onMounted(() => {
 .table-preview {
   width: 100%;
   white-space: nowrap;
+  touch-action: pan-x;
 }
 
 .table-add::after {
@@ -116,11 +117,6 @@ onMounted(() => {
 
 .table-main {
   width: 100%;
-  height: calc(100vh - 150px);
-}
-
-.timetable {
-  height: 70vh;
-  width: 100%;
+  height: calc(100vh - 170px);
 }
 </style>

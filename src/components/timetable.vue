@@ -1,16 +1,5 @@
 <template>
-  <scroll-view class="scroll-container" scroll-y>
-    <view class="container">
-      <view class="section-wrap">
-        <text class="table-time">{{ $mouthNum }}月</text>
-        <text
-          v-for="(_, index) in sectionTextArr"
-          :key="index"
-          class="section-time"
-        >
-          第 {{ index + 1 }} 讲
-        </text>
-      </view>
+  <view class="container">
       <swiper
         class="table-swiper"
         :indicator-dots="false"
@@ -21,11 +10,12 @@
           <WeekTable
             :course="c ?? emptyCourseWeek"
             :day-num="dayInfoArr[index + 1]"
-          ></WeekTable>
+            :day-name="dayArr"
+            :course-height="rowHeight"
+          />
         </swiper-item>
       </swiper>
     </view>
-  </scroll-view>
 </template>
 <script lang="ts" setup>
 /**
@@ -53,11 +43,12 @@ const emit = defineEmits<{
   (e: "weekChange", current: number): any;
 }>();
 
-const $mouthNum = shallowRef(9);
-
 const emptyCourseWeek = new Array(7) as TWeekCourse;
 
-const sectionTextArr = new Array(6).fill(null);
+/**每讲课显示的默认高度 */
+const rowHeight = 100;
+/**一周有的星期数中文 */
+const  dayArr = ["一", "二", "三", "四", "五", "六", "日"];
 
 onUpdated(() => {
   // 输出学期信息
@@ -74,7 +65,6 @@ const dayInfoArr = computed<IDayInfo[][]>(() => {
   }
   const dayArr = getDaysInfo(props.startTime, props.endTime),
     result: IDayInfo[][] = [];
-  $mouthNum.value = dayArr[0].month;
   let dayStart = 0,
     dayEnd = 7;
   for (let i = 0; i < props.course.length; i++) {
@@ -93,45 +83,22 @@ const handleWeekChange = (e: {
   };
 }) => {
   const curWeekNum = e.detail.current + 1;
-  $mouthNum.value = dayInfoArr.value[curWeekNum][0].month;
   emit("weekChange", curWeekNum);
 };
 </script>
 
 <style scoped>
-.scroll-container {
-  width: 100%;
-  height: 100%;
-}
 .container {
   display: flex;
   justify-content: flex-start;
   width: 100%;
   height: 100%;
 }
-.section-wrap {
-  width: 20px;
-  text-align: center;
-  flex: 0 0 auto;
-  display: flex;
-  justify-content: flex-start;
-  flex-direction: column;
-  height: 100%;
-}
 .table-swiper {
-  width: calc(100% - 40px);
+  width: 100%;
   height: 100%;
   flex: 0 0 auto;
-  touch-action: pan-x;
   white-space: nowrap;
   overscroll-behavior: contain;
-}
-.table-time {
-  height: 60px;
-  flex: 0 0 60px;
-}
-.section-time {
-  height: 100px;
-  vertical-align: middle;
 }
 </style>

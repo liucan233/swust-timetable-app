@@ -50,6 +50,7 @@
     "selectedColor": "#1296db",
     "borderStyle": "black",
     "backgroundColor": "#ffffff",
+    "position": "bottom",
     "list": [
       {
         "pagePath": "pages/table/index",
