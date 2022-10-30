@@ -42,9 +42,7 @@ const $termInfo = ref({
 
 const $courseData = shallowRef<TOrganizedCourse>([]);
 
-const handleUpdateCookie=()=>{
-  
-}
+const handleUpdateCookie = () => {};
 
 const handleUpdateCourse = () => {
   const labCookie = "JSESSIONID=B6224D36ED4BFD3516800F1E929FE859.node1; Path=/";
@@ -52,9 +50,9 @@ const handleUpdateCourse = () => {
     "JSESSIONID=578804F86B7CA1639AFB975105879A92.node1; Path=/";
 
   Promise.all([
-    getLabTimetable(labCookie),
-    getCommonTimetable(commonCookie),
-    getTermInfo(labCookie),
+    getLabTimetable("development"),
+    getCommonTimetable("development"),
+    getTermInfo("development"),
   ]).then(arr => {
     let courseArr: ICommonCourse[] = [];
 
@@ -70,11 +68,14 @@ const handleUpdateCourse = () => {
       $termInfo.value.weekNum = curWeekNum;
       $termInfo.value.viewWeekNum = curWeekNum;
       $termInfo.value.termName = arr[2].data.time;
-      $termInfo.value.beginTime = getDateFromWeek(curWeekNum);
-      $termInfo.value.overTime = getDateFromWeek(curWeekNum-courseArr.length);
     }
 
+    const curWeekNum = $termInfo.value.weekNum;
     $courseData.value = putCourseInOrder(courseArr, $termInfo.value.weekNum);
+    $termInfo.value.beginTime = getDateFromWeek(-curWeekNum);
+    $termInfo.value.overTime = getDateFromWeek(
+      $courseData.value.length - curWeekNum
+    );
   });
 };
 

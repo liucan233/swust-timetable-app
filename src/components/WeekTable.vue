@@ -15,7 +15,7 @@
   </view>
 </template>
 <script lang="ts" setup>
-import { CSSProperties, onUpdated } from "vue";
+import { CSSProperties, effect, onUpdated } from "vue";
 import { TWeekCourse } from "@utils/timetable";
 import { IDayInfo } from "@utils/common";
 
@@ -25,13 +25,13 @@ interface IProps {
 }
 const props = defineProps<IProps>();
 
-onUpdated(() => {
+effect(()=>{
   props.course.forEach(d => {
     if (d?.conflict.length) {
-      console.log("冲突课程: ", d);
+      console.log("冲突课程: ", d.conflict);
     }
   });
-});
+})
 
 const rowHeight = 100,
   base = 60,

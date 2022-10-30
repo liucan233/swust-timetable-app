@@ -26,6 +26,6 @@ export const getDaysInfo = (start: Date, end: Date) => {
 
 export const getDateFromWeek = (currentWeek: number):Date => {
   return new Date(
-    dayjs().startOf('week').add(-currentWeek,'week').valueOf()
+    dayjs().startOf('week').add(currentWeek,'week').valueOf()
   )
 };
