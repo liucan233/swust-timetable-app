@@ -1,3 +1,5 @@
+import dayjs from "@src/lib/dayjs";
+
 export interface IDayInfo {
   year: number;
   month: number;
@@ -22,10 +24,8 @@ export const getDaysInfo = (start: Date, end: Date) => {
   return result;
 };
 
-export const getDateFromWeek = (currentWeek: number) => {
-  // 除以10s防止计算时天数加1
-  const now = new Date((Date.now() / 10000) * 10000);
-  const div = ((now.getDay() + 6) % 7) + currentWeek * 7;
-  now.setDate(now.getDate() - div);
-  return now;
+export const getDateFromWeek = (currentWeek: number):Date => {
+  return new Date(
+    dayjs().startOf('week').add(-currentWeek,'week').valueOf()
+  )
 };
