@@ -8,9 +8,10 @@ export default defineConfig({
   plugins: [uni(), viteEslint()],
   resolve: {
     alias: {
-      "@": path.resolve("./src"),
+      "@src": path.resolve("./src"),
       "@components": path.resolve("./src/components/"),
-      "@api": path.resolve("./src/api/index.ts"),
+      "@api": path.resolve("./src/api/"),
+      "@lib": path.resolve("./src/lib/"),
       "@enums": path.resolve("./src/enums/"),
       "@utils": path.resolve("./src/utils/"),
     },

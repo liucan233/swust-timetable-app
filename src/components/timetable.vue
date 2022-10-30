@@ -5,7 +5,7 @@
         <text class="table-time">{{ $mouthNum }}月</text>
         <text
           v-for="(_, index) in sectionTextArr"
-          key="index"
+          :key="index"
           class="section-time"
         >
           第 {{ index + 1 }} 讲
@@ -17,7 +17,7 @@
         @change="handleWeekChange"
         :current="props.weekNum"
       >
-        <swiper-item v-for="(c, index) in props.course.slice(1)">
+        <swiper-item v-for="(c, index) in props.course.slice(1)" :key="index">
           <WeekTable
             :course="c ?? emptyCourseWeek"
             :day-num="dayInfoArr[index + 1]"
@@ -36,9 +36,9 @@
  *  3. 用户手指移动时判断运动方向（水平or竖直），事件穿透给对应滚动内容
  */
 import { shallowRef } from "vue";
-import { getDaysInfo, IDayInfo } from "@/utils/common";
+import { getDaysInfo, IDayInfo } from "@utils/common";
 import WeekTable from "./WeekTable.vue";
-import { TOrganizedCourse, TWeekCourse } from "@/utils/timetable";
+import { TOrganizedCourse, TWeekCourse } from "@utils/timetable";
 import { computed, onUpdated } from "vue";
 
 const props = defineProps<{

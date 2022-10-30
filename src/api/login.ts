@@ -1,8 +1,9 @@
 import { Cookie } from "@enums/storage";
+import { TGetCookieAndCaptchaUrlDto, TLoginDto } from "@src/types/login";
 import { getCookieSync } from "@utils/cookie";
-import { Network } from "@/lib/network";
+import { network } from ".";
 
-const network = new Network();
+// const network = new Network();
 
 /**
  * 获取当前cookie和验证码

@@ -1,12 +1,13 @@
 <template>
   <view class="week-container">
-    <view v-for="(text, index) in dayArr" class="day-wrap">
+    <view v-for="(text, index) in dayArr" :key="index" class="day-wrap">
       <text class="day-name">周{{ text }}</text>
-      <text class="day-num">{{ dayNum[index].day }}</text>
+      <!-- <text class="day-num">{{ dayNum[index].day }}</text> -->
       <view
-        v-for="c in props.course[index]?.list ?? []"
+        v-for="(c, index2) in props.course[index]?.list ?? []"
         class="course-item"
         :style="getPosition(c.begin, c.over)"
+        :key="index2"
       >
         <text>
           {{ c.name }}
@@ -16,9 +17,9 @@
   </view>
 </template>
 <script lang="ts" setup>
-import { CSSProperties, onMounted, shallowRef, watch } from "vue";
-import { TWeekCourse } from "@/utils/timetable";
-import { IDayInfo } from "@/utils/common";
+import { CSSProperties } from "vue";
+import { TWeekCourse } from "@utils/timetable";
+import { IDayInfo } from "@utils/common";
 
 interface IProps {
   course: TWeekCourse;
@@ -26,11 +27,11 @@ interface IProps {
 }
 const props = defineProps<IProps>();
 
-let rowHeight = 100,
+const rowHeight = 100,
   base = 60,
   dayArr = ["一", "二", "三", "四", "五", "六", "日"];
 
-onMounted(() => {});
+// onMounted(() => {});
 
 const getPosition = (s: number, e: number): CSSProperties => {
   return {

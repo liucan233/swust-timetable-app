@@ -35,12 +35,12 @@
 <script setup lang="ts">
 import { onMounted, shallowRef } from "vue";
 
-import LoginInput from "@components/LoginInput";
+import LoginInput from "@components/LoginInput.vue";
 
 import { TABLE } from "@enums/pages";
 import { Cookie } from "@enums/storage";
 import { setCookieSync } from "@utils/cookie";
-import { getCookieAndCaptchaUrl, login } from "@/api/login";
+import { getCookieAndCaptchaUrl, login } from "@api/login";
 
 /**组件ref属性的类型，T为组件类型 */
 type TLoginInputRef = InstanceType<typeof LoginInput> | null;
@@ -76,8 +76,10 @@ onMounted(() => {
 const refreshCookieAndCaptchaUrl = () => {
   /** 获取cookie和验证码 */
   getCookieAndCaptchaUrl().then(response => {
-    imageURL.value = response?.data.captcha || "";
-    setCookieSync(Cookie.LOGIN_COOKIE, response?.data.cookie || "");
+    if (response) {
+      imageURL.value = response.data.captcha;
+      setCookieSync(Cookie.LOGIN_COOKIE, response?.data.cookie || "");
+    }
   });
 };
 
