@@ -2,22 +2,20 @@
   <view class="week-container">
     <view v-for="(text, index) in dayArr" :key="index" class="day-wrap">
       <text class="day-name">周{{ text }}</text>
-      <!-- <text class="day-num">{{ dayNum[index].day }}</text> -->
+      <text class="day-num">{{ dayNum[index].day }}</text>
       <view
-        v-for="(c, index2) in props.course[index]?.list ?? []"
+        v-for="(c, index2) in props.course[index + 1]?.list ?? []"
         class="course-item"
         :style="getPosition(c.begin, c.over)"
         :key="index2"
       >
-        <text>
-          {{ c.name }}
-        </text>
+        <text> {{ c.place }} {{ c.name }} </text>
       </view>
     </view>
   </view>
 </template>
 <script lang="ts" setup>
-import { CSSProperties } from "vue";
+import { CSSProperties, onUpdated } from "vue";
 import { TWeekCourse } from "@utils/timetable";
 import { IDayInfo } from "@utils/common";
 
@@ -26,6 +24,14 @@ interface IProps {
   dayNum: IDayInfo[];
 }
 const props = defineProps<IProps>();
+
+onUpdated(() => {
+  props.course.forEach(d => {
+    if (d?.conflict.length) {
+      console.log("冲突课程: ", d);
+    }
+  });
+});
 
 const rowHeight = 100,
   base = 60,
