@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import Timetable from "@components/timetable.vue";
+import Timetable from "@src/components/Timetable.vue";
 import CoursePreview from "@components/CoursePreview.vue";
 import { getDateFromWeek } from "@utils/common";
 import { putCourseInOrder, TOrganizedCourse } from "@utils/timetable";
@@ -68,7 +68,7 @@ const handleUpdateCourse = () => {
       $termInfo.value.viewWeekNum=curWeekNum
       $termInfo.value.termName = arr[2].data.time;
       $termInfo.value.beginTime = getDateFromWeek(curWeekNum);
-      $termInfo.value.overTime = getDateFromWeek(courseArr.length - curWeekNum);
+      $termInfo.value.overTime = getDateFromWeek(curWeekNum-courseArr.length);
     }
 
     $courseData.value = putCourseInOrder(courseArr, $termInfo.value.weekNum);
