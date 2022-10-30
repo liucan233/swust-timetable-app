@@ -43,6 +43,10 @@ const $termInfo = ref({
 
 const $courseData = shallowRef<TOrganizedCourse>([]);
 
+const handleUpdateCookie=()=>{
+  
+}
+
 const handleUpdateCourse = () => {
   const labCookie = "JSESSIONID=B6224D36ED4BFD3516800F1E929FE859.node1; Path=/";
   const commonCookie =

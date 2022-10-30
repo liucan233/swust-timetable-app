@@ -2,17 +2,15 @@
   <view class="week-container">
     <view v-for="(text, index) in dayArr" :key="index" class="day-wrap">
       <text class="day-name">周{{ text }}</text>
-      <!-- <text class="day-num">{{ dayNum[index].day }}</text> -->
+      <text class="day-num">{{ dayNum[index].day }}</text>
       <view
-        v-for="(c, index2) in props.course[index+1]?.list ?? []"
+        v-for="(c, index2) in props.course[index + 1]?.list ?? []"
         class="course-item"
         :style="getPosition(c.begin, c.over)"
         :key="index2"
       >
-        <text>
-            {{c.name}}
-        </text>
-         </view>
+        <text> {{ c.place }} {{ c.name }} </text>
+      </view>
     </view>
   </view>
 </template>
@@ -23,17 +21,17 @@ import { IDayInfo } from "@utils/common";
 
 interface IProps {
   course: TWeekCourse;
-  dayNum:IDayInfo[]
+  dayNum: IDayInfo[];
 }
 const props = defineProps<IProps>();
 
-onUpdated(()=>{
-  props.course.forEach(d=>{
-    if(d?.conflict.length){
-      console.log('冲突课程: ',d.conflict)
+onUpdated(() => {
+  props.course.forEach(d => {
+    if (d?.conflict.length) {
+      console.log("冲突课程: ", d);
     }
-  })
-})
+  });
+});
 
 const rowHeight = 100,
   base = 60,
@@ -41,12 +39,12 @@ const rowHeight = 100,
 
 // onMounted(() => {});
 
-const getPosition=(s:number,e:number):CSSProperties=>{
-    return {
-        top: base+rowHeight/2*(s-1)+'px',
-        height: `calc(${e-s} * 8.33%)`
-    }
-}
+const getPosition = (s: number, e: number): CSSProperties => {
+  return {
+    top: base + (rowHeight / 2) * (s - 1) + "px",
+    height: `calc(${e - s} * 8.33%)`,
+  };
+};
 </script>
 
 <style scoped>
@@ -63,17 +61,17 @@ const getPosition=(s:number,e:number):CSSProperties=>{
   position: relative;
   text-align: center;
 }
-.day-name{
-    width: 100%;
-    text-align: center;
+.day-name {
+  width: 100%;
+  text-align: center;
 }
-.course-item{
-    width: 100%;
-    position: absolute;
-    left: 0;
-    border: 1px solid;
+.course-item {
+  width: 100%;
+  position: absolute;
+  left: 0;
+  border: 1px solid;
 }
-.day-course{
-    width: 100%;
+.day-course {
+  width: 100%;
 }
 </style>
