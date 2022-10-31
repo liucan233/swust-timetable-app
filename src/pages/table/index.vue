@@ -42,9 +42,7 @@ const $termInfo = ref({
 
 const $courseData = shallowRef<TOrganizedCourse>([]);
 
-const handleUpdateCookie=()=>{
-  
-}
+// const handleUpdateCookie = () => {};
 
 const handleUpdateCourse = () => {
   const labCookie = "JSESSIONID=B6224D36ED4BFD3516800F1E929FE859.node1; Path=/";
@@ -71,7 +69,7 @@ const handleUpdateCourse = () => {
       $termInfo.value.viewWeekNum = curWeekNum;
       $termInfo.value.termName = arr[2].data.time;
       $termInfo.value.beginTime = getDateFromWeek(curWeekNum);
-      $termInfo.value.overTime = getDateFromWeek(curWeekNum-courseArr.length);
+      $termInfo.value.overTime = getDateFromWeek(curWeekNum - courseArr.length);
     }
 
     $courseData.value = putCourseInOrder(courseArr, $termInfo.value.weekNum);

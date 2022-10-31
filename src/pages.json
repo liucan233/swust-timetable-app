@@ -6,7 +6,7 @@
         "app-plus": {
           "navigationBarTitleText": "首屏加载页",
           "navigationStyle": "custom",
-          "animationType": "slide-in-right",
+          "animationType": "slide-in-left",
           "animationDuration": 500
         }
       }
@@ -17,7 +17,7 @@
         "app-plus": {
           "navigationBarTitleText": "登录",
           "navigationStyle": "custom",
-          "animationType": "slide-in-right",
+          "animationType": "slide-in-left",
           "animationDuration": 500
         }
       }
@@ -25,10 +25,9 @@
     {
       "path": "pages/table/index",
       "style": {
-        "navigationBarTitleText": "课表",
-        "navigationStyle": "custom",
         "app-plus": {
-          "animationType": "slide-in-right",
+          "navigationBarTitleText": "课表",
+          "animationType": "slide-in-left",
           "animationDuration": 500
         }
       }
@@ -36,10 +35,9 @@
     {
       "path": "pages/personal/index",
       "style": {
-        "navigationBarTitleText": "个人中心",
-        "navigationStyle": "custom",
         "app-plus": {
-          "animationType": "slide-in-right",
+          "navigationBarTitleText": "个人中心",
+          "animationType": "slide-in-left",
           "animationDuration": 500
         }
       }
@@ -66,23 +64,18 @@
     ]
   },
   "globalStyle": {
-    "navigationBarTextStyle": "black",
-    "navigationBarTitleText": "uni-app",
-    "navigationBarBackgroundColor": "#F8F8F8",
-
-    "backgroundColor": "#F8F8F8",
-    "h5": {
-      "titleNView": false
+    "app-plus": {
+      "navigationBarTextStyle": "black",
+      "navigationBarTitleText": "uni-app"
     }
   },
   "condition": {
-    //模式配置，仅开发期间生效
-    "current": 0, //当前激活的模式(list 的索引项)
+    "current": 0,
     "list": [
       {
-        "name": "", //模式名称
-        "path": "", //启动页面，必选
-        "query": "" //启动参数，在页面的onLoad函数里面得到
+        "name": "",
+        "path": "",
+        "query": ""
       }
     ]
   }

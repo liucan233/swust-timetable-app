@@ -14,6 +14,7 @@ export default defineConfig({
       "@lib": path.resolve("./src/lib/"),
       "@enums": path.resolve("./src/enums/"),
       "@utils": path.resolve("./src/utils/"),
+      "@static": path.resolve("./src/static/"),
     },
   },
 });
