@@ -53,6 +53,7 @@
     "@nabla/vite-plugin-eslint": "^1.4.1",
     "@types/node": "16",
     "dayjs": "^1.11.6",
+    "esbuild-darwin-64": "0.14.54",
     "vue": "^3.2.39",
     "vue-i18n": "^9.1.9"
   },
