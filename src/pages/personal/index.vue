@@ -13,15 +13,15 @@
     >
       <ToolItem v-for="(item, index) in tools" :key="index" :data="item" />
     </view>
-    <view class="card mb-4 shadow radius-4">
+    <view class="flex justify-between mb-4 shadow radius-4 card">
       <view
-        class="flex flex-col justify-center items-center radius-4 shadow card1"
+        class="flex flex-col justify-center items-center radius-4 shadow w-49percent"
       >
         <image :src="groupChat" class="card-image" />
         <text class="text-gray-500 text-center">维护QQ群</text>
       </view>
       <view
-        class="flex flex-col justify-center items-center radius-4 shadow card2"
+        class="flex flex-col justify-center items-center radius-4 shadow w-49percent"
         ><image :src="coffee" class="card-image" /><text
           class="text-gray-500 text-center"
           >Buy a Coffee</text
@@ -65,7 +65,8 @@ const tools: TTool[] = [
 const { windowHeight } = uni.getWindowInfo();
 
 const logout = () => {
-  uni.navigateTo({ url: LOGIN });
+  uni.clearStorage();
+  uni.reLaunch({ url: LOGIN });
 };
 </script>
 
@@ -98,16 +99,14 @@ const logout = () => {
 }
 
 .card {
-  display: flex;
-  justify-content: space-between;
-  min-height: 200px;
+  min-height: 10rem;
   padding: 0.5rem;
   background-color: #fff;
 }
 
-.card1,
-.card2 {
-  width: 49%;
+.card > view:active {
+  --tw-bg-opacity: 1;
+  background-color: rgba(243, 244, 246, var(--tw-bg-opacity));
 }
 
 .card-image {
@@ -116,9 +115,9 @@ const logout = () => {
 }
 
 .logout {
-  height: 40px;
+  height: 2.2rem;
   width: 100%;
-  line-height: 40px;
+  line-height: 2.2rem;
   background-color: rgb(255, 113, 113);
   color: #fff;
 }

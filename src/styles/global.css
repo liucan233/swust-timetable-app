@@ -1,3 +1,7 @@
+.w-49percent {
+  width: 49%;
+}
+
 .mb-4 {
   margin-bottom: 1rem;
 }
@@ -20,6 +24,10 @@
 
 .justify-center {
   justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
 }
 
 .items-center {

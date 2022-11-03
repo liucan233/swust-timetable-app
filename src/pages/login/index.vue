@@ -1,6 +1,8 @@
 <template>
   <view>
-    <view class="main-container slide-top">
+    <view
+      class="flex flex-col justify-center items-center main-container slide-top"
+    >
       <view class="greeting-text">{{ text.title }}</view>
       <LoginInput
         :placeholder="text.username.default"
@@ -169,16 +171,12 @@ const handleClick = async () => {
 
 <style scoped>
 .main-container {
-  display: flex;
   height: 100vh;
   width: 100%;
   max-width: 30rem;
   padding: 0 0 10%;
   margin: 0 auto;
   box-sizing: border-box;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
   background-image: url("../../static/image/swust.png");
   background-repeat: no-repeat;
   background-position: 0rem 35rem;
@@ -194,9 +192,6 @@ const handleClick = async () => {
   line-height: 3rem;
   background-image: linear-gradient(60deg, #76b632 0%, #64b3f4 100%);
   background-clip: text;
-}
-
-.greeting-text {
 }
 
 .login-input {
@@ -242,6 +237,11 @@ const handleClick = async () => {
   font-weight: bold;
   line-height: 1.5rem;
   text-align: center;
+}
+
+.login-button:active {
+  background-image: linear-gradient(60deg, #76b6327c 0%, #64b3f483 100%);
+  margin-top: 0.5rem;
 }
 
 .slide-top {
