@@ -38,11 +38,11 @@ import { LOGIN } from "@enums/pages";
 import { TTool } from "@src/types/tool";
 
 import avatar from "@static/image/illustration.png";
-import score from "@static/image/学分查询.png";
-import exam from "@static/image/考试.png";
-import mark from "@static/image/我的成绩.png";
-import groupChat from "@static/image/维护.png";
-import coffee from "@static/image/咖啡.png";
+import score from "@static/image/toolBar/学分查询.png";
+import exam from "@static/image/toolBar/考试.png";
+import mark from "@static/image/toolBar/我的成绩.png";
+import groupChat from "@static/image/toolBar/维护.png";
+import coffee from "@static/image/toolBar/咖啡.png";
 
 const tools: TTool[] = [
   {
@@ -120,5 +120,9 @@ const logout = () => {
   line-height: 2.2rem;
   background-color: rgb(255, 113, 113);
   color: #fff;
+}
+
+.logout:active {
+  background-color: rgba(255, 113, 113, 0.596);
 }
 </style>
