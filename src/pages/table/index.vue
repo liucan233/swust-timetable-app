@@ -1,7 +1,9 @@
 <template>
   <view class="table-header">
     <text class="table-time">{{ $termInfo.termName }}</text>
-    <text class="table-time">第 {{ $termInfo.viewWeekNum }} / {{$courseData.length}} 周</text>
+    <text class="table-time"
+      >第 {{ $termInfo.viewWeekNum }} / {{ $courseData.length }} 周</text
+    >
     <button class="table-add">添加课程</button>
   </view>
   <scroll-view class="table-preview" scroll-x>
@@ -22,16 +24,20 @@
 <script setup lang="ts">
 import Timetable from "@src/components/Timetable.vue";
 import CoursePreview from "@components/CoursePreview.vue";
-import { getDateFromWeek } from "@utils/common";
+import { getDateFromWeek, showUnknownErrModal } from "@utils/common";
 import { putCourseInOrder, TOrganizedCourse } from "@utils/timetable";
 import { onMounted, ref, shallowRef } from "vue";
+import { credentials, timetable, valueIsFalsy } from "@utils/storage";
 import {
   getLabTimetable,
   getCommonTimetable,
   ICommonCourse,
   getTermInfo,
+  getTargetCookie,
+  getTickets,
 } from "@api/timetable";
 
+/**学期信息 */
 const $termInfo = ref({
   weekNum: 1,
   termName: "",
@@ -40,51 +46,142 @@ const $termInfo = ref({
   viewWeekNum: 0,
 });
 
+/**一个学期的课程 */
 const $courseData = shallowRef<TOrganizedCourse>([]);
 
-const handleUpdateCookie = () => {};
-
-const handleUpdateCourse = () => {
-  const labCookie = "JSESSIONID=B6224D36ED4BFD3516800F1E929FE859.node1; Path=/";
-  const commonCookie =
-    "JSESSIONID=578804F86B7CA1639AFB975105879A92.node1; Path=/";
-
-  Promise.all([
-    getLabTimetable(labCookie),
-    getCommonTimetable(commonCookie),
-    getTermInfo(labCookie),
-  ]).then(arr => {
-    let courseArr: ICommonCourse[] = [];
-
-    if (arr[0]) {
-      courseArr = arr[0].data.courses;
-    }
-    if (arr[1]) {
-      courseArr = arr[1].data.courses.concat(courseArr);
-    }
-
-    if (arr[2]) {
-      const curWeekNum = Number(arr[2].data.weeks);
-      $termInfo.value.weekNum = curWeekNum;
-      $termInfo.value.viewWeekNum = curWeekNum;
-      $termInfo.value.termName = arr[2].data.time;
-    }
-
-    const curWeekNum = $termInfo.value.weekNum;
-    $courseData.value = putCourseInOrder(courseArr, $termInfo.value.weekNum);
-    $termInfo.value.beginTime = getDateFromWeek(-curWeekNum);
-    $termInfo.value.overTime = getDateFromWeek(
-      $courseData.value.length - curWeekNum
-    );
+/**重定向到登陆页面 */
+const redirectToLogin = () => {
+  uni.redirectTo({
+    url: "/pages/login/index",
   });
+};
+
+/**获取实验课和教务系统的课表 */
+const handleUpdateCourse = async (labCookie: string) => {
+  const [labCourse, jwCourse] = await Promise.all([
+    getLabTimetable(labCookie),
+    getCommonTimetable(labCookie),
+  ]);
+  let courseArr: ICommonCourse[] = [];
+
+  if (labCourse) {
+    courseArr = labCourse.data.courses;
+  }
+  if (jwCourse) {
+    courseArr = jwCourse.data.courses.concat(courseArr);
+  }
+
+  const curWeekNum = $termInfo.value.weekNum;
+  $courseData.value = putCourseInOrder(courseArr, $termInfo.value.weekNum);
+  $termInfo.value.beginTime = getDateFromWeek(-curWeekNum);
+  $termInfo.value.overTime = getDateFromWeek(
+    $courseData.value.length - curWeekNum
+  );
+};
+
+/**更新学期和当前周数 */
+const handleUpdateTerm = async (labCookie: string) => {
+  const termInfo = await getTermInfo(labCookie);
+
+  if (termInfo) {
+    const curWeekNum = Number(termInfo.data.weeks);
+    $termInfo.value.weekNum = curWeekNum;
+    $termInfo.value.viewWeekNum = curWeekNum;
+    $termInfo.value.termName = termInfo.data.time;
+  } else {
+    throw new Error("获取学期信息失败");
+  }
 };
 
 const handleWeekChange = (w: number) => {
   $termInfo.value.viewWeekNum = w;
 };
 
-onMounted(() => {
-  handleUpdateCourse();
+/**读取CAS系统cookie */
+const readCASCookie = async (): Promise<string> => {
+  let cookie = "";
+  try {
+    cookie = await credentials.getCasCookie();
+  } catch (error) {
+    // 如果不是假值捕但获到错误，说明发生了未知错误
+    if (valueIsFalsy(error)) {
+      // 空值说明未登录
+      throw new Error("未登录，请先登录");
+    } else {
+      // 如果不是假值捕但获到错误，说明发生了未知错误
+      showUnknownErrModal();
+      throw new Error("获取CAS页面cookie失败");
+    }
+  }
+  return cookie;
+};
+
+/**使用cas页面cookie拿ticket再获取实验系统cookie，结果存入本地储存 */
+const updateLabCookie = async () => {
+  let casCookie = await readCASCookie(),
+    labTicket = "",
+    labCookie = "";
+  const ticketResult = await getTickets(casCookie, [
+    "http://202.115.175.175/swust/",
+  ]);
+  if (ticketResult && ticketResult.data.tickets.length === 1) {
+    labTicket = ticketResult.data.tickets[0];
+  } else {
+    throw new Error("获取实验系统ticket失败");
+  }
+  const cookieResult = await getTargetCookie(labTicket);
+  if (cookieResult) {
+    labCookie = cookieResult.data.cookie;
+  } else {
+    throw new Error("使用ticket获取实验系统cookie失败");
+  }
+  credentials.setLabCookie(labCookie);
+  return labCookie;
+};
+
+/**读取实验系统cookie */
+const readLabCookie = async (): Promise<string> => {
+  let cookie = "";
+  try {
+    cookie = await credentials.getJwCookie();
+  } catch (error) {
+    if (valueIsFalsy(error)) {
+      // 空值，需要拿到ticket获取下
+      cookie = await updateLabCookie();
+    } else {
+      // 如果不是假值捕但获到错误，说明发生了未知错误
+      showUnknownErrModal();
+      throw new Error("获取实验系统cookie失败");
+    }
+  }
+  return cookie;
+};
+
+onMounted(async () => {
+  let labCookie = "";
+  try {
+    labCookie = await readLabCookie();
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.message === "未登录，请先登录") {
+        redirectToLogin();
+      } else {
+        console.log(error.message);
+      }
+    } else {
+      showUnknownErrModal();
+    }
+  }
+  try {
+    await handleUpdateTerm(labCookie);
+    await handleUpdateCourse(labCookie);
+  } catch (error) {
+    if (error instanceof Error) {
+      console.log(error.message);
+    } else {
+      showUnknownErrModal();
+    }
+  }
 });
 </script>
 

@@ -29,3 +29,14 @@ export const getDateFromWeek = (currentWeek: number):Date => {
     dayjs().startOf('week').add(currentWeek,'week').valueOf()
   )
 };
+
+
+/**向用户弹窗未知错误 */
+export const showUnknownErrModal = () => {
+  uni.showModal({
+    title: "发生未知错误",
+    showCancel: false,
+    content:
+      "发生未知错误，请向开发者反馈，设备ID为："+uni.getDeviceInfo().deviceId,
+  });
+};

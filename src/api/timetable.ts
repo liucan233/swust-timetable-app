@@ -28,3 +28,17 @@ export const getTermInfo = (cookie: string) =>
   network.get<TBaseRes<{ time: string; term: string; weeks: string }>>(
     "/api/timetable/time?cookie=" + encodeURIComponent(cookie)
   );
+
+/**获取指定系统的ticket */
+export const getTickets = (casCookie: string, targets: string[]) =>
+  network.post<
+    TBaseRes<{
+      tickets: string[];
+    }>
+  >("/api/swust/ticket", { cookie: casCookie, targets });
+
+/**使用ticket获取指定系统的cookie */
+export const getTargetCookie = (ticket: string) =>
+  network.get<TBaseRes<{ cookie: string }>>(
+    "/api/timetable/cookie?ticket=" + encodeURIComponent(ticket)
+  );
