@@ -24,12 +24,9 @@ export const getDaysInfo = (start: Date, end: Date) => {
   return result;
 };
 
-export const getDateFromWeek = (currentWeek: number):Date => {
-  return new Date(
-    dayjs().startOf('week').add(currentWeek,'week').valueOf()
-  )
+export const getDateFromWeek = (currentWeek: number): Date => {
+  return new Date(dayjs().startOf("week").add(currentWeek, "week").valueOf());
 };
-
 
 /**向用户弹窗未知错误 */
 export const showUnknownErrModal = () => {
@@ -37,6 +34,19 @@ export const showUnknownErrModal = () => {
     title: "发生未知错误",
     showCancel: false,
     content:
-      "发生未知错误，请向开发者反馈，设备ID为："+uni.getDeviceInfo().deviceId,
+      "发生未知错误，请向开发者反馈，设备ID为：" + uni.getDeviceInfo().deviceId,
+  });
+};
+
+/**向用户弹窗错误 */
+export const showErrModal = (title: string, msg: string) => {
+  uni.showModal({
+    title,
+    showCancel: false,
+    content:
+      msg +
+      "，" +
+      "请重试向开发者反馈，设备ID为：" +
+      uni.getDeviceInfo().deviceId,
   });
 };
