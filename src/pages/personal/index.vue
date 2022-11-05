@@ -38,11 +38,11 @@ import { LOGIN } from "@enums/pages";
 import { TTool } from "@src/types/tool";
 
 import avatar from "@static/image/illustration.png";
-import score from "@static/image/toolBar/学分查询.png";
-import exam from "@static/image/toolBar/考试.png";
-import mark from "@static/image/toolBar/我的成绩.png";
-import groupChat from "@static/image/toolBar/维护.png";
-import coffee from "@static/image/toolBar/咖啡.png";
+import score from "@static/image/toolBar/score.png";
+import exam from "@static/image/toolBar/exam.png";
+import mark from "@static/image/toolBar/mark.png";
+import groupChat from "@static/image/toolBar/scan.png";
+import coffee from "@static/image/toolBar/coffee.png";
 import { clearStorage } from "@src/utils/storage";
 
 const tools: TTool[] = [
