@@ -163,4 +163,11 @@ namespace timetable {
   };
 }
 
+
+export const clearStorage = () => {
+  credentials.setCasCookie("");
+  credentials.setJwCookie("");
+  credentials.setLabCookie("");
+};
+
 export { credentials, timetable };

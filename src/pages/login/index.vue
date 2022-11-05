@@ -1,6 +1,8 @@
 <template>
   <view>
-    <view class="main-container slide-top">
+    <view
+      class="flex flex-col justify-center items-center main-container slide-top"
+    >
       <view class="greeting-text">{{ text.title }}</view>
       <LoginInput
         :placeholder="text.username.default"
@@ -13,7 +15,7 @@
         className="login-input"
         ref="passwordRef"
       />
-      <view class="verify-warper">
+      <view class="flex justify-center items-center verify-warper">
         <LoginInput
           className="verify-input"
           :placeholder="text.code.default"
@@ -38,9 +40,8 @@ import { onMounted, shallowRef } from "vue";
 import LoginInput from "@components/LoginInput.vue";
 
 import { TABLE } from "@enums/pages";
-import { Cookie } from "@enums/storage";
-import { setCookieSync } from "@utils/cookie";
 import { getCookieAndCaptchaUrl, login } from "@api/login";
+import { credentials } from "@src/utils/storage";
 
 /**组件ref属性的类型，T为组件类型 */
 type TLoginInputRef = InstanceType<typeof LoginInput> | null;
@@ -139,15 +140,18 @@ const handleClick = async () => {
       uni.hideLoading();
       if (response?.code === 200) {
         /**登录成功后存储到uni storage中 */
-        setCookieSync(Cookie.CAS_COOKIE, response.data.cookie);
+        credentials.setCasCookie(response.data.cookie);
+        /*这里获取两个cookie */
         uni.switchTab({ url: TABLE });
       } else {
         if (response?.code === 401) {
           // 返回的msg有两种，"验证码错误" "用户名或密码错误"
           if (response.msg.length === 8) {
+            console.error("用户名或密码错误");
             usernameRef.value?.warning(text.username.errorText);
             passwordRef.value?.warning(text.password.errorText);
           } else if (response.msg.length === 5) {
+            console.error("验证码错误");
             verifyRef.value?.warning(text.code.errorText);
           }
         }
@@ -156,6 +160,7 @@ const handleClick = async () => {
       }
     },
     error => {
+      /**登陆失败 */
       uni.hideLoading();
       uni.showToast({
         icon: "error",
@@ -169,16 +174,12 @@ const handleClick = async () => {
 
 <style scoped>
 .main-container {
-  display: flex;
   height: 100vh;
   width: 100%;
   max-width: 30rem;
   padding: 0 0 10%;
   margin: 0 auto;
   box-sizing: border-box;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
   background-image: url("../../static/image/swust.png");
   background-repeat: no-repeat;
   background-position: 0rem 35rem;
@@ -196,18 +197,12 @@ const handleClick = async () => {
   background-clip: text;
 }
 
-.greeting-text {
-}
-
 .login-input {
   width: 90%;
   margin: 0.4rem 0 0;
 }
 
 .verify-warper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   width: 90%;
 }
 
@@ -242,6 +237,11 @@ const handleClick = async () => {
   font-weight: bold;
   line-height: 1.5rem;
   text-align: center;
+}
+
+.login-button:active {
+  background-image: linear-gradient(60deg, #76b6327c 0%, #64b3f483 100%);
+  margin-top: 0.5rem;
 }
 
 .slide-top {

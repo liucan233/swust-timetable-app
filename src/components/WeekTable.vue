@@ -6,7 +6,7 @@
         <text>月</text>
       </view>
       <view class="table-date">
-        <view v-for="(d, index) in dayNum" key="d.day" class="table-date-item">
+        <view v-for="(d, index) in dayNum" :key="d.day" class="table-date-item">
           <text class="day-name">周{{ props.dayName[index] }}</text>
           <text class="day-num">{{ d.day }}</text>
         </view>
@@ -58,7 +58,7 @@
   </view>
 </template>
 <script lang="ts" setup>
-import { CSSProperties, effect, onUpdated } from "vue";
+import { CSSProperties, effect } from "vue";
 import { TWeekCourse } from "@utils/timetable";
 import { IDayInfo } from "@utils/common";
 import type { IConflictCourse } from "@utils/timetable";
