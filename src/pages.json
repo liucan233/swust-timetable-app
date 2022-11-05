@@ -27,6 +27,7 @@
       "style": {
         "app-plus": {
           "navigationBarTitleText": "课表",
+          "navigationStyle": "custom",
           "animationType": "slide-in-left",
           "animationDuration": 500
         }
@@ -51,6 +52,7 @@
     "height": "65px",
     "fontSize": "14px",
     "iconWidth": "30px",
+    "position": "bottom",
     "list": [
       {
         "pagePath": "pages/table/index",

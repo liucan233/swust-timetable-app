@@ -28,8 +28,11 @@ network.onErr = err => {
 
 network.onRes = res => {
   const { statusCode } = res;
-  if ((statusCode < 300 && statusCode > 199) || statusCode === 304) {
-    return res.data;
+  if (statusCode < 200 || (statusCode > 299 && statusCode !== 304)) {
+    throw new Error("HTTP状态码为" + statusCode);
   }
-  throw new Error("状态码不正确");
+  if (res.data && (res.data as any).code !== 200) {
+    throw new Error("业务状态码为" + (res.data as any).code);
+  }
+  return res.data;
 };

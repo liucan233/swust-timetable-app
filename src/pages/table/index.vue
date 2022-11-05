@@ -42,7 +42,9 @@ const $termInfo = ref({
 
 const $courseData = shallowRef<TOrganizedCourse>([]);
 
-// const handleUpdateCookie = () => {};
+// const handleUpdateCookie=()=>{
+
+// }
 
 const handleUpdateCourse = () => {
   const labCookie = "JSESSIONID=B6224D36ED4BFD3516800F1E929FE859.node1; Path=/";
@@ -72,7 +74,12 @@ const handleUpdateCourse = () => {
       $termInfo.value.overTime = getDateFromWeek(curWeekNum - courseArr.length);
     }
 
+    const curWeekNum = $termInfo.value.weekNum;
     $courseData.value = putCourseInOrder(courseArr, $termInfo.value.weekNum);
+    $termInfo.value.beginTime = getDateFromWeek(-curWeekNum);
+    $termInfo.value.overTime = getDateFromWeek(
+      $courseData.value.length - curWeekNum
+    );
   });
 };
 
@@ -105,6 +112,7 @@ onMounted(() => {
 .table-preview {
   width: 100%;
   white-space: nowrap;
+  touch-action: pan-x;
 }
 
 .table-add::after {
@@ -113,11 +121,6 @@ onMounted(() => {
 
 .table-main {
   width: 100%;
-  height: calc(100vh - 150px);
-}
-
-.timetable {
-  height: 70vh;
-  width: 100%;
+  height: calc(100vh - 170px);
 }
 </style>

@@ -43,6 +43,7 @@ import exam from "@static/image/toolBar/考试.png";
 import mark from "@static/image/toolBar/我的成绩.png";
 import groupChat from "@static/image/toolBar/维护.png";
 import coffee from "@static/image/toolBar/咖啡.png";
+import { clearStorage } from "@src/utils/storage";
 
 const tools: TTool[] = [
   {
@@ -65,7 +66,7 @@ const tools: TTool[] = [
 const { windowHeight } = uni.getWindowInfo();
 
 const logout = () => {
-  uni.clearStorage();
+  clearStorage();
   uni.reLaunch({ url: LOGIN });
 };
 </script>

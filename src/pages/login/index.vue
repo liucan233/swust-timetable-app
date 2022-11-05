@@ -15,7 +15,7 @@
         className="login-input"
         ref="passwordRef"
       />
-      <view class="verify-warper">
+      <view class="flex justify-center items-center verify-warper">
         <LoginInput
           className="verify-input"
           :placeholder="text.code.default"
@@ -40,9 +40,8 @@ import { onMounted, shallowRef } from "vue";
 import LoginInput from "@components/LoginInput.vue";
 
 import { TABLE } from "@enums/pages";
-import { Cookie } from "@enums/storage";
-import { setCookieSync } from "@utils/cookie";
 import { getCookieAndCaptchaUrl, login } from "@api/login";
+import { credentials } from "@src/utils/storage";
 
 /**组件ref属性的类型，T为组件类型 */
 type TLoginInputRef = InstanceType<typeof LoginInput> | null;
@@ -141,15 +140,18 @@ const handleClick = async () => {
       uni.hideLoading();
       if (response?.code === 200) {
         /**登录成功后存储到uni storage中 */
-        setCookieSync(Cookie.CAS_COOKIE, response.data.cookie);
+        credentials.setCasCookie(response.data.cookie);
+        /*这里获取两个cookie */
         uni.switchTab({ url: TABLE });
       } else {
         if (response?.code === 401) {
           // 返回的msg有两种，"验证码错误" "用户名或密码错误"
           if (response.msg.length === 8) {
+            console.error("用户名或密码错误");
             usernameRef.value?.warning(text.username.errorText);
             passwordRef.value?.warning(text.password.errorText);
           } else if (response.msg.length === 5) {
+            console.error("验证码错误");
             verifyRef.value?.warning(text.code.errorText);
           }
         }
@@ -158,6 +160,7 @@ const handleClick = async () => {
       }
     },
     error => {
+      /**登陆失败 */
       uni.hideLoading();
       uni.showToast({
         icon: "error",
@@ -200,9 +203,6 @@ const handleClick = async () => {
 }
 
 .verify-warper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   width: 90%;
 }
 

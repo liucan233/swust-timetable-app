@@ -6,9 +6,11 @@
 <style scoped>
 .container {
   display: inline-block;
-  border: 1px solid black;
-  width: 80px;
-  height: 80px;
+  background-color: antiquewhite;
+  border-radius: 4px;
+  width: 55px;
+  height: 55px;
   flex: 0 0 auto;
+  margin: 5px 12px;
 }
 </style>
