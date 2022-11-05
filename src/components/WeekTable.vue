@@ -24,11 +24,11 @@
           </text>
         </view>
         <view
-          v-for="(, dayIndex) in props.dayName"
+          v-for="(_, dayIndex) in props.dayName"
           :key="dayIndex"
           class="day-wrap"
         >
-        <view
+          <view
             v-for="(c, index2) in props.course[dayIndex + 1]?.conflict ?? []"
             class="conflict-item"
             :style="getPosition(c.begin, c.over)"
@@ -58,7 +58,7 @@
   </view>
 </template>
 <script lang="ts" setup>
-import { CSSProperties, effect } from "vue";
+import { CSSProperties } from "vue";
 import { TWeekCourse } from "@utils/timetable";
 import { IDayInfo } from "@utils/common";
 import type { IConflictCourse } from "@utils/timetable";

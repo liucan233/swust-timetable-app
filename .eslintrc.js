@@ -26,6 +26,7 @@ module.exports = {
     "@typescript-eslint/no-explicit-any": 1,
     "vue/multi-word-component-names": 1,
     "vue/multi-word-component-names":0,
-    "prefer-const":1
+    "prefer-const":0,
+    "@typescript-eslint/no-explicit-any": 0
   },
 };
