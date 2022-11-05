@@ -2,7 +2,7 @@
   <view class="table-header">
     <text class="table-time">{{ $termInfo.termName }}</text>
     <text class="table-time"
-      >第 {{ $termInfo.viewWeekNum }} / {{ $courseData.length }} 周</text
+      >第 {{ $termInfo.viewWeekNum }} / {{ $courseData.length-1 }} 周</text
     >
     <button class="table-add">添加课程</button>
   </view>
@@ -25,8 +25,13 @@
 import Timetable from "@src/components/Timetable.vue";
 import CoursePreview from "@components/CoursePreview.vue";
 import { getDateFromWeek, showUnknownErrModal } from "@utils/common";
-import { putCourseInOrder, TOrganizedCourse } from "@utils/timetable";
+import {
+  getTermInfoFromLocal,
+  putCourseInOrder,
+  TOrganizedCourse,
+} from "@utils/timetable";
 import { onMounted, ref, shallowRef } from "vue";
+import { onPullDownRefresh } from "@dcloudio/uni-app";
 import { credentials, timetable, valueIsFalsy } from "@utils/storage";
 import {
   getLabTimetable,
@@ -56,8 +61,8 @@ const redirectToLogin = () => {
   });
 };
 
-/**获取实验课和教务系统的课表 */
-const handleUpdateCourse = async (labCookie: string) => {
+/**获取实验课和教务系统的课表更新组件并写入本地储存 */
+const updateCourse = async (labCookie: string) => {
   const [labCourse, jwCourse] = await Promise.all([
     getLabTimetable(labCookie),
     getCommonTimetable(labCookie),
@@ -71,16 +76,23 @@ const handleUpdateCourse = async (labCookie: string) => {
     courseArr = jwCourse.data.courses.concat(courseArr);
   }
 
+  timetable.setTimetable(courseArr);
+
   const curWeekNum = $termInfo.value.weekNum;
   $courseData.value = putCourseInOrder(courseArr, $termInfo.value.weekNum);
   $termInfo.value.beginTime = getDateFromWeek(-curWeekNum);
   $termInfo.value.overTime = getDateFromWeek(
     $courseData.value.length - curWeekNum
   );
+  timetable.setTermInfo({
+    begin: $termInfo.value.beginTime.valueOf(),
+    over: $termInfo.value.overTime.valueOf(),
+    termName: $termInfo.value.termName,
+  });
 };
 
 /**更新学期和当前周数 */
-const handleUpdateTerm = async (labCookie: string) => {
+const updateTerm = async (labCookie: string) => {
   const termInfo = await getTermInfo(labCookie);
 
   if (termInfo) {
@@ -143,7 +155,7 @@ const updateLabCookie = async () => {
 const readLabCookie = async (): Promise<string> => {
   let cookie = "";
   try {
-    cookie = await credentials.getJwCookie();
+    cookie = await credentials.getLabCookie();
   } catch (error) {
     if (valueIsFalsy(error)) {
       // 空值，需要拿到ticket获取下
@@ -157,8 +169,10 @@ const readLabCookie = async (): Promise<string> => {
   return cookie;
 };
 
-onMounted(async () => {
+/**从服务器更新课表和学期数据 */
+const updateTimetableFromServer = async () => {
   let labCookie = "";
+  // 尝试获取实验系统cookie
   try {
     labCookie = await readLabCookie();
   } catch (error) {
@@ -172,9 +186,13 @@ onMounted(async () => {
       showUnknownErrModal();
     }
   }
+
+  console.log(labCookie)
+
+  // 尝试获取学期信息和课程信息
   try {
-    await handleUpdateTerm(labCookie);
-    await handleUpdateCourse(labCookie);
+    await updateTerm(labCookie);
+    await updateCourse(labCookie);
   } catch (error) {
     if (error instanceof Error) {
       console.log(error.message);
@@ -182,6 +200,35 @@ onMounted(async () => {
       showUnknownErrModal();
     }
   }
+};
+
+/**从本地储存获取初始化课表 */
+const updateTimetableFromLocal = async () => {
+  const termInfo = await getTermInfoFromLocal();
+  const courseArr = await timetable.getTimetable();
+  $termInfo.value.beginTime = termInfo.begin;
+  $termInfo.value.overTime = termInfo.over;
+  $termInfo.value.weekNum = termInfo.curWeek;
+  $termInfo.value.viewWeekNum = termInfo.curWeek;
+  $termInfo.value.termName = termInfo.termName;
+  const curWeekNum = $termInfo.value.weekNum;
+  $courseData.value = putCourseInOrder(courseArr, $termInfo.value.weekNum);
+  $termInfo.value.beginTime = getDateFromWeek(-curWeekNum);
+  $termInfo.value.overTime = getDateFromWeek(
+    $courseData.value.length - curWeekNum
+  );
+};
+onMounted(() => {
+  updateTimetableFromLocal().finally(()=>{
+    uni.startPullDownRefresh({})
+    updateTimetableFromServer().finally(uni.stopPullDownRefresh)
+  })
+});
+
+onPullDownRefresh(() => {
+  updateTimetableFromServer().finally(()=>{
+    uni.stopPullDownRefresh();
+  })
 });
 </script>
 

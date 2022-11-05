@@ -63,6 +63,7 @@ enum Key {
   RAW_TIMETABLE,
   LAB_COOKIE,
   JW_COOKIE,
+  TERM_INFO,
 }
 
 /**登陆凭证相关 */
@@ -139,6 +140,25 @@ namespace timetable {
     return getStorage(Key.RAW_TIMETABLE).then(res => {
       rawTimetable = res as ICommonCourse[];
       return rawTimetable;
+    });
+  };
+
+  type TTermInfo={begin:number,over:number,termName:string}
+  let termInfo: TTermInfo | null = null;
+  /**储存服务端返回的课表 */
+  export const setTermInfo = (info: TTermInfo): Promise<unknown> => {
+    termInfo = info;
+    return setStorage(Key.TERM_INFO, info);
+  };
+
+  /**读取储存中的课表 */
+  export const getTermInfo = (): Promise<TTermInfo> => {
+    if (termInfo) {
+      return Promise.resolve(termInfo);
+    }
+    return getStorage(Key.TERM_INFO).then(res => {
+      termInfo = res as TTermInfo;
+      return termInfo;
     });
   };
 }

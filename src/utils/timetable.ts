@@ -1,4 +1,6 @@
 import { ICommonCourse } from "@api/timetable";
+import dayjs from "@lib/dayjs";
+import { credentials, timetable } from "./storage";
 
 /**本APP使用的课程类型 */
 export interface IAppCourse {
@@ -301,3 +303,20 @@ export const putCourseInOrder = (arr: ICommonCourse[], currentWeek: number) => {
   const weekCourse = covertToWeek(correctCourse);
   return organizeCourse(weekCourse);
 };
+
+/**从本地储存获取学期时间，计算当前周数 */
+export const getTermInfoFromLocal=()=>{
+  return timetable.getTermInfo().then(v=>{
+    if(v.begin>=v.over){
+      throw new Error('学期开始时间应该小于学期结束时间')
+    }
+    const begin=new Date(v.begin),
+    over=new Date(v.over);
+    return {
+      begin,
+      over,
+      termName: v.termName,
+      curWeek: Math.floor((Date.now()-v.begin)/1000/60/60/24/7)
+    }
+  })
+}

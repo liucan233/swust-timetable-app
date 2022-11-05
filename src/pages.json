@@ -27,6 +27,7 @@
       "style": {
         "navigationBarTitleText": "课表",
         "navigationStyle": "custom",
+        "enablePullDownRefresh": true,
         "app-plus": {
           "animationType": "slide-in-right",
           "animationDuration": 500
