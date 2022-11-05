@@ -1,21 +1,21 @@
 <template>
   <view class="container">
-      <swiper
-        class="table-swiper"
-        :indicator-dots="false"
-        @change="handleWeekChange"
-        :current="props.weekNum"
-      >
-        <swiper-item v-for="(c, index) in props.course.slice(1)" :key="index">
-          <WeekTable
-            :course="c ?? emptyCourseWeek"
-            :day-num="dayInfoArr[index + 1]"
-            :day-name="dayArr"
-            :course-height="rowHeight"
-          />
-        </swiper-item>
-      </swiper>
-    </view>
+    <swiper
+      class="table-swiper"
+      :indicator-dots="false"
+      @change="handleWeekChange"
+      :current="props.weekNum - 1"
+    >
+      <swiper-item v-for="(c, index) in props.course.slice(1)" :key="index">
+        <WeekTable
+          :course="c ?? emptyCourseWeek"
+          :day-num="dayInfoArr[index + 1]"
+          :day-name="dayArr"
+          :course-height="rowHeight"
+        />
+      </swiper-item>
+    </swiper>
+  </view>
 </template>
 <script lang="ts" setup>
 /**
@@ -48,7 +48,7 @@ const emptyCourseWeek = new Array(7) as TWeekCourse;
 /**每讲课显示的默认高度 */
 const rowHeight = 100;
 /**一周有的星期数中文 */
-const  dayArr = ["一", "二", "三", "四", "五", "六", "日"];
+const dayArr = ["一", "二", "三", "四", "五", "六", "日"];
 
 onUpdated(() => {
   // 输出学期信息

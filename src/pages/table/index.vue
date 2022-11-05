@@ -36,7 +36,7 @@ import {
   showUnknownErrModal,
   showErrModal,
 } from "@utils/common";
-import { onMounted, ref, shallowRef } from "vue";
+import { onMounted, ref, shallowRef, watch } from "vue";
 import { onPullDownRefresh } from "@dcloudio/uni-app";
 import {
   getTermInfoFromLocal,
@@ -205,6 +205,7 @@ const updateTimetableFromServer = async () => {
     if (error instanceof Error) {
       if (error.message === "未登录，请先登录") {
         redirectToLogin();
+        return;
       } else {
         showErrModal("尝试登陆实验系统出错", error.message);
       }
@@ -235,18 +236,15 @@ const updateTimetableFromLocal = async () => {
   $termInfo.value.weekNum = termInfo.curWeek;
   $termInfo.value.viewWeekNum = termInfo.curWeek;
   $termInfo.value.termName = termInfo.termName;
-  const curWeekNum = $termInfo.value.weekNum;
   $courseData.value = putCourseInOrder(courseArr, $termInfo.value.weekNum);
-  $termInfo.value.beginTime = getDateFromWeek(-curWeekNum);
-  $termInfo.value.overTime = getDateFromWeek(
-    $courseData.value.length - curWeekNum
-  );
 };
+
 onMounted(() => {
   updateTimetableFromLocal().finally(() => {
     uni.startPullDownRefresh({});
   });
 });
+
 
 onPullDownRefresh(() => {
   updateTimetableFromServer().finally(() => {

@@ -24,15 +24,30 @@
           </text>
         </view>
         <view
-          v-for="(text, index) in props.dayName"
-          :key="index"
+          v-for="(, dayIndex) in props.dayName"
+          :key="dayIndex"
           class="day-wrap"
         >
+        <view
+            v-for="(c, index2) in props.course[dayIndex + 1]?.conflict ?? []"
+            class="conflict-item"
+            :style="getPosition(c.begin, c.over)"
+            :key="index2"
+          >
+            <view
+              :style="getConflictStyle(c)"
+              data-conflict="true"
+              :data-begin="c.begin"
+              :data-over="c.over"
+            />
+          </view>
           <view
-            v-for="(c, index2) in props.course[index + 1]?.list ?? []"
+            v-for="(c, index2) in props.course[dayIndex + 1]?.list ?? []"
             class="course-item"
             :style="getPosition(c.begin, c.over)"
             :key="index2"
+            :data-begin="c.begin"
+            :data-over="c.over"
           >
             <text>@{{ c.place }}</text>
             <text>{{ c.name }}</text>
@@ -46,6 +61,7 @@
 import { CSSProperties, effect, onUpdated } from "vue";
 import { TWeekCourse } from "@utils/timetable";
 import { IDayInfo } from "@utils/common";
+import type { IConflictCourse } from "@utils/timetable";
 
 interface IProps {
   course: TWeekCourse;
@@ -58,14 +74,6 @@ const props = defineProps<IProps>();
 /**每天有6讲12节课 */
 const sectionTextArr = new Array(6).fill(null);
 
-effect(() => {
-  props.course.forEach(d => {
-    if (d?.conflict.length) {
-      console.log("冲突课程: ", d.conflict);
-    }
-  });
-});
-
 const rowHeight = 140,
   gapHeight = 6;
 
@@ -75,6 +83,14 @@ const getPosition = (s: number, e: number): CSSProperties => {
   return {
     top: (s >> 1) * rowHeight + "px",
     height: ((e - s + 1) * rowHeight) / 2 - gapHeight + "px",
+  };
+};
+
+const getConflictStyle = (c: IConflictCourse) => {
+  const size = (c.over - c.begin + 1) * rowHeight;
+  return {
+    height: size + "px",
+    width: size + "px",
   };
 };
 </script>
@@ -93,7 +109,7 @@ const getPosition = (s: number, e: number): CSSProperties => {
 .table-time {
   width: 40px;
   flex: 0 0 40px;
-  padding:0 10px;
+  padding: 0 10px;
   box-sizing: border-box;
 }
 .table-date {
@@ -101,7 +117,7 @@ const getPosition = (s: number, e: number): CSSProperties => {
   display: flex;
   justify-content: space-between;
 }
-.table-date-item{
+.table-date-item {
   flex: 1 1 100px;
 }
 .scroll-view {
@@ -141,7 +157,6 @@ const getPosition = (s: number, e: number): CSSProperties => {
 }
 .course-item {
   width: 95%;
-
   position: absolute;
   left: 0;
   border: 1px solid;
@@ -152,6 +167,7 @@ const getPosition = (s: number, e: number): CSSProperties => {
   line-height: 1.5;
   font-size: 15px;
   box-sizing: border-box;
+  z-index: 2;
 }
 .course-item > text {
   display: -webkit-box;
@@ -160,5 +176,24 @@ const getPosition = (s: number, e: number): CSSProperties => {
   -webkit-box-orient: vertical;
   text-overflow: ellipsis;
   vertical-align: baseline;
+}
+.conflict-item {
+  width: 95%;
+  position: absolute;
+  left: 0;
+  border-radius: 4px;
+  z-index: 1;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.conflict-item > view {
+  background-image: linear-gradient(
+    rgba(110, 195, 252, 0.5) 50%,
+    rgba(0, 0, 0, 0) 50%
+  );
+  background-size: 100% 10px;
+  background-repeat: repeat;
+  transform: translate(-40%, -40%) rotateZ(-45deg);
+  transform-origin: center;
 }
 </style>

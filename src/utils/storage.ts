@@ -41,7 +41,7 @@ export const valueIsFalsy = (err: unknown) => {
 
 export const showGetStorageErrModal = () => {
   uni.showModal({
-    title: "读取储存失败",
+    title: "读取数据失败",
     showCancel: false,
     content:
       "从设备储存中读取由本App写入的数据时发生错误，请确保本App有储存权限或者反馈此问题。",
@@ -50,10 +50,10 @@ export const showGetStorageErrModal = () => {
 
 export const showSetStorageErrModal = () => {
   uni.showModal({
-    title: "读取储存失败",
+    title: "写入数据失败",
     showCancel: false,
     content:
-      "从设备储存中读取由本App写入的数据时发生错误，请确保本App有储存权限或者反馈此问题。",
+      "向设备写入本App运行时产生的一些数据时发生错误，请确保本App有储存权限或者反馈此问题。",
   });
 };
 

@@ -87,7 +87,7 @@ export const flatCourse = (arr: ICommonCourse[]) => {
 };
 
 /**冲突的课程 */
-interface IConflictCourse {
+export interface IConflictCourse {
   begin: number;
   over: number;
   /**[begin, over]区间内冲突的课程，例如1-2 3-4 1-4，则list仅包含1-4 */
