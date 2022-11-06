@@ -25,11 +25,13 @@
     {
       "path": "pages/table/index",
       "style": {
+        "enablePullDownRefresh": true,
         "app-plus": {
           "navigationBarTitleText": "课表",
           "navigationStyle": "custom",
           "animationType": "slide-in-left",
-          "animationDuration": 500
+          "animationDuration": 500,
+          "bounce": "none"
         }
       }
     },

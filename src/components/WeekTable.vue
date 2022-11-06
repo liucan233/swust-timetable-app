@@ -12,49 +12,47 @@
         </view>
       </view>
     </view>
-    <scroll-view class="scroll-view" scroll-y :show-scrollbar="false">
-      <view class="week-container">
-        <view class="section-time">
-          <text
-            v-for="(_, index) in sectionTextArr"
-            :key="index"
-            class="time-name"
-          >
-            第 {{ index + 1 }} 讲
-          </text>
-        </view>
+    <view class="week-container">
+      <view class="section-time">
+        <text
+          v-for="(_, index) in sectionTextArr"
+          :key="index"
+          class="time-name"
+        >
+          第 {{ index + 1 }} 讲
+        </text>
+      </view>
+      <view
+        v-for="(_, dayIndex) in props.dayName"
+        :key="dayIndex"
+        class="day-wrap"
+      >
         <view
-          v-for="(_, dayIndex) in props.dayName"
-          :key="dayIndex"
-          class="day-wrap"
+          v-for="(c, index2) in props.course[dayIndex + 1]?.conflict ?? []"
+          class="conflict-item"
+          :style="getPosition(c.begin, c.over)"
+          :key="index2"
         >
           <view
-            v-for="(c, index2) in props.course[dayIndex + 1]?.conflict ?? []"
-            class="conflict-item"
-            :style="getPosition(c.begin, c.over)"
-            :key="index2"
-          >
-            <view
-              :style="getConflictStyle(c)"
-              data-conflict="true"
-              :data-begin="c.begin"
-              :data-over="c.over"
-            />
-          </view>
-          <view
-            v-for="(c, index2) in props.course[dayIndex + 1]?.list ?? []"
-            class="course-item"
-            :style="getPosition(c.begin, c.over)"
-            :key="index2"
+            :style="getConflictStyle(c)"
+            data-conflict="true"
             :data-begin="c.begin"
             :data-over="c.over"
-          >
-            <text>@{{ c.place }}</text>
-            <text>{{ c.name }}</text>
-          </view>
+          />
+        </view>
+        <view
+          v-for="(c, index2) in props.course[dayIndex + 1]?.list ?? []"
+          class="course-item"
+          :style="getPosition(c.begin, c.over)"
+          :key="index2"
+          :data-begin="c.begin"
+          :data-over="c.over"
+        >
+          <text>@{{ c.place }}</text>
+          <text>{{ c.name }}</text>
         </view>
       </view>
-    </scroll-view>
+    </view>
   </view>
 </template>
 <script lang="ts" setup>
@@ -97,7 +95,6 @@ const getConflictStyle = (c: IConflictCourse) => {
 
 <style scoped>
 .swiper-item {
-  height: calc(100% - 50px);
   width: 100%;
 }
 .table-header {
@@ -119,10 +116,6 @@ const getConflictStyle = (c: IConflictCourse) => {
 }
 .table-date-item {
   flex: 1 1 100px;
-}
-.scroll-view {
-  height: 100%;
-  width: 100%;
 }
 .week-container {
   width: calc(100% - 5px);
@@ -172,10 +165,13 @@ const getConflictStyle = (c: IConflictCourse) => {
 .course-item > text {
   display: -webkit-box;
   overflow: hidden;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   text-overflow: ellipsis;
   vertical-align: baseline;
+}
+.course-item > text:nth-child(2){
+  -webkit-line-clamp: 2;
 }
 .conflict-item {
   width: 95%;

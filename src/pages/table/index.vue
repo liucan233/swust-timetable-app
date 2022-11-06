@@ -7,17 +7,32 @@
     <button class="table-add">添加课程</button>
   </view>
   <scroll-view class="table-preview" scroll-x>
-    <CoursePreview v-for="(week, index) in $courseData" :key="index" />
+    <CoursePreview v-for="(_, index) in $courseData" :key="index" />
   </scroll-view>
   <view class="table-main">
     <Timetable
       class-name="timetable"
-      :start-time="$termInfo.beginTime"
-      :end-time="$termInfo.overTime"
       :course="$courseData"
-      :week-num="$termInfo.weekNum"
+      :week-num="$termInfo.viewWeekNum"
+      :calendar-arr="dayInfoArr"
       @week-change="handleWeekChange"
     />
+  </view>
+  <view class="fixed-header" :data-active="$showHeader">
+    <view class="table-mouth">
+      <text>{{ dayInfoArr[$termInfo.viewWeekNum]?.[0]?.month || -1 }}</text>
+      <text>月</text>
+    </view>
+    <view class="table-date">
+      <view
+        v-for="(d, index) in dayInfoArr[$termInfo.viewWeekNum] ?? []"
+        :key="d.day"
+        class="table-date-item"
+      >
+        <text class="day-name">周{{ dayArr[index] }}</text>
+        <text class="day-num">{{ d.day }}</text>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -35,9 +50,11 @@ import {
   getDateFromWeek,
   showUnknownErrModal,
   showErrModal,
+  IDayInfo,
+  getDaysInfo,
 } from "@utils/common";
-import { onMounted, ref, shallowRef, watch } from "vue";
-import { onPullDownRefresh } from "@dcloudio/uni-app";
+import { onMounted, ref, shallowRef, computed } from "vue";
+import { onPullDownRefresh, onPageScroll } from "@dcloudio/uni-app";
 import {
   getTermInfoFromLocal,
   putCourseInOrder,
@@ -64,6 +81,32 @@ const $termInfo = ref({
 
 /**一个学期的课程 */
 const $courseData = shallowRef<TOrganizedCourse>([]);
+
+/**是否显示固定的日期 */
+const $showHeader = shallowRef(false);
+
+/**课表表头的日历信息 */
+const dayInfoArr = computed<IDayInfo[][]>(() => {
+  if (!$courseData.value.length) {
+    return [];
+  }
+  const dayArr = getDaysInfo(
+      $termInfo.value.beginTime,
+      $termInfo.value.overTime
+    ),
+    result: IDayInfo[][] = [];
+  let dayStart = 0,
+    dayEnd = 7;
+  for (let i = 0; i < $courseData.value.length; i++) {
+    result.push(dayArr.slice(dayStart, dayEnd));
+    dayStart = dayEnd;
+    dayEnd += 7;
+  }
+  return result;
+});
+
+/**一周有的星期数中文 */
+const dayArr = ["一", "二", "三", "四", "五", "六", "日"];
 
 /**重定向到登陆页面 */
 const redirectToLogin = () => {
@@ -188,8 +231,7 @@ const readLabCookie = async (): Promise<string> => {
       cookie = await updateLabCookie();
     } else {
       // 如果不是假值捕但获到错误，说明发生了未知错误
-      showUnknownErrModal();
-      throw new Error("从学校系统获取实验系统cookie失败");
+      throw new Error("从本地储存获取实验系统cookie失败");
     }
   }
   return cookie;
@@ -204,14 +246,14 @@ const updateTimetableFromServer = async () => {
   } catch (error) {
     if (error instanceof Error) {
       if (error.message === "未登录，请先登录") {
-        redirectToLogin();
-        return;
+        return redirectToLogin();
       } else {
         showErrModal("尝试登陆实验系统出错", error.message);
       }
     } else {
       showUnknownErrModal();
     }
+    throw error;
   }
 
   // 尝试获取学期信息和课程信息
@@ -245,16 +287,27 @@ onMounted(() => {
   });
 });
 
-
 onPullDownRefresh(() => {
   updateTimetableFromServer().finally(() => {
     uni.stopPullDownRefresh();
   });
 });
+onPageScroll(({ scrollTop }) => {
+  if (scrollTop > 116) {
+    if ($showHeader.value === false) {
+      $showHeader.value = true;
+    }
+  } else {
+    if ($showHeader.value) {
+      $showHeader.value = false;
+    }
+  }
+});
 </script>
 
 <style scoped>
 .table-header {
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -276,12 +329,45 @@ onPullDownRefresh(() => {
   touch-action: pan-x;
 }
 
-.table-add::after {
-  content: none;
-}
-
 .table-main {
   width: 100%;
-  height: calc(100vh - 170px);
+}
+.fixed-header {
+  padding-right: 5px;
+  position: fixed;
+  top: -50px;
+  left: 0;
+  background-color: #fff;
+  height: 50px;
+  width: 100%;
+  transition: top 0.5s ease-in-out;
+  display: flex;
+  justify-content: space-between;
+  box-sizing: border-box;
+  box-shadow: 0px 30px 80px rgba(0, 0, 0, 0.07);
+}
+.fixed-header[data-active="true"] {
+  top: 0;
+}
+.table-mouth {
+  width: 40px;
+  flex: 0 0 40px;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+.table-date {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+}
+.table-date-item {
+  flex: 1 1 100px;
+}
+.day-name,
+.day-num {
+  width: 100%;
+  height: 25px;
+  display: block;
 }
 </style>
