@@ -295,11 +295,32 @@ export const organizeCourse = (arr: IAppCourse[][]): TOrganizedCourse => {
   return result;
 };
 
+/**去除相同的课程 */
+const filterDuplication = (arr: IAppCourse[]) => {
+  const set = new Set<string>(),
+    result: IAppCourse[] = [];
+  for (const c of arr) {
+    c.name = c.name.trim();
+    c.teacher = c.teacher.trim();
+    c.place = c.place.trim();
+    const unique = `${c.week}:${c.day}:${c.teacher}:${c.begin}:${c.over}`;
+    if (set.has(unique)) {
+      console.warn("存在相同课程：", c);
+      continue;
+    } else {
+      set.add(unique);
+      result.push(c);
+    }
+  }
+  return result;
+};
+
 /**整理将服务端返回的课程 */
 export const putCourseInOrder = (arr: ICommonCourse[], currentWeek: number) => {
   const flattedCourse = flatCourse(arr);
   const correctCourse = fixCourseArr(flattedCourse, currentWeek);
-  const weekCourse = covertToWeek(correctCourse);
+  const noDuplication = filterDuplication(correctCourse);
+  const weekCourse = covertToWeek(noDuplication);
   return organizeCourse(weekCourse);
 };
 

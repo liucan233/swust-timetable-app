@@ -6,11 +6,14 @@
   "versionCode": "100",
   "transformPx": false,
   "app-plus": {
+    "compatible": {
+      "ignoreVersion": true
+    },
     "usingComponents": true,
     "nvueStyleCompiler": "uni-app",
     "compilerVersion": 3,
     "splashscreen": {
-      "alwaysShowBeforeRender": true,
+      "alwaysShowBeforeRender": false,
       "waiting": true,
       "autoclose": true,
       "delay": 0
@@ -35,10 +38,15 @@
           "<uses-feature android:name=\"android.hardware.camera\"/>",
           "<uses-permission android:name=\"android.permission.WRITE_SETTINGS\"/>"
         ],
-        "abiFilters": ["armeabi-v7a", "arm64-v8a", "x86"]
+        "abiFilters": ["armeabi-v7a", "arm64-v8a"],
+        "minSdkVersion": 21
       },
-      "ios": {},
-      "sdkConfigs": {}
+      "ios": {
+        "dSYMs": false
+      },
+      "sdkConfigs": {
+        "ad": {}
+      }
     },
     "uniStatistics": {
       "enable": true
@@ -47,7 +55,8 @@
       "immersed": "none",
       "style": "light",
       "background": "#RRGGBB"
-    }
+    },
+    "nvueLaunchMode": ""
   },
   "quickapp": {},
   "mp-weixin": {
@@ -83,6 +92,5 @@
       }
     }
   }
-}
-/* 快应用特有相关 *//* 小程序特有相关 */
-
+} /* 小程序特有相关 */
+/* 快应用特有相关 */
