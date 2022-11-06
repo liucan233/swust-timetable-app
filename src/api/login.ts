@@ -1,7 +1,20 @@
-import { network, TBaseRes } from ".";
+import { TBaseRes } from ".";
 import { TGetCookieAndCaptchaUrlDto, TLoginDto } from "@src/types/login";
+import { Network } from "@src/lib/network";
+import { BACKEND_PREFIX } from "@src/config";
 
-// const network = new Network();
+const network = new Network({ url: BACKEND_PREFIX, timeout: 10000 });
+
+network.onRes = res => {
+  const { statusCode } = res;
+  if (statusCode < 200 || (statusCode > 299 && statusCode !== 304)) {
+    throw new Error("HTTP状态码为" + statusCode);
+  }
+  if (res.data && (res.data as any).code !== 200) {
+    throw new Error((res.data as any).msg);
+  }
+  return res.data;
+};
 
 /**
  * 获取当前cookie和验证码

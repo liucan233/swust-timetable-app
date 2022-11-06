@@ -138,34 +138,29 @@ const handleClick = async () => {
   login(username, password, code, remoteData.value.cookie).then(
     response => {
       uni.hideLoading();
-      if (response?.code === 200) {
-        /**登录成功后存储到uni storage中 */
-        credentials.setCasCookie(response.data.cookie);
-        /*这里获取两个cookie */
-        uni.switchTab({ url: TABLE });
-      } else {
-        if (response?.code === 401) {
-          // 返回的msg有两种，"验证码错误" "用户名或密码错误"
-          if (response.msg.length === 8) {
-            console.error("用户名或密码错误");
-            usernameRef.value?.warning(text.username.errorText);
-            passwordRef.value?.warning(text.password.errorText);
-          } else if (response.msg.length === 5) {
-            console.error("验证码错误");
-            verifyRef.value?.warning(text.code.errorText);
-          }
-        }
-        /** 登录失败需要重新获取cookie和验证码 */
-        refreshCookieAndCaptchaUrl();
-      }
+      // if (response?.code === 200) {
+      /**登录成功后存储到uni storage中 */
+      credentials.setCasCookie(response?.data.cookie || "");
+      /*这里获取两个cookie */
+      uni.switchTab({ url: TABLE });
     },
-    error => {
-      /**登陆失败 */
+    (error: Error) => {
       uni.hideLoading();
-      uni.showToast({
-        icon: "error",
-        title: `${error}`,
-      });
+      /**登陆失败 */
+      // 返回的msg有两种，"验证码错误" "用户名或密码错误"
+      if (error.message.length === 8) {
+        console.error("用户名或密码错误");
+        usernameRef.value?.warning(text.username.errorText);
+        passwordRef.value?.warning(text.password.errorText);
+      } else if (error.message.length === 5) {
+        console.error("验证码错误");
+        verifyRef.value?.warning(text.code.errorText);
+      } else {
+        uni.showToast({
+          icon: "error",
+          title: `${error}`,
+        });
+      }
       refreshCookieAndCaptchaUrl();
     }
   );
