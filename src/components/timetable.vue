@@ -5,7 +5,6 @@
       :indicator-dots="false"
       @change="handleWeekChange"
       :current="props.weekNum - 1"
-      :data-active="$pointerActive"
     >
       <swiper-item v-for="(c, index) in props.course.slice(1)" :key="index">
         <WeekTable
@@ -26,7 +25,6 @@
  *  2. 一个竖直（上下）滚动的小时刻度轴；
  *  3. 用户手指移动时判断运动方向（水平or竖直），事件穿透给对应滚动内容
  */
-import { shallowRef } from "vue";
 import { IDayInfo } from "@utils/common";
 import WeekTable from "./WeekTable.vue";
 import { TOrganizedCourse, TWeekCourse } from "@utils/timetable";
@@ -37,8 +35,6 @@ const props = defineProps<{
   weekNum: number;
   calendarArr: IDayInfo[][];
 }>();
-
-const $pointerActive = shallowRef(true);
 
 const emit = defineEmits<{
   (e: "weekChange", current: number): any;

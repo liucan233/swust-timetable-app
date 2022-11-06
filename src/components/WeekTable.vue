@@ -81,6 +81,8 @@ const getPosition = (s: number, e: number): CSSProperties => {
   return {
     top: (s >> 1) * rowHeight + "px",
     height: ((e - s + 1) * rowHeight) / 2 - gapHeight + "px",
+    "--place-line": (e - s + 1) * 2,
+    "--name-line": e - s + 1,
   };
 };
 
@@ -158,20 +160,21 @@ const getConflictStyle = (c: IConflictCourse) => {
   justify-content: center;
   flex-direction: column;
   line-height: 1.5;
-  font-size: 15px;
   box-sizing: border-box;
   z-index: 2;
 }
 .course-item > text {
   display: -webkit-box;
   overflow: hidden;
-  -webkit-line-clamp: 4;
+  font-size: 12px;
+  -webkit-line-clamp: var(--place-line);
   -webkit-box-orient: vertical;
   text-overflow: ellipsis;
   vertical-align: baseline;
 }
-.course-item > text:nth-child(2){
-  -webkit-line-clamp: 2;
+.course-item > text:nth-child(2) {
+  font-size: 13px;
+  -webkit-line-clamp: var(--name-line);
 }
 .conflict-item {
   width: 95%;
