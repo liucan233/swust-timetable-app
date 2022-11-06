@@ -12,7 +12,7 @@ onBeforeMount(() => {
   credentials
     .getCasCookie()
     .then(() => {
-      uni.redirectTo({ url: TABLE });
+      uni.switchTab({ url: TABLE });
     })
     .catch(err => {
       uni.redirectTo({ url: LOGIN });
