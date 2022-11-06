@@ -33,8 +33,7 @@ export const showUnknownErrModal = () => {
   uni.showModal({
     title: "发生未知错误",
     showCancel: false,
-    content:
-      "发生未知错误，请向开发者反馈，设备ID为：" + uni.getDeviceInfo().deviceId,
+    content: "请向开发者反馈，设备ID为：" + uni.getDeviceInfo().deviceId,
   });
 };
 
