@@ -6,3 +6,9 @@ declare module "*.vue" {
   const component: DefineComponent<{}, {}, any>;
   export default component;
 }
+
+declare type TBaseRes<T> = {
+  code: number;
+  msg: string;
+  data: T;
+};

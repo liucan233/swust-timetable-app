@@ -1,4 +1,4 @@
-import { network, TBaseRes } from ".";
+import { network } from ".";
 import { TGetCookieAndCaptchaUrlDto, TLoginDto } from "@src/types/login";
 
 // const network = new Network();
