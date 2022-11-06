@@ -16,6 +16,7 @@
     <view class="flex justify-between mb-4 shadow radius-4 card">
       <view
         class="flex flex-col justify-center items-center radius-4 shadow w-49percent"
+        @click="getQQGroupNumber"
       >
         <image :src="groupChat" class="card-image" />
         <text class="text-gray-500 text-center">维护QQ群</text>
@@ -44,6 +45,7 @@ import mark from "@static/image/toolBar/mark.png";
 import groupChat from "@static/image/toolBar/scan.png";
 import coffee from "@static/image/toolBar/coffee.png";
 import { clearStorage } from "@src/utils/storage";
+import { QQ_GROUP_NUMBER } from "@src/enums/common";
 
 const tools: TTool[] = [
   {
@@ -64,6 +66,15 @@ const tools: TTool[] = [
 ];
 
 const { windowHeight } = uni.getWindowInfo();
+
+const getQQGroupNumber = () => {
+  uni.setClipboardData({
+    data: QQ_GROUP_NUMBER,
+    success: function () {
+      console.log("success");
+    },
+  });
+};
 
 const logout = () => {
   clearStorage();
