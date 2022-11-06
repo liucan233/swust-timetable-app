@@ -72,7 +72,7 @@ const props = defineProps<IProps>();
 /**每天有6讲12节课 */
 const sectionTextArr = new Array(6).fill(null);
 
-const rowHeight = 140,
+const rowHeight = 130,
   gapHeight = 6;
 
 // onMounted(() => {});

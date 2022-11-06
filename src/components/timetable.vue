@@ -47,7 +47,7 @@ const emit = defineEmits<{
 const emptyCourseWeek = new Array(7) as TWeekCourse;
 
 /**每讲课显示的默认高度 */
-const rowHeight = 140;
+const rowHeight = 130;
 /**一周有的星期数中文 */
 const dayArr = ["一", "二", "三", "四", "五", "六", "日"];
 
