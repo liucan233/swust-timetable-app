@@ -30,9 +30,13 @@ const setStorage = (key: string | number, data: unknown) => {
 };
 
 export const valueIsFalsy = (err: unknown) => {
+  if (!err) {
+    return false;
+  }
   if (
-    (err instanceof TypeError && err.message === "本地储存中该值为假值") ||
-    (err && /not found/.test((err as any).errMsg))
+    (err as any).code === -1 ||
+    (err as any).message === "本地储存中该值为假值" ||
+    /not found/.test((err as any).errMsg ?? "")
   ) {
     return true;
   }

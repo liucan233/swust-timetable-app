@@ -1,4 +1,4 @@
-import { network, TBaseRes } from ".";
+import { network } from ".";
 
 /**抓取课程API返回类型 */
 export interface ICommonCourse {

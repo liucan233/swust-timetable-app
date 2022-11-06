@@ -1,4 +1,3 @@
-import { TBaseRes } from ".";
 import { TGetCookieAndCaptchaUrlDto, TLoginDto } from "@src/types/login";
 import { Network } from "@src/lib/network";
 import { BACKEND_PREFIX } from "@src/config";
