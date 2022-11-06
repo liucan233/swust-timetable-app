@@ -1,4 +1,5 @@
 <template>
+  <Message ref="messageRef" />
   <view>
     <view
       class="flex flex-col justify-center items-center main-container slide-top"
@@ -38,6 +39,7 @@
 import { onMounted, shallowRef } from "vue";
 
 import LoginInput from "@components/LoginInput.vue";
+import Message from "@components/Message.vue";
 
 import { TABLE } from "@enums/pages";
 import { getCookieAndCaptchaUrl, login } from "@api/login";
@@ -46,6 +48,7 @@ import { credentials } from "@src/utils/storage";
 /**组件ref属性的类型，T为组件类型 */
 type TLoginInputRef = InstanceType<typeof LoginInput> | null;
 
+const messageRef = shallowRef();
 const usernameRef = shallowRef<TLoginInputRef>(null);
 const passwordRef = shallowRef<TLoginInputRef>(null);
 const verifyRef = shallowRef<TLoginInputRef>(null);
@@ -69,7 +72,7 @@ const text = {
   code: {
     default: "验证码",
     lintWarningText: "请输入四位验证码",
-    errorText: "验证码错误",
+    errorText: "验证码无效",
   },
 };
 
@@ -149,17 +152,14 @@ const handleClick = async () => {
       /**登陆失败 */
       // 返回的msg有两种，"验证码错误" "用户名或密码错误"
       if (error.message.length === 8) {
-        console.error("用户名或密码错误");
         usernameRef.value?.warning(text.username.errorText);
         passwordRef.value?.warning(text.password.errorText);
+        messageRef.value?.error(error.message);
       } else if (error.message.length === 5) {
-        console.error("验证码错误");
         verifyRef.value?.warning(text.code.errorText);
+        messageRef.value?.error(error.message);
       } else {
-        uni.showToast({
-          icon: "error",
-          title: `${error}`,
-        });
+        messageRef.value?.error(error.message);
       }
       refreshCookieAndCaptchaUrl();
     }

@@ -1,4 +1,5 @@
 <template>
+  <Message ref="messageRef" />
   <view class="flex flex-col container">
     <view
       class="flex flex-col justify-center items-center mb-4 radius-4 avatar-warper"
@@ -35,6 +36,7 @@
 
 <script setup lang="ts">
 import ToolItem from "@components/ToolItem.vue";
+import Message from "@components/Message.vue";
 import { LOGIN } from "@enums/pages";
 import { TTool } from "@src/types/tool";
 
@@ -46,6 +48,9 @@ import groupChat from "@static/image/toolBar/scan.png";
 import coffee from "@static/image/toolBar/coffee.png";
 import { clearStorage } from "@src/utils/storage";
 import { QQ_GROUP_NUMBER } from "@src/enums/common";
+import { ref } from "vue";
+
+const messageRef = ref();
 
 const tools: TTool[] = [
   {
@@ -70,8 +75,9 @@ const { windowHeight } = uni.getWindowInfo();
 const getQQGroupNumber = () => {
   uni.setClipboardData({
     data: QQ_GROUP_NUMBER,
+    showToast: false,
     success: function () {
-      console.log("success");
+      messageRef.value?.success("群号已复制到剪切板");
     },
   });
 };
