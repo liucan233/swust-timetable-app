@@ -50,6 +50,16 @@
           "animationDuration": 500
         }
       }
+    },
+    {
+      "path": "pages/exam/index",
+      "style": {
+        "app-plus": {
+          "navigationBarTitleText": "我的考试",
+          "animationType": "slide-in-left",
+          "animationDuration": 500
+        }
+      }
     }
   ],
   "tabBar": {

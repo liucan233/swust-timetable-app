@@ -68,7 +68,7 @@ const tools: TTool[] = [
   {
     imageURL: exam,
     title: "我的考试",
-    to: "",
+    to: "/pages/exam/index",
   },
   {
     imageURL: mark,

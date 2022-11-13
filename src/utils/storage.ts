@@ -69,6 +69,7 @@ enum Key {
   JW_COOKIE,
   TERM_INFO,
   SWUST_ACCOUNT,
+  EXAM_LIST,
 }
 
 /**登陆凭证相关 */
@@ -177,6 +178,33 @@ const getSwustAccount = (): Promise<TSwustAccount> => {
   return getStorage(Key.SWUST_ACCOUNT) as Promise<TSwustAccount>;
 };
 
+export type TExamList = {
+  /**考试名 */
+  name: string;
+  // 考试周数
+  week: string;
+  // 考试天数 第一周五讲
+  day: string;
+  // 考试日期
+  date: string;
+  // 考试时间
+  time: string;
+  // 考试地点
+  place: string;
+  // 考试座位号
+  seat: string;
+  // 类型吧 不是很清楚
+  type: number;
+};
+/**存储存储的考试信息 */
+const setExamList = (examList: TExamList[]) => {
+  return setStorage(Key.EXAM_LIST, examList);
+};
+/**获取存储的考试信息 */
+const getExamList = (): Promise<TExamList[]> => {
+  return getStorage(Key.EXAM_LIST) as Promise<TExamList[]>;
+};
+
 export const clearStorage = () => {
   credentials.setCasCookie("");
   credentials.setLabCookie("");
@@ -200,4 +228,9 @@ export const timetable = {
 export const account = {
   setSwustAccount,
   getSwustAccount,
+};
+
+export const cacheExamList = {
+  setExamList,
+  getExamList,
 };
