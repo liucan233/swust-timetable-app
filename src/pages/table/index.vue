@@ -6,21 +6,21 @@
     >
     <button class="table-add">添加课程</button>
   </view>
-  <scroll-view class="table-preview" scroll-x>
+  <!-- <scroll-view class="table-preview" scroll-x>
     <CoursePreview v-for="(_, index) in $courseData" :key="index" />
-  </scroll-view>
+  </scroll-view> -->
   <view class="table-main">
     <Timetable
       class-name="timetable"
       :course="$courseData"
-      :week-num="$termInfo.viewWeekNum"
+      :week-num="Math.min($termInfo.viewWeekNum, $termInfo.weekNum)"
       :calendar-arr="dayInfoArr"
       @week-change="handleWeekChange"
     />
   </view>
   <view class="fixed-header" :data-active="$showHeader">
     <view class="table-mouth">
-      <text>{{ dayInfoArr[$termInfo.viewWeekNum]?.[0]?.month || -1 }}</text>
+      <text>{{ dayInfoArr[$termInfo.viewWeekNum]?.[0]?.month || 1 }}</text>
       <text>月</text>
     </view>
     <view class="table-date">
@@ -30,7 +30,7 @@
         class="table-date-item"
       >
         <text class="day-name">周{{ dayArr[index] }}</text>
-        <text class="day-num">{{ d.day }}</text>
+        <text class="day-num" :data-active="dateIsToday(d)">{{ d.day }}</text>
       </view>
     </view>
   </view>
@@ -52,6 +52,7 @@ import {
   showErrModal,
   IDayInfo,
   getDaysInfo,
+getCurDate,
 } from "@utils/common";
 import { onMounted, ref, shallowRef, computed } from "vue";
 import { onPullDownRefresh, onPageScroll } from "@dcloudio/uni-app";
@@ -76,14 +77,17 @@ const $termInfo = ref({
   termName: "",
   beginTime: new Date("2022/9/1"),
   overTime: new Date("2023/1/1"),
-  viewWeekNum: 0,
+  viewWeekNum: 1,
 });
 
 /**一个学期的课程 */
-const $courseData = shallowRef<TOrganizedCourse>([]);
+const $courseData = shallowRef<TOrganizedCourse>([null]);
 
 /**是否显示固定的日期 */
 const $showHeader = shallowRef(false);
+
+/**今天的日月年信息 */
+const todayInfo = getCurDate();
 
 /**课表表头的日历信息 */
 const dayInfoArr = computed<IDayInfo[][]>(() => {
@@ -115,6 +119,14 @@ const redirectToLogin = () => {
   });
 };
 
+const dateIsToday = (d: IDayInfo) => {
+  return (
+    d.day === todayInfo.day &&
+    d.month === todayInfo.month &&
+    d.year === todayInfo.year
+  );
+};
+
 /**获取实验课和教务系统的课表更新组件并写入本地储存 */
 const updateCourse = async (labCookie: string) => {
   const [labCourse, jwCourse] = await Promise.all([
@@ -139,25 +151,20 @@ const updateCourse = async (labCookie: string) => {
 
   if (errMessage) {
     showErrModal("刷新课表失败", errMessage);
+    const localTimetable = await timetable.getTimetable();
+    courseArr = courseArr.concat(localTimetable);
+  } else {
+    // 新课表写入本地储存
+    timetable.setTimetable(courseArr);
   }
-
-  // 将课表写入本地储存
-  timetable.setTimetable(courseArr);
-
-  // 更新课表和当前周数
-  const curWeekNum = $termInfo.value.weekNum;
   $courseData.value = putCourseInOrder(courseArr, $termInfo.value.weekNum);
-  $termInfo.value.beginTime = getDateFromWeek(-curWeekNum);
-  $termInfo.value.overTime = getDateFromWeek(
-    $courseData.value.length - curWeekNum
-  );
 
-  // 将学期信息写入本地储存
-  timetable.setTermInfo({
-    begin: $termInfo.value.beginTime.valueOf(),
-    over: $termInfo.value.overTime.valueOf(),
-    termName: $termInfo.value.termName,
-  });
+  // 课程获取成功才更新周数信息
+  if (!errMessage) {
+    $termInfo.value.overTime = getDateFromWeek(
+      $termInfo.value.weekNum - $courseData.value.length
+    );
+  }
 };
 
 /**更新学期和当前周数 */
@@ -169,6 +176,13 @@ const updateTerm = async (labCookie: string) => {
     $termInfo.value.weekNum = curWeekNum;
     $termInfo.value.viewWeekNum = curWeekNum;
     $termInfo.value.termName = termInfo.data.time;
+    $termInfo.value.beginTime = getDateFromWeek(curWeekNum);
+    $termInfo.value.overTime = getDateFromWeek(curWeekNum - 20);
+    timetable.setTermInfo({
+      begin: $termInfo.value.beginTime.valueOf(),
+      over: $termInfo.value.overTime.valueOf(),
+      termName: $termInfo.value.termName,
+    });
   } else {
     throw new Error("从学校系统获取学期信息失败");
   }
@@ -248,7 +262,7 @@ const updateTimetableFromServer = async () => {
       if (error.message === "未登录，请先登录") {
         return redirectToLogin();
       } else {
-        showErrModal("尝试登陆实验系统出错", error.message);
+        showErrModal("访问学校实验系统出错", error.message);
       }
     } else {
       showUnknownErrModal();
@@ -288,12 +302,22 @@ onMounted(() => {
 });
 
 onPullDownRefresh(() => {
-  updateTimetableFromServer().finally(() => {
-    uni.stopPullDownRefresh();
-  });
+  updateTimetableFromServer()
+    .then(() => {
+      if ($termInfo.value.weekNum >= $courseData.value.length) {
+        uni.showModal({
+          title: `当前是第${$termInfo.value.viewWeekNum}周`,
+          content: `本学期${$courseData.value.length}周起你就没课咯。`,
+          showCancel: false,
+        });
+      }
+    })
+    .finally(() => {
+      uni.stopPullDownRefresh();
+    });
 });
 onPageScroll(({ scrollTop }) => {
-  if (scrollTop > 116) {
+  if (scrollTop > 100) {
     if ($showHeader.value === false) {
       $showHeader.value = true;
     }
@@ -311,16 +335,26 @@ onPageScroll(({ scrollTop }) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-sizing: border-box;
+  padding: 10px;
+  font-size: 18px;
 }
 
 .table-time {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .table-add {
   border: none;
   outline: none;
   margin: 0;
+  line-height: 1;
+  padding: 0;
+  background: none;
+}
+.table-add::after {
+  display: none;
+  content: none;
 }
 
 .table-preview {
@@ -333,12 +367,12 @@ onPageScroll(({ scrollTop }) => {
   width: 100%;
 }
 .fixed-header {
-  padding-right: 5px;
+  padding: 8px 5px 0 0;
   position: fixed;
-  top: -50px;
+  top: -60px;
   left: 0;
   background-color: #fff;
-  height: 50px;
+  height: 60px;
   width: 100%;
   transition: top 0.5s ease-in-out;
   display: flex;
@@ -369,5 +403,20 @@ onPageScroll(({ scrollTop }) => {
   width: 100%;
   height: 25px;
   display: block;
+}
+.day-num[data-active="true"] {
+  position: relative;
+}
+.day-num[data-active="true"]::before {
+  position: absolute;
+  content: "";
+  width: 26px;
+  height: 26px;
+  background-color: #5ac8fa;
+  left: 50%;
+  top: 50%;
+  z-index: -1;
+  border-radius: 50%;
+  transform: translate(-49%, -51%);
 }
 </style>
