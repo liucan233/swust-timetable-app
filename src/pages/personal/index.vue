@@ -6,7 +6,7 @@
     >
       <image :src="avatar" class="mb-4 shadow avatar" />
       <text class="mb-4 text-base text-white font-semibold"
-        >学号: 5120205917</text
+        >学号: {{ $user }}</text
       >
     </view>
     <view
@@ -46,11 +46,18 @@ import exam from "@static/image/toolBar/exam.png";
 import mark from "@static/image/toolBar/mark.png";
 import groupChat from "@static/image/toolBar/scan.png";
 import coffee from "@static/image/toolBar/coffee.png";
-import { clearStorage } from "@src/utils/storage";
+import { account, clearStorage } from "@src/utils/storage";
 import { QQ_GROUP_NUMBER } from "@src/enums/common";
-import { ref } from "vue";
+import { onMounted, shallowRef } from "vue";
 
-const messageRef = ref();
+const $user = shallowRef("");
+const $messageRef = shallowRef();
+
+onMounted(() => {
+  account.getSwustAccount().then(account => {
+    $user.value = account.user;
+  });
+});
 
 const tools: TTool[] = [
   {
@@ -77,7 +84,7 @@ const getQQGroupNumber = () => {
     data: QQ_GROUP_NUMBER,
     showToast: false,
     success: function () {
-      messageRef.value?.success("群号已复制到剪切板");
+      $messageRef.value?.success("群号已复制到剪切板");
     },
   });
 };

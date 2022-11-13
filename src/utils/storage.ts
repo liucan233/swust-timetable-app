@@ -68,6 +68,7 @@ enum Key {
   LAB_COOKIE,
   JW_COOKIE,
   TERM_INFO,
+  SWUST_ACCOUNT,
 }
 
 /**登陆凭证相关 */
@@ -163,9 +164,23 @@ const getTermInfo = (): Promise<TTermInfo> => {
   });
 };
 
+export type TSwustAccount = {
+  user: string;
+  password: string;
+};
+
+const setSwustAccount = (account: TSwustAccount) => {
+  return setStorage(Key.SWUST_ACCOUNT, account);
+};
+
+const getSwustAccount = (): Promise<TSwustAccount> => {
+  return getStorage(Key.SWUST_ACCOUNT) as Promise<TSwustAccount>;
+};
+
 export const clearStorage = () => {
   credentials.setCasCookie("");
   credentials.setLabCookie("");
+  account.setSwustAccount({ user: "", password: "" });
 };
 
 export const credentials = {
@@ -180,4 +195,9 @@ export const timetable = {
   setTimetable,
   getTermInfo,
   getTimetable,
+};
+
+export const account = {
+  setSwustAccount,
+  getSwustAccount,
 };

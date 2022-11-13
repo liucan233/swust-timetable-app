@@ -43,7 +43,7 @@ import Message from "@components/Message.vue";
 
 import { TABLE } from "@enums/pages";
 import { getCookieAndCaptchaUrl, login } from "@api/login";
-import { credentials } from "@src/utils/storage";
+import { account, credentials } from "@src/utils/storage";
 
 /**组件ref属性的类型，T为组件类型 */
 type TLoginInputRef = InstanceType<typeof LoginInput> | null;
@@ -53,7 +53,7 @@ const usernameRef = shallowRef<TLoginInputRef>(null);
 const passwordRef = shallowRef<TLoginInputRef>(null);
 const verifyRef = shallowRef<TLoginInputRef>(null);
 const remoteData = shallowRef({
-  cookie: "",
+  //cookie: "",
   captcha: "",
 });
 
@@ -144,6 +144,7 @@ const handleClick = async () => {
       // if (response?.code === 200) {
       /**登录成功后存储到uni storage中 */
       credentials.setCasCookie(response?.data.cookie || "");
+      account.setSwustAccount({ user: username, password });
       /*这里获取两个cookie */
       uni.switchTab({ url: TABLE });
     },

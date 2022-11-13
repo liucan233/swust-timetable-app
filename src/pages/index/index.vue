@@ -5,8 +5,8 @@
 <script setup lang="ts">
 import { onBeforeMount } from "vue";
 import { TABLE, LOGIN } from "@enums/pages";
-import { credentials, valueIsFalsy } from "@utils/storage";
-import { showErrModal, showUnknownErrModal } from "@src/utils/common";
+import { clearStorage, credentials } from "@utils/storage";
+// import { showErrModal, showUnknownErrModal } from "@src/utils/common";
 
 onBeforeMount(() => {
   credentials
@@ -14,15 +14,16 @@ onBeforeMount(() => {
     .then(() => {
       uni.switchTab({ url: TABLE });
     })
-    .catch(err => {
+    .catch(() => {
+      clearStorage();
       uni.redirectTo({ url: LOGIN });
-      if (!valueIsFalsy(err)) {
-        if (err instanceof Error) {
-          showErrModal("App启动时遇到问题", err.message);
-        } else {
-          showUnknownErrModal();
-        }
-      }
+      // if (!valueIsFalsy(err)) {
+      //   if (err instanceof Error) {
+      //     showErrModal("App启动时遇到问题", err.message);
+      //   } else {
+      //     showUnknownErrModal();
+      //   }
+      // }
     });
 });
 </script>
