@@ -8,7 +8,7 @@
       <view class="table-date">
         <view v-for="(d, index) in dayNum" :key="d.day" class="table-date-item">
           <text class="day-name">周{{ props.dayName[index] }}</text>
-          <text class="day-num">{{ d.day }}</text>
+          <text class="day-num" :data-active="dateIsToday(d)">{{ d.day }}</text>
         </view>
       </view>
     </view>
@@ -22,6 +22,12 @@
           第 {{ index + 1 }} 讲
         </text>
       </view>
+      <view
+        v-for="(_, index) in sectionTextArr"
+        :key="index"
+        :style="getSeparatorStyle(index)"
+        class="course-separator"
+      />
       <view
         v-for="(_, dayIndex) in props.dayName"
         :key="dayIndex"
@@ -64,6 +70,7 @@ import type { IConflictCourse } from "@utils/timetable";
 interface IProps {
   course: TWeekCourse;
   dayNum: IDayInfo[];
+  todayInfo: IDayInfo;
   dayName: string[];
   courseHeight: number;
 }
@@ -79,7 +86,7 @@ const rowHeight = 130,
 
 const getPosition = (s: number, e: number): CSSProperties => {
   return {
-    top: (s >> 1) * rowHeight + "px",
+    top: (s >> 1) * rowHeight + 3 + "px",
     height: ((e - s + 1) * rowHeight) / 2 - gapHeight + "px",
     "--place-line": (e - s + 1) * 2,
     "--name-line": e - s + 1,
@@ -92,6 +99,18 @@ const getConflictStyle = (c: IConflictCourse) => {
     height: size + "px",
     width: size + "px",
   };
+};
+const getSeparatorStyle = (index: number) => {
+  return {
+    top: index * props.courseHeight + "px",
+  };
+};
+const dateIsToday = (d: IDayInfo) => {
+  return (
+    d.day === props.todayInfo.day &&
+    d.month === props.todayInfo.month &&
+    d.year === props.todayInfo.year
+  );
 };
 </script>
 
@@ -120,6 +139,7 @@ const getConflictStyle = (c: IConflictCourse) => {
   flex: 1 1 100px;
 }
 .week-container {
+  position: relative;
   width: calc(100% - 5px);
   height: v-bind("rowHeight*6+'px'");
   display: flex;
@@ -149,6 +169,21 @@ const getConflictStyle = (c: IConflictCourse) => {
   height: 25px;
   display: block;
   /* text-align: center; */
+}
+.day-num[data-active="true"] {
+  position: relative;
+}
+.day-num[data-active="true"]::before {
+  position: absolute;
+  content: "";
+  width: 25px;
+  height: 25px;
+  background-color: #5ac8fa;
+  left: 50%;
+  top: 50%;
+  z-index: -1;
+  border-radius: 50%;
+  transform: translate(-49%, -51%);
 }
 .course-item {
   width: 95%;
@@ -194,5 +229,17 @@ const getConflictStyle = (c: IConflictCourse) => {
   background-repeat: repeat;
   transform: translate(-40%, -40%) rotateZ(-45deg);
   transform-origin: center;
+}
+.course-separator {
+  position: absolute;
+  right: 0;
+  width: calc(100% - 40px);
+  height: v-bind("rowHeight+'px'");
+}
+.table-date,
+.course-separator {
+  border-style: dashed;
+  border-color: #c5cbd0;
+  border-width: 0 0 1px;
 }
 </style>

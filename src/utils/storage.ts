@@ -34,7 +34,6 @@ export const valueIsFalsy = (err: unknown) => {
     return false;
   }
   if (
-    (err as any).code === -1 ||
     (err as any).message === "本地储存中该值为假值" ||
     /not found/.test((err as any).errMsg ?? "")
   ) {
@@ -70,6 +69,7 @@ enum Key {
   TERM_INFO,
   SWUST_ACCOUNT,
   EXAM_LIST,
+  FIRST_LAUNCH,
 }
 
 /**登陆凭证相关 */
@@ -177,6 +177,10 @@ const setSwustAccount = (account: TSwustAccount) => {
 const getSwustAccount = (): Promise<TSwustAccount> => {
   return getStorage(Key.SWUST_ACCOUNT) as Promise<TSwustAccount>;
 };
+/**判断是否是首次启动 */
+const getIsFirstLaunch = () => {
+  return getStorage(Key.FIRST_LAUNCH);
+};
 
 export type TExamList = {
   /**考试名 */
@@ -205,10 +209,9 @@ const getExamList = (): Promise<TExamList[]> => {
   return getStorage(Key.EXAM_LIST) as Promise<TExamList[]>;
 };
 
-export const clearStorage = () => {
-  credentials.setCasCookie("");
-  credentials.setLabCookie("");
-  account.setSwustAccount({ user: "", password: "" });
+/**首次启动标志设为false */
+const setNoFirstLaunch = () => {
+  return setStorage(Key.FIRST_LAUNCH, "no");
 };
 
 export const credentials = {
@@ -229,8 +232,18 @@ export const account = {
   setSwustAccount,
   getSwustAccount,
 };
+export const appCommon = {
+  getIsFirstLaunch,
+  setNoFirstLaunch,
+};
 
 export const cacheExamList = {
   setExamList,
   getExamList,
+};
+export const clearStorage = () => {
+  setCasCookie("");
+  setLabCookie("");
+  setNoFirstLaunch();
+  setSwustAccount({ user: "", password: "" });
 };

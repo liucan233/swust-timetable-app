@@ -24,8 +24,20 @@ export const getDaysInfo = (start: Date, end: Date) => {
   return result;
 };
 
+/**获取当前日期 */
+export const getCurDate = (): IDayInfo => {
+  const curDate = new Date();
+  return {
+    year: curDate.getFullYear(),
+    month: curDate.getMonth() + 1,
+    day: curDate.getDate(),
+  };
+};
+
 export const getDateFromWeek = (currentWeek: number): Date => {
-  return new Date(dayjs().startOf("week").add(currentWeek, "week").valueOf());
+  return new Date(
+    dayjs().startOf("week").subtract(currentWeek, "week").valueOf()
+  );
 };
 
 /**向用户弹窗未知错误 */
@@ -45,7 +57,7 @@ export const showErrModal = (title: string, msg: string) => {
     content:
       msg +
       "，" +
-      "请重试向开发者反馈，设备ID为：" +
+      "请重试或向开发者反馈，设备ID为：" +
       uni.getDeviceInfo().deviceId,
   });
 };

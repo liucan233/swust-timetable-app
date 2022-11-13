@@ -1,5 +1,6 @@
 <template>
   <!-- thumbnail="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-dc-site/460d46d0-4fcc-11eb-8ff1-d5dcf8779628.png" -->
+  <view v-if="examList?.length === 0">empty</view>
   <uni-card
     v-for="(item, index) in examList"
     :key="index"
