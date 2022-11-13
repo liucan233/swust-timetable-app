@@ -20,7 +20,7 @@
   </view>
   <view class="fixed-header" :data-active="$showHeader">
     <view class="table-mouth">
-      <text>{{ dayInfoArr[$termInfo.viewWeekNum]?.[0]?.month || -1 }}</text>
+      <text>{{ dayInfoArr[$termInfo.viewWeekNum]?.[0]?.month || 1 }}</text>
       <text>月</text>
     </view>
     <view class="table-date">
@@ -30,7 +30,7 @@
         class="table-date-item"
       >
         <text class="day-name">周{{ dayArr[index] }}</text>
-        <text class="day-num">{{ d.day }}</text>
+        <text class="day-num" :data-active="dateIsToday(d)">{{ d.day }}</text>
       </view>
     </view>
   </view>
@@ -52,6 +52,7 @@ import {
   showErrModal,
   IDayInfo,
   getDaysInfo,
+getCurDate,
 } from "@utils/common";
 import { onMounted, ref, shallowRef, computed } from "vue";
 import { onPullDownRefresh, onPageScroll } from "@dcloudio/uni-app";
@@ -76,14 +77,17 @@ const $termInfo = ref({
   termName: "",
   beginTime: new Date("2022/9/1"),
   overTime: new Date("2023/1/1"),
-  viewWeekNum: 0,
+  viewWeekNum: 1,
 });
 
 /**一个学期的课程 */
-const $courseData = shallowRef<TOrganizedCourse>([]);
+const $courseData = shallowRef<TOrganizedCourse>([null]);
 
 /**是否显示固定的日期 */
 const $showHeader = shallowRef(false);
+
+/**今天的日月年信息 */
+const todayInfo = getCurDate();
 
 /**课表表头的日历信息 */
 const dayInfoArr = computed<IDayInfo[][]>(() => {
@@ -113,6 +117,14 @@ const redirectToLogin = () => {
   uni.redirectTo({
     url: "/pages/login/index",
   });
+};
+
+const dateIsToday = (d: IDayInfo) => {
+  return (
+    d.day === todayInfo.day &&
+    d.month === todayInfo.month &&
+    d.year === todayInfo.year
+  );
 };
 
 /**获取实验课和教务系统的课表更新组件并写入本地储存 */
@@ -355,12 +367,12 @@ onPageScroll(({ scrollTop }) => {
   width: 100%;
 }
 .fixed-header {
-  padding: 5px 5px 0 0;
+  padding: 8px 5px 0 0;
   position: fixed;
   top: -60px;
   left: 0;
   background-color: #fff;
-  height: 55px;
+  height: 60px;
   width: 100%;
   transition: top 0.5s ease-in-out;
   display: flex;
@@ -391,5 +403,20 @@ onPageScroll(({ scrollTop }) => {
   width: 100%;
   height: 25px;
   display: block;
+}
+.day-num[data-active="true"] {
+  position: relative;
+}
+.day-num[data-active="true"]::before {
+  position: absolute;
+  content: "";
+  width: 26px;
+  height: 26px;
+  background-color: #5ac8fa;
+  left: 50%;
+  top: 50%;
+  z-index: -1;
+  border-radius: 50%;
+  transform: translate(-49%, -51%);
 }
 </style>

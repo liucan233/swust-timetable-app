@@ -86,7 +86,7 @@ const rowHeight = 130,
 
 const getPosition = (s: number, e: number): CSSProperties => {
   return {
-    top: (s >> 1) * rowHeight +3+ "px",
+    top: (s >> 1) * rowHeight + 3 + "px",
     height: ((e - s + 1) * rowHeight) / 2 - gapHeight + "px",
     "--place-line": (e - s + 1) * 2,
     "--name-line": e - s + 1,
@@ -176,8 +176,8 @@ const dateIsToday = (d: IDayInfo) => {
 .day-num[data-active="true"]::before {
   position: absolute;
   content: "";
-  width: 26px;
-  height: 26px;
+  width: 25px;
+  height: 25px;
   background-color: #5ac8fa;
   left: 50%;
   top: 50%;
@@ -230,13 +230,14 @@ const dateIsToday = (d: IDayInfo) => {
   transform: translate(-40%, -40%) rotateZ(-45deg);
   transform-origin: center;
 }
-.course-separator{
+.course-separator {
   position: absolute;
   right: 0;
   width: calc(100% - 40px);
   height: v-bind("rowHeight+'px'");
 }
-.table-date,.course-separator{
+.table-date,
+.course-separator {
   border-style: dashed;
   border-color: #c5cbd0;
   border-width: 0 0 1px;
