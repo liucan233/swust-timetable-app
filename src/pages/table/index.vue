@@ -6,14 +6,14 @@
     >
     <button class="table-add">添加课程</button>
   </view>
-  <scroll-view class="table-preview" scroll-x>
+  <!-- <scroll-view class="table-preview" scroll-x>
     <CoursePreview v-for="(_, index) in $courseData" :key="index" />
-  </scroll-view>
+  </scroll-view> -->
   <view class="table-main">
     <Timetable
       class-name="timetable"
       :course="$courseData"
-      :week-num="$termInfo.viewWeekNum"
+      :week-num="Math.min($termInfo.viewWeekNum, $termInfo.weekNum)"
       :calendar-arr="dayInfoArr"
       @week-change="handleWeekChange"
     />
@@ -290,12 +290,22 @@ onMounted(() => {
 });
 
 onPullDownRefresh(() => {
-  updateTimetableFromServer().finally(() => {
-    uni.stopPullDownRefresh();
-  });
+  updateTimetableFromServer()
+    .then(() => {
+      if ($termInfo.value.weekNum >= $courseData.value.length) {
+        uni.showModal({
+          title: `当前是第${$termInfo.value.viewWeekNum}周`,
+          content: `本学期${$courseData.value.length}周起你就没课咯。`,
+          showCancel: false,
+        });
+      }
+    })
+    .finally(() => {
+      uni.stopPullDownRefresh();
+    });
 });
 onPageScroll(({ scrollTop }) => {
-  if (scrollTop > 116) {
+  if (scrollTop > 100) {
     if ($showHeader.value === false) {
       $showHeader.value = true;
     }
@@ -313,16 +323,26 @@ onPageScroll(({ scrollTop }) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-sizing: border-box;
+  padding: 10px;
+  font-size: 18px;
 }
 
 .table-time {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 .table-add {
   border: none;
   outline: none;
   margin: 0;
+  line-height: 1;
+  padding: 0;
+  background: none;
+}
+.table-add::after {
+  display: none;
+  content: none;
 }
 
 .table-preview {
@@ -335,12 +355,12 @@ onPageScroll(({ scrollTop }) => {
   width: 100%;
 }
 .fixed-header {
-  padding-right: 5px;
+  padding: 5px 5px 0 0;
   position: fixed;
-  top: -50px;
+  top: -60px;
   left: 0;
   background-color: #fff;
-  height: 50px;
+  height: 55px;
   width: 100%;
   transition: top 0.5s ease-in-out;
   display: flex;

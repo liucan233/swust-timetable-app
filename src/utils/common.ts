@@ -24,6 +24,16 @@ export const getDaysInfo = (start: Date, end: Date) => {
   return result;
 };
 
+/**获取当前日期 */
+export const getCurDate = (): IDayInfo => {
+  const curDate = new Date();
+  return {
+    year: curDate.getFullYear(),
+    month: curDate.getMonth() + 1,
+    day: curDate.getDate(),
+  };
+};
+
 export const getDateFromWeek = (currentWeek: number): Date => {
   return new Date(
     dayjs().startOf("week").subtract(currentWeek, "week").valueOf()

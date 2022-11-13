@@ -12,6 +12,7 @@
           :day-num="props.calendarArr[index + 1]"
           :day-name="dayArr"
           :course-height="rowHeight"
+          :today-info="todayInfo"
         />
       </swiper-item>
     </swiper>
@@ -25,7 +26,7 @@
  *  2. 一个竖直（上下）滚动的小时刻度轴；
  *  3. 用户手指移动时判断运动方向（水平or竖直），事件穿透给对应滚动内容
  */
-import { IDayInfo } from "@utils/common";
+import { IDayInfo, getCurDate } from "@utils/common";
 import WeekTable from "./WeekTable.vue";
 import { TOrganizedCourse, TWeekCourse } from "@utils/timetable";
 
@@ -41,6 +42,9 @@ const emit = defineEmits<{
 }>();
 
 const emptyCourseWeek = new Array(7) as TWeekCourse;
+
+/**今天的日月年信息 */
+const todayInfo = getCurDate();
 
 /**每讲课显示的默认高度 */
 const rowHeight = 130;
