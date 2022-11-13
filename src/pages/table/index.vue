@@ -139,25 +139,20 @@ const updateCourse = async (labCookie: string) => {
 
   if (errMessage) {
     showErrModal("刷新课表失败", errMessage);
+    const localTimetable = await timetable.getTimetable();
+    courseArr = courseArr.concat(localTimetable);
+  } else {
+    // 新课表写入本地储存
+    timetable.setTimetable(courseArr);
   }
-
-  // 将课表写入本地储存
-  timetable.setTimetable(courseArr);
-
-  // 更新课表和当前周数
-  const curWeekNum = $termInfo.value.weekNum;
   $courseData.value = putCourseInOrder(courseArr, $termInfo.value.weekNum);
-  $termInfo.value.beginTime = getDateFromWeek(-curWeekNum);
-  $termInfo.value.overTime = getDateFromWeek(
-    $courseData.value.length - curWeekNum
-  );
 
-  // 将学期信息写入本地储存
-  timetable.setTermInfo({
-    begin: $termInfo.value.beginTime.valueOf(),
-    over: $termInfo.value.overTime.valueOf(),
-    termName: $termInfo.value.termName,
-  });
+  // 课程获取成功才更新周数信息
+  if (!errMessage) {
+    $termInfo.value.overTime = getDateFromWeek(
+      $termInfo.value.weekNum - $courseData.value.length
+    );
+  }
 };
 
 /**更新学期和当前周数 */
@@ -169,6 +164,13 @@ const updateTerm = async (labCookie: string) => {
     $termInfo.value.weekNum = curWeekNum;
     $termInfo.value.viewWeekNum = curWeekNum;
     $termInfo.value.termName = termInfo.data.time;
+    $termInfo.value.beginTime = getDateFromWeek(curWeekNum);
+    $termInfo.value.overTime = getDateFromWeek(curWeekNum - 20);
+    timetable.setTermInfo({
+      begin: $termInfo.value.beginTime.valueOf(),
+      over: $termInfo.value.overTime.valueOf(),
+      termName: $termInfo.value.termName,
+    });
   } else {
     throw new Error("从学校系统获取学期信息失败");
   }
@@ -248,7 +250,7 @@ const updateTimetableFromServer = async () => {
       if (error.message === "未登录，请先登录") {
         return redirectToLogin();
       } else {
-        showErrModal("尝试登陆实验系统出错", error.message);
+        showErrModal("访问学校实验系统出错", error.message);
       }
     } else {
       showUnknownErrModal();

@@ -25,7 +25,9 @@ export const getDaysInfo = (start: Date, end: Date) => {
 };
 
 export const getDateFromWeek = (currentWeek: number): Date => {
-  return new Date(dayjs().startOf("week").add(currentWeek, "week").valueOf());
+  return new Date(
+    dayjs().startOf("week").subtract(currentWeek, "week").valueOf()
+  );
 };
 
 /**向用户弹窗未知错误 */
@@ -45,7 +47,7 @@ export const showErrModal = (title: string, msg: string) => {
     content:
       msg +
       "，" +
-      "请重试向开发者反馈，设备ID为：" +
+      "请重试或向开发者反馈，设备ID为：" +
       uni.getDeviceInfo().deviceId,
   });
 };

@@ -34,7 +34,6 @@ export const valueIsFalsy = (err: unknown) => {
     return false;
   }
   if (
-    (err as any).code === -1 ||
     (err as any).message === "本地储存中该值为假值" ||
     /not found/.test((err as any).errMsg ?? "")
   ) {
@@ -68,6 +67,7 @@ enum Key {
   LAB_COOKIE,
   JW_COOKIE,
   TERM_INFO,
+  FIRST_LAUNCH,
 }
 
 /**登陆凭证相关 */
@@ -163,9 +163,14 @@ const getTermInfo = (): Promise<TTermInfo> => {
   });
 };
 
-export const clearStorage = () => {
-  credentials.setCasCookie("");
-  credentials.setLabCookie("");
+/**判断是否是首次启动 */
+const getIsFirstLaunch = () => {
+  return getStorage(Key.FIRST_LAUNCH);
+};
+
+/**首次启动标志设为false */
+const setNoFirstLaunch = () => {
+  return setStorage(Key.FIRST_LAUNCH, "no");
 };
 
 export const credentials = {
@@ -180,4 +185,15 @@ export const timetable = {
   setTimetable,
   getTermInfo,
   getTimetable,
+};
+
+export const appCommon = {
+  getIsFirstLaunch,
+  setNoFirstLaunch,
+};
+
+export const clearStorage = () => {
+  setCasCookie("");
+  setLabCookie("");
+  setNoFirstLaunch();
 };
