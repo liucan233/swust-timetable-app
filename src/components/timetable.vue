@@ -29,6 +29,7 @@
 import { IDayInfo, getCurDate } from "@utils/common";
 import WeekTable from "./WeekTable.vue";
 import { TOrganizedCourse, TWeekCourse } from "@utils/timetable";
+import { onUpdated, watch } from "vue";
 
 const props = defineProps<{
   className: string;
@@ -36,6 +37,10 @@ const props = defineProps<{
   weekNum: number;
   calendarArr: IDayInfo[][];
 }>();
+
+onUpdated(()=>{
+  console.log(props.weekNum)
+})
 
 const emit = defineEmits<{
   (e: "weekChange", current: number): any;

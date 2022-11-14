@@ -23,9 +23,11 @@ export const getCommonTimetable = (cookie: string) =>
     "/api/timetable/commonTimeTable?cookie=" + encodeURIComponent(cookie)
   );
 
+  /**周数学期信息 */
+  export interface ITermInfo{ time: string; term: string; weeks: string }
 /**获取当前学期的周数等 */
 export const getTermInfo = (cookie: string) =>
-  network.get<TBaseRes<{ time: string; term: string; weeks: string }>>(
+  network.get<TBaseRes<ITermInfo>>(
     "/api/timetable/time?cookie=" + encodeURIComponent(cookie)
   );
 

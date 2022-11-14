@@ -2,7 +2,7 @@
   <view class="table-header">
     <text class="table-time">{{ $termInfo.termName }}</text>
     <text class="table-time"
-      >第 {{ $termInfo.viewWeekNum }} / {{ $courseData.length - 1 }} 周</text
+      >第 {{ $termInfo.viewWeekNum }} / {{ $termInfo.weekNum }} 周</text
     >
     <button class="table-add">添加课程</button>
   </view>
@@ -13,7 +13,7 @@
     <Timetable
       class-name="timetable"
       :course="$courseData"
-      :week-num="Math.min($termInfo.viewWeekNum, $termInfo.weekNum)"
+      :week-num="getAndCorrectCurWeek()"
       :calendar-arr="dayInfoArr"
       @week-change="handleWeekChange"
     />
@@ -45,14 +45,13 @@
  * 4. 若CAS cookie不存在则表示用户未登录，重定向到登陆页面。
  */
 import Timetable from "@src/components/Timetable.vue";
-import CoursePreview from "@components/CoursePreview.vue";
 import {
   getDateFromWeek,
   showUnknownErrModal,
   showErrModal,
   IDayInfo,
   getDaysInfo,
-getCurDate,
+  getCurDate,
 } from "@utils/common";
 import { onMounted, ref, shallowRef, computed } from "vue";
 import { onPullDownRefresh, onPageScroll } from "@dcloudio/uni-app";
@@ -69,19 +68,20 @@ import {
   getTermInfo,
   getTargetCookie,
   getTickets,
+  ITermInfo,
 } from "@api/timetable";
 
 /**学期信息 */
 const $termInfo = ref({
-  weekNum: 1,
-  termName: "",
+  weekNum: 30,
+  termName: "2022-2023",
   beginTime: new Date("2022/9/1"),
-  overTime: new Date("2023/1/1"),
+  overTime: new Date("2023/2/1"),
   viewWeekNum: 1,
 });
 
 /**一个学期的课程 */
-const $courseData = shallowRef<TOrganizedCourse>([null]);
+const $courseData = shallowRef<TOrganizedCourse>([]);
 
 /**是否显示固定的日期 */
 const $showHeader = shallowRef(false);
@@ -128,7 +128,7 @@ const dateIsToday = (d: IDayInfo) => {
 };
 
 /**获取实验课和教务系统的课表更新组件并写入本地储存 */
-const updateCourse = async (labCookie: string) => {
+const updateCourse = async (labCookie: string, termInfo: ITermInfo) => {
   const [labCourse, jwCourse] = await Promise.all([
     getLabTimetable(labCookie),
     getCommonTimetable(labCookie),
@@ -157,32 +157,31 @@ const updateCourse = async (labCookie: string) => {
     // 新课表写入本地储存
     timetable.setTimetable(courseArr);
   }
-  $courseData.value = putCourseInOrder(courseArr, $termInfo.value.weekNum);
+  // 整理当前课表
+  const curWeekNum = Number(termInfo.weeks) || 1;
+  $courseData.value = putCourseInOrder(courseArr, curWeekNum);
 
-  // 课程获取成功才更新周数信息
-  if (!errMessage) {
-    $termInfo.value.overTime = getDateFromWeek(
-      $termInfo.value.weekNum - $courseData.value.length
-    );
-  }
+  // 更新周数信息
+  $termInfo.value.overTime = getDateFromWeek(
+    curWeekNum - $courseData.value.length
+  );
+  $termInfo.value.beginTime = getDateFromWeek(curWeekNum);
+  $termInfo.value.weekNum = $courseData.value.length - 1;
+  $termInfo.value.viewWeekNum = curWeekNum;
+
+  // 将学期信息写入储存
+  timetable.setTermInfo({
+    begin: $termInfo.value.beginTime.valueOf(),
+    over: $termInfo.value.overTime.valueOf(),
+    termName: $termInfo.value.termName,
+  });
 };
 
 /**更新学期和当前周数 */
 const updateTerm = async (labCookie: string) => {
   const termInfo = await getTermInfo(labCookie);
-
   if (termInfo) {
-    const curWeekNum = Number(termInfo.data.weeks);
-    $termInfo.value.weekNum = curWeekNum;
-    $termInfo.value.viewWeekNum = curWeekNum;
-    $termInfo.value.termName = termInfo.data.time;
-    $termInfo.value.beginTime = getDateFromWeek(curWeekNum);
-    $termInfo.value.overTime = getDateFromWeek(curWeekNum - 20);
-    timetable.setTermInfo({
-      begin: $termInfo.value.beginTime.valueOf(),
-      over: $termInfo.value.overTime.valueOf(),
-      termName: $termInfo.value.termName,
-    });
+    return termInfo;
   } else {
     throw new Error("从学校系统获取学期信息失败");
   }
@@ -190,6 +189,18 @@ const updateTerm = async (labCookie: string) => {
 
 const handleWeekChange = (w: number) => {
   $termInfo.value.viewWeekNum = w;
+};
+
+const getAndCorrectCurWeek = () => {
+  if ($termInfo.value.viewWeekNum >= $termInfo.value.weekNum) {
+    uni.showModal({
+      title: `当前是第${$termInfo.value.viewWeekNum}周`,
+      content: `本学期${$courseData.value.length}周起你就没课咯。`,
+      showCancel: false,
+    });
+    $termInfo.value.viewWeekNum = $termInfo.value.weekNum;
+  }
+  return $termInfo.value.viewWeekNum;
 };
 
 /**读取CAS系统cookie */
@@ -272,14 +283,15 @@ const updateTimetableFromServer = async () => {
 
   // 尝试获取学期信息和课程信息
   try {
-    await updateTerm(labCookie);
-    await updateCourse(labCookie);
+    const termInfo = await updateTerm(labCookie);
+    await updateCourse(labCookie, termInfo.data);
   } catch (error) {
     if (error instanceof Error) {
       showErrModal("从学校系统获取课程出错", error.message);
     } else {
       showUnknownErrModal();
     }
+    throw error;
   }
 };
 
@@ -287,12 +299,12 @@ const updateTimetableFromServer = async () => {
 const updateTimetableFromLocal = async () => {
   const termInfo = await getTermInfoFromLocal();
   const courseArr = await timetable.getTimetable();
+  $courseData.value = putCourseInOrder(courseArr, $termInfo.value.weekNum);
   $termInfo.value.beginTime = termInfo.begin;
   $termInfo.value.overTime = termInfo.over;
-  $termInfo.value.weekNum = termInfo.curWeek;
+  $termInfo.value.weekNum = $courseData.value.length - 1;
   $termInfo.value.viewWeekNum = termInfo.curWeek;
   $termInfo.value.termName = termInfo.termName;
-  $courseData.value = putCourseInOrder(courseArr, $termInfo.value.weekNum);
 };
 
 onMounted(() => {
@@ -302,19 +314,9 @@ onMounted(() => {
 });
 
 onPullDownRefresh(() => {
-  updateTimetableFromServer()
-    .then(() => {
-      if ($termInfo.value.weekNum >= $courseData.value.length) {
-        uni.showModal({
-          title: `当前是第${$termInfo.value.viewWeekNum}周`,
-          content: `本学期${$courseData.value.length}周起你就没课咯。`,
-          showCancel: false,
-        });
-      }
-    })
-    .finally(() => {
-      uni.stopPullDownRefresh();
-    });
+  updateTimetableFromServer().finally(() => {
+    uni.stopPullDownRefresh();
+  });
 });
 onPageScroll(({ scrollTop }) => {
   if (scrollTop > 100) {
