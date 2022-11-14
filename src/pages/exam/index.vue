@@ -1,13 +1,12 @@
 <template>
-  <!-- thumbnail="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-dc-site/460d46d0-4fcc-11eb-8ff1-d5dcf8779628.png" -->
   <view v-if="examList?.length === 0">empty</view>
   <uni-card
     v-for="(item, index) in examList"
     :key="index"
-    :title="item.name"
     :is-shadow="true"
-    :extra="`${item.date}&nbsp;&nbsp;&nbsp;&nbsp; 第${item.week}周`"
-    :class="{ out: isOutOfDate(item.date, item.time.split('-')[0]) }"
+    :title="`${item.name}(${getExamType(item.type)})`"
+    :extra="`${item.date}-第${item.week}周`"
+    :class="{ out: isOutOfDate(item.date, item.time) }"
     mode="title"
     note="Tips"
   >
@@ -17,29 +16,38 @@
         <p class="my-2">时间: {{ item.day }} - {{ item.time }}</p>
         <p>座位号: {{ item.seat }}</p>
       </view>
-      <view class="counter">{{
-        getTimeFromNow(item.date, item.time.split("-")[0])
-      }}</view>
+      <view class="counter">{{ getTimeFromNow(item.date, item.time) }}</view>
     </view>
   </uni-card>
 </template>
 
 <script setup lang="ts">
-import { getExamInfo } from "@src/api/personal";
-import { cacheExamList, credentials, TExamList } from "@src/utils/storage";
+import { getExamInfo } from "@api/personal";
+import { cacheExamList, credentials, TExamList } from "@utils/storage";
 import dayjs from "@lib/dayjs";
+import { getExamType } from "@enums/exam";
 import { onMounted, shallowRef } from "vue";
 
 const examList = shallowRef<TExamList[]>();
 
 const getTimeFromNow = (date: string, time: string): string => {
-  return dayjs(`${date} ${time}:00`, "YYYY/MM/DD HH:mm:ss").fromNow();
+  const match = /^[0-9]{2}:[0-9]{2}-[0-9]{2}:[0-9]{2}$/;
+  if (match.test(time)) {
+    time = time.match(/[0-9]{2}:[0-9]{2}/)?.toString() || "";
+    return dayjs(`${date} ${time}:00`, "YYYY/MM/DD HH:mm:ss").fromNow();
+  }
+  return "Error";
 };
 
 const isOutOfDate = (date: string, time: string): boolean => {
-  return dayjs(`${date} ${time}:00`, "YYYY/MM/DD HH:mm:ss").isBefore(
-    dayjs(new Date())
-  );
+  const match = /^[0-9]{2}:[0-9]{2}-[0-9]{2}:[0-9]{2}$/;
+  if (match.test(time)) {
+    time = time.match(/[0-9]{2}:[0-9]{2}/)?.toString() || "";
+    return dayjs(`${date} ${time}:00`, "YYYY/MM/DD HH:mm:ss").isBefore(
+      dayjs(new Date())
+    );
+  }
+  return false;
 };
 
 onMounted(() => {

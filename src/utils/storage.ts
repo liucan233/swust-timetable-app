@@ -197,7 +197,7 @@ export type TExamList = {
   place: string;
   // 考试座位号
   seat: string;
-  // 类型吧 不是很清楚
+  // 1期末 2期中 3补考
   type: number;
 };
 /**存储存储的考试信息 */
@@ -246,4 +246,5 @@ export const clearStorage = () => {
   setLabCookie("");
   setNoFirstLaunch();
   setSwustAccount({ user: "", password: "" });
+  setExamList([]);
 };
