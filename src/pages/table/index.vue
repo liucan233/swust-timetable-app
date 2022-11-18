@@ -33,6 +33,7 @@
         <text class="day-num" :data-active="dateIsToday(d)">{{ d.day }}</text>
       </view>
     </view>
+    <Toast />
   </view>
 </template>
 
@@ -70,6 +71,7 @@ import {
   getTickets,
   ITermInfo,
 } from "@api/timetable";
+import Toast from "@src/components/Toast.vue";
 
 /**学期信息 */
 const $termInfo = ref({

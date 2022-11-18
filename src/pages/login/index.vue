@@ -32,6 +32,7 @@
       </view>
       <view @click="handleClick" class="login-button">登录</view>
     </view>
+    <Toast />
   </view>
 </template>
 
@@ -44,6 +45,7 @@ import Message from "@components/Message.vue";
 import { TABLE } from "@enums/pages";
 import { getCookieAndCaptchaUrl, login } from "@api/login";
 import { account, credentials } from "@src/utils/storage";
+import Toast from "@src/components/Toast.vue";
 
 /**组件ref属性的类型，T为组件类型 */
 type TLoginInputRef = InstanceType<typeof LoginInput> | null;
