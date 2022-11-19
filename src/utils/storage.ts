@@ -182,7 +182,7 @@ const getIsFirstLaunch = () => {
   return getStorage(Key.FIRST_LAUNCH);
 };
 
-export type TExamList = {
+export type TExamItem = {
   /**考试名 */
   name: string;
   // 考试周数
@@ -201,12 +201,12 @@ export type TExamList = {
   type: number;
 };
 /**存储存储的考试信息 */
-const setExamList = (examList: TExamList[]) => {
+const setExamList = (examList: TExamItem[]) => {
   return setStorage(Key.EXAM_LIST, examList);
 };
 /**获取存储的考试信息 */
-const getExamList = (): Promise<TExamList[]> => {
-  return getStorage(Key.EXAM_LIST) as Promise<TExamList[]>;
+const getExamList = (): Promise<TExamItem[]> => {
+  return getStorage(Key.EXAM_LIST) as Promise<TExamItem[]>;
 };
 
 /**首次启动标志设为false */
@@ -237,7 +237,7 @@ export const appCommon = {
   setNoFirstLaunch,
 };
 
-export const cacheExamList = {
+export const examInfo = {
   setExamList,
   getExamList,
 };
