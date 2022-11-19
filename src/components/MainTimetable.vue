@@ -29,7 +29,6 @@
 import { IDayInfo, getCurDate } from "@utils/common";
 import WeekTable from "./WeekTable.vue";
 import { TOrganizedCourse, TWeekCourse } from "@utils/timetable";
-import { onUpdated, watch } from "vue";
 
 const props = defineProps<{
   className: string;

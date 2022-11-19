@@ -32,7 +32,7 @@
  * 3. 实验系统cookie读取失败尝试用CAS cookie获取实验系统cookie；
  * 4. 若CAS cookie不存在则表示用户未登录，重定向到登陆页面。
  */
-import Timetable from "@src/components/Timetable.vue";
+import Timetable from "@src/components/MainTimetable.vue";
 import {
   getDateFromWeek,
   showUnknownErrModal,
