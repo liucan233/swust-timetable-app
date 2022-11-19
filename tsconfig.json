@@ -18,7 +18,8 @@
       "@components/*": ["components/*"],
       "@enums/*": ["enums/*"],
       "@utils/*": ["utils/*"],
-      "@static/*": ["static/*"]
+      "@static/*": ["static/*"],
+      "@toast/*":["components/Toast/*"]
     }
   },
   "include": ["src/**/*.ts", "src/**/*.vue"]

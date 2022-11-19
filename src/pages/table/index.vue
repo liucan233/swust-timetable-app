@@ -6,9 +6,6 @@
     >
     <button class="table-add">添加课程</button>
   </view>
-  <!-- <scroll-view class="table-preview" scroll-x>
-    <CoursePreview v-for="(_, index) in $courseData" :key="index" />
-  </scroll-view> -->
   <view class="table-main">
     <Timetable
       class-name="timetable"
@@ -17,23 +14,14 @@
       :calendar-arr="dayInfoArr"
       @week-change="handleWeekChange"
     />
+    <image
+      :src="refreshImg"
+      class="refresh-btn"
+      @click="handleRefresh"
+      :data-refreshing="$refreshing"
+    />
   </view>
-  <view class="fixed-header" :data-active="$showHeader">
-    <view class="table-mouth">
-      <text>{{ dayInfoArr[$termInfo.viewWeekNum]?.[0]?.month || 1 }}</text>
-      <text>月</text>
-    </view>
-    <view class="table-date">
-      <view
-        v-for="(d, index) in dayInfoArr[$termInfo.viewWeekNum] ?? []"
-        :key="d.day"
-        class="table-date-item"
-      >
-        <text class="day-name">周{{ dayArr[index] }}</text>
-        <text class="day-num" :data-active="dateIsToday(d)">{{ d.day }}</text>
-      </view>
-    </view>
-  </view>
+  <Toast />
 </template>
 
 <script setup lang="ts">
@@ -44,17 +32,15 @@
  * 3. 实验系统cookie读取失败尝试用CAS cookie获取实验系统cookie；
  * 4. 若CAS cookie不存在则表示用户未登录，重定向到登陆页面。
  */
-import Timetable from "@src/components/Timetable.vue";
+import Timetable from "@src/components/MainTimetable.vue";
 import {
   getDateFromWeek,
   showUnknownErrModal,
   showErrModal,
   IDayInfo,
   getDaysInfo,
-  getCurDate,
 } from "@utils/common";
 import { onMounted, ref, shallowRef, computed } from "vue";
-import { onPullDownRefresh, onPageScroll } from "@dcloudio/uni-app";
 import {
   getTermInfoFromLocal,
   putCourseInOrder,
@@ -70,24 +56,24 @@ import {
   getTickets,
   ITermInfo,
 } from "@api/timetable";
+import Toast from "@src/components/Toast.vue";
+import refreshImg from "@static/image/refresh.png";
+import { info, success } from "@src/lib/toast";
 
 /**学期信息 */
 const $termInfo = ref({
-  weekNum: 30,
+  weekNum: 3,
   termName: "2022-2023",
   beginTime: new Date("2022/9/1"),
-  overTime: new Date("2023/2/1"),
+  overTime: new Date("2022/10/1"),
   viewWeekNum: 1,
 });
 
 /**一个学期的课程 */
-const $courseData = shallowRef<TOrganizedCourse>([]);
+const $courseData = shallowRef<TOrganizedCourse>([null, null, null]);
 
-/**是否显示固定的日期 */
-const $showHeader = shallowRef(false);
-
-/**今天的日月年信息 */
-const todayInfo = getCurDate();
+/**是否正在刷新课表 */
+const $refreshing = shallowRef(false);
 
 /**课表表头的日历信息 */
 const dayInfoArr = computed<IDayInfo[][]>(() => {
@@ -106,25 +92,15 @@ const dayInfoArr = computed<IDayInfo[][]>(() => {
     dayStart = dayEnd;
     dayEnd += 7;
   }
+  console.log(dayArr);
   return result;
 });
-
-/**一周有的星期数中文 */
-const dayArr = ["一", "二", "三", "四", "五", "六", "日"];
 
 /**重定向到登陆页面 */
 const redirectToLogin = () => {
   uni.redirectTo({
     url: "/pages/login/index",
   });
-};
-
-const dateIsToday = (d: IDayInfo) => {
-  return (
-    d.day === todayInfo.day &&
-    d.month === todayInfo.month &&
-    d.year === todayInfo.year
-  );
 };
 
 /**获取实验课和教务系统的课表更新组件并写入本地储存 */
@@ -307,27 +283,28 @@ const updateTimetableFromLocal = async () => {
   $termInfo.value.termName = termInfo.termName;
 };
 
-onMounted(() => {
-  updateTimetableFromLocal().finally(() => {
-    uni.startPullDownRefresh({});
-  });
-});
-
-onPullDownRefresh(() => {
-  updateTimetableFromServer().finally(() => {
-    uni.stopPullDownRefresh();
-  });
-});
-onPageScroll(({ scrollTop }) => {
-  if (scrollTop > 100) {
-    if ($showHeader.value === false) {
-      $showHeader.value = true;
-    }
-  } else {
-    if ($showHeader.value) {
-      $showHeader.value = false;
-    }
+const handleRefresh = () => {
+  if ($refreshing.value === false) {
+    $refreshing.value = true;
+    info({
+      title: "正在刷新课表",
+      content: "正在从教务处和实验系统获取最新课表",
+    });
+    updateTimetableFromServer()
+      .then(() => {
+        success({
+          title: "更新课表成功",
+          content: "已从教务处和实验系统获取最新课表",
+        });
+      })
+      .finally(() => {
+        $refreshing.value = false;
+      });
   }
+};
+
+onMounted(() => {
+  updateTimetableFromLocal().catch(handleRefresh);
 });
 </script>
 
@@ -338,8 +315,9 @@ onPageScroll(({ scrollTop }) => {
   justify-content: space-between;
   align-items: center;
   box-sizing: border-box;
-  padding: 10px;
+  padding: var(--status-bar-height) 16px 10px;
   font-size: 18px;
+  touch-action: none;
 }
 
 .table-time {
@@ -358,67 +336,42 @@ onPageScroll(({ scrollTop }) => {
   display: none;
   content: none;
 }
-
-.table-preview {
-  width: 100%;
-  white-space: nowrap;
-  touch-action: pan-x;
-}
-
+/*  #ifndef  APP-PLUS  */
 .table-main {
   width: 100%;
-}
-.fixed-header {
-  padding: 8px 5px 0 0;
-  position: fixed;
-  top: -60px;
-  left: 0;
-  background-color: #fff;
-  height: 60px;
-  width: 100%;
-  transition: top 0.5s ease-in-out;
-  display: flex;
-  justify-content: space-between;
-  box-sizing: border-box;
-  box-shadow: 0px 30px 80px rgba(0, 0, 0, 0.07);
-}
-.fixed-header[data-active="true"] {
-  top: 0;
-}
-.table-mouth {
-  width: 40px;
-  flex: 0 0 40px;
-  padding: 0 10px;
-  box-sizing: border-box;
-}
-.table-date {
-  flex: 1 1 auto;
-  display: flex;
-  justify-content: space-between;
-  text-align: center;
-}
-.table-date-item {
-  flex: 1 1 100px;
-}
-.day-name,
-.day-num {
-  width: 100%;
-  height: 25px;
-  display: block;
-}
-.day-num[data-active="true"] {
   position: relative;
+  box-sizing: border-box;
+  height: calc(100vh - 45px - var(--status-bar-height) - var(--tab-bar-height));
 }
-.day-num[data-active="true"]::before {
+/*  #endif  */
+
+/*  #ifdef  APP-PLUS  */
+.table-main {
+  position: relative;
+  width: 100%;
+  padding: 0 6px;
+  box-sizing: border-box;
+  height: calc(100vh - 45px - var(--status-bar-height));
+}
+/*  #endif  */
+.refresh-btn {
   position: absolute;
-  content: "";
-  width: 26px;
-  height: 26px;
-  background-color: #5ac8fa;
-  left: 50%;
-  top: 50%;
-  z-index: -1;
-  border-radius: 50%;
-  transform: translate(-49%, -51%);
+  right: 30px;
+  bottom: 20px;
+  width: 42px;
+  height: 42px;
+  animation: refreshing 1.2s linear infinite;
+  animation-play-state: paused;
+}
+@keyframes refreshing {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.refresh-btn[data-refreshing="true"] {
+  animation-play-state: running;
 }
 </style>

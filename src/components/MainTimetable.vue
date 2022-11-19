@@ -29,7 +29,6 @@
 import { IDayInfo, getCurDate } from "@utils/common";
 import WeekTable from "./WeekTable.vue";
 import { TOrganizedCourse, TWeekCourse } from "@utils/timetable";
-import { onUpdated, watch } from "vue";
 
 const props = defineProps<{
   className: string;
@@ -37,10 +36,6 @@ const props = defineProps<{
   weekNum: number;
   calendarArr: IDayInfo[][];
 }>();
-
-onUpdated(()=>{
-  console.log(props.weekNum)
-})
 
 const emit = defineEmits<{
   (e: "weekChange", current: number): any;
@@ -73,14 +68,13 @@ const handleWeekChange = (e: {
   display: flex;
   justify-content: flex-start;
   width: 100%;
-  height: v-bind("6*rowHeight+70+'px'");
+  height: 100%;
 }
 .table-swiper {
   width: 100%;
   height: 100%;
   flex: 0 0 auto;
   white-space: nowrap;
-  overscroll-behavior: auto;
 }
 .table-swiper[data-active="false"] {
   pointer-events: none;

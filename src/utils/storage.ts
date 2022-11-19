@@ -68,6 +68,7 @@ enum Key {
   JW_COOKIE,
   TERM_INFO,
   SWUST_ACCOUNT,
+  EXAM_LIST,
   FIRST_LAUNCH,
 }
 
@@ -181,6 +182,33 @@ const getIsFirstLaunch = () => {
   return getStorage(Key.FIRST_LAUNCH);
 };
 
+export type TExamItem = {
+  /**考试名 */
+  name: string;
+  // 考试周数
+  week: string;
+  // 考试天数 第一周五讲
+  day: string;
+  // 考试日期
+  date: string;
+  // 考试时间
+  time: string;
+  // 考试地点
+  place: string;
+  // 考试座位号
+  seat: string;
+  // 类型吧 不是很清楚
+  type: number;
+};
+/**存储存储的考试信息 */
+const setExamList = (examList: TExamItem[]) => {
+  return setStorage(Key.EXAM_LIST, examList);
+};
+/**获取存储的考试信息 */
+const getExamList = (): Promise<TExamItem[]> => {
+  return getStorage(Key.EXAM_LIST) as Promise<TExamItem[]>;
+};
+
 /**首次启动标志设为false */
 const setNoFirstLaunch = () => {
   return setStorage(Key.FIRST_LAUNCH, "no");
@@ -203,14 +231,19 @@ export const timetable = {
 export const account = {
   setSwustAccount,
   getSwustAccount,
-}
+};
 export const appCommon = {
   getIsFirstLaunch,
   setNoFirstLaunch,
 };
 
+export const examInfo = {
+  setExamList,
+  getExamList,
+};
 export const clearStorage = () => {
   setCasCookie("");
   setLabCookie("");
   setNoFirstLaunch();
-}
+  setSwustAccount({ user: "", password: "" });
+};

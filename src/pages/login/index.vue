@@ -1,5 +1,4 @@
 <template>
-  <Message ref="messageRef" />
   <view>
     <view
       class="flex flex-col justify-center items-center main-container slide-top"
@@ -23,6 +22,7 @@
           ref="verifyRef"
         />
         <view class="verify-img-warper">
+          <!-- <view /> -->
           <image
             :src="remoteData.captcha"
             alt="点击刷新"
@@ -32,6 +32,7 @@
       </view>
       <view @click="handleClick" class="login-button">登录</view>
     </view>
+    <Toast />
   </view>
 </template>
 
@@ -39,21 +40,21 @@
 import { onMounted, shallowRef } from "vue";
 
 import LoginInput from "@components/LoginInput.vue";
-import Message from "@components/Message.vue";
 
 import { TABLE } from "@enums/pages";
 import { getCookieAndCaptchaUrl, login } from "@api/login";
 import { account, credentials } from "@src/utils/storage";
+import Toast from "@src/components/Toast.vue";
+import { error } from "@src/lib/toast";
 
 /**组件ref属性的类型，T为组件类型 */
 type TLoginInputRef = InstanceType<typeof LoginInput> | null;
 
-const messageRef = shallowRef();
 const usernameRef = shallowRef<TLoginInputRef>(null);
 const passwordRef = shallowRef<TLoginInputRef>(null);
 const verifyRef = shallowRef<TLoginInputRef>(null);
 const remoteData = shallowRef({
-  //cookie: "",
+  cookie: "",
   captcha: "",
 });
 
@@ -83,8 +84,13 @@ onMounted(() => {
 /** 刷新cookie和重新获取验证码 */
 const refreshCookieAndCaptchaUrl = () => {
   getCookieAndCaptchaUrl().then(response => {
-    if (response) {
+    if (response && response.code === 200) {
       remoteData.value = response.data;
+    } else {
+      error({
+        title: "获取验证码失败",
+        content: "服务端返回数据不正确",
+      });
     }
   });
 };
@@ -138,33 +144,37 @@ const handleClick = async () => {
   uni.showLoading({
     title: "登陆中",
   });
-  login(username, password, code, remoteData.value.cookie).then(
-    response => {
-      uni.hideLoading();
-      // if (response?.code === 200) {
-      /**登录成功后存储到uni storage中 */
-      credentials.setCasCookie(response?.data.cookie || "");
-      account.setSwustAccount({ user: username, password });
-      /*这里获取两个cookie */
-      uni.switchTab({ url: TABLE });
-    },
-    (error: Error) => {
-      uni.hideLoading();
-      /**登陆失败 */
+  login(username, password, code, remoteData.value.cookie).then(res => {
+    uni.hideLoading();
+    if (!res) {
+      error({
+        title: "服务器错误",
+        content: "登录时服务器返回为空",
+      });
+      return;
+    }
+    if (res.code !== 200) {
       // 返回的msg有两种，"验证码错误" "用户名或密码错误"
-      if (error.message.length === 8) {
+      if (res.msg.includes("验证码")) {
+        verifyRef.value?.warning(text.code.errorText);
+      } else if (res.msg.includes("密码")) {
         usernameRef.value?.warning(text.username.errorText);
         passwordRef.value?.warning(text.password.errorText);
-        messageRef.value?.error(error.message);
-      } else if (error.message.length === 5) {
-        verifyRef.value?.warning(text.code.errorText);
-        messageRef.value?.error(error.message);
       } else {
-        messageRef.value?.error(error.message);
+        error({
+          title: "登录失败",
+          content: res.msg,
+        });
       }
       refreshCookieAndCaptchaUrl();
+      return;
     }
-  );
+    /**登录成功后存储到uni storage中 */
+    credentials.setCasCookie(res.data.cookie);
+    account.setSwustAccount({ user: username, password });
+    /*这里获取两个cookie */
+    uni.switchTab({ url: TABLE });
+  });
 };
 </script>
 

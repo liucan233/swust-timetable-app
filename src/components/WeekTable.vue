@@ -12,57 +12,59 @@
         </view>
       </view>
     </view>
-    <view class="week-container">
-      <view class="section-time">
-        <text
+    <scroll-view class="scroll-container" scroll-y>
+      <view class="week-container">
+        <view class="section-time">
+          <text
+            v-for="(_, index) in sectionTextArr"
+            :key="index"
+            class="time-name"
+          >
+            第 {{ index + 1 }} 讲
+          </text>
+        </view>
+        <view
           v-for="(_, index) in sectionTextArr"
           :key="index"
-          class="time-name"
-        >
-          第 {{ index + 1 }} 讲
-        </text>
-      </view>
-      <view
-        v-for="(_, index) in sectionTextArr"
-        :key="index"
-        :style="getSeparatorStyle(index)"
-        class="course-separator"
-      />
-      <view
-        v-for="(_, dayIndex) in props.dayName"
-        :key="dayIndex"
-        class="day-wrap"
-      >
+          :style="getSeparatorStyle(index)"
+          class="course-separator"
+        />
         <view
-          v-for="(c, index2) in props.course[dayIndex + 1]?.conflict ?? []"
-          class="conflict-item"
-          :style="getPosition(c.begin, c.over)"
-          :key="index2"
+          v-for="(_, dayIndex) in props.dayName"
+          :key="dayIndex"
+          class="day-wrap"
         >
           <view
-            :style="getConflictStyle(c)"
-            data-conflict="true"
+            v-for="(c, index2) in props.course[dayIndex + 1]?.conflict ?? []"
+            class="conflict-item"
+            :style="getPosition(c.begin, c.over)"
+            :key="index2"
+          >
+            <view
+              :style="getConflictStyle(c)"
+              data-conflict="true"
+              :data-begin="c.begin"
+              :data-over="c.over"
+            />
+          </view>
+          <view
+            v-for="(c, index2) in props.course[dayIndex + 1]?.list ?? []"
+            class="course-item"
+            :style="getPosition(c.begin, c.over)"
+            :key="index2"
             :data-begin="c.begin"
             :data-over="c.over"
-          />
-        </view>
-        <view
-          v-for="(c, index2) in props.course[dayIndex + 1]?.list ?? []"
-          class="course-item"
-          :style="getPosition(c.begin, c.over)"
-          :key="index2"
-          :data-begin="c.begin"
-          :data-over="c.over"
-        >
-          <text>@{{ c.place }}</text>
-          <text>{{ c.name }}</text>
+          >
+            <text>@{{ c.place }}</text>
+            <text>{{ c.name }}</text>
+          </view>
         </view>
       </view>
-    </view>
+    </scroll-view>
   </view>
 </template>
 <script lang="ts" setup>
-import { CSSProperties } from "vue";
+import { CSSProperties, shallowRef } from "vue";
 import { TWeekCourse } from "@utils/timetable";
 import { IDayInfo } from "@utils/common";
 import type { IConflictCourse } from "@utils/timetable";
@@ -82,8 +84,6 @@ const sectionTextArr = new Array(6).fill(null);
 const rowHeight = 130,
   gapHeight = 6;
 
-// onMounted(() => {});
-
 const getPosition = (s: number, e: number): CSSProperties => {
   return {
     top: (s >> 1) * rowHeight + 3 + "px",
@@ -100,9 +100,10 @@ const getConflictStyle = (c: IConflictCourse) => {
     width: size + "px",
   };
 };
-const getSeparatorStyle = (index: number) => {
+const getSeparatorStyle = (index: number): CSSProperties => {
   return {
     top: index * props.courseHeight + "px",
+    borderWidth: index ? undefined : "1px 0",
   };
 };
 const dateIsToday = (d: IDayInfo) => {
@@ -117,6 +118,7 @@ const dateIsToday = (d: IDayInfo) => {
 <style scoped>
 .swiper-item {
   width: 100%;
+  height: calc(100% - 55px);
 }
 .table-header {
   width: calc(100% - 5px);
@@ -138,6 +140,9 @@ const dateIsToday = (d: IDayInfo) => {
 .table-date-item {
   flex: 1 1 100px;
 }
+.scroll-container {
+  height: 100%;
+}
 .week-container {
   position: relative;
   width: calc(100% - 5px);
@@ -150,11 +155,13 @@ const dateIsToday = (d: IDayInfo) => {
   height: 100%;
   flex: 0 0 40px;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
 }
 .time-name {
   display: block;
-  height: v-bind("rowHeight+'px'");
-  line-height: v-bind("Math.floor(rowHeight/3)+'px'");
+  line-height: 1.5;
 }
 .day-wrap {
   flex: 1 1 auto;
@@ -236,7 +243,6 @@ const dateIsToday = (d: IDayInfo) => {
   width: calc(100% - 40px);
   height: v-bind("rowHeight+'px'");
 }
-.table-date,
 .course-separator {
   border-style: dashed;
   border-color: #c5cbd0;

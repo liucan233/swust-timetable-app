@@ -16,7 +16,7 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 
-const messageRef = ref<null | { open: () => void }>(null);
+const messageRef = ref<any>(null);
 const messageType = ref("");
 const messageText = ref("");
 
@@ -27,6 +27,8 @@ function messageToggle(type: string, text: string) {
 }
 
 const success = (text: string) => {
+  console.log(1);
+
   messageToggle("success", text);
 };
 const error = (text: string) => {

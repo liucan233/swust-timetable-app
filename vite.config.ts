@@ -15,6 +15,7 @@ export default defineConfig({
       "@enums": path.resolve("./src/enums/"),
       "@utils": path.resolve("./src/utils/"),
       "@static": path.resolve("./src/static/"),
+      "@toast": path.resolve("./src/components/Toast/"),
     },
   },
 });
