@@ -1,9 +1,17 @@
+.h {
+  height: 5rem;
+}
+
 .w-49percent {
   width: 49%;
 }
 
 .mb-4 {
   margin-bottom: 1rem;
+}
+
+.my-2 {
+  margin: 0.5rem 0;
 }
 
 .radius-4 {

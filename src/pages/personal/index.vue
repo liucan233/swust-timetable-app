@@ -1,5 +1,5 @@
 <template>
-  <Message ref="messageRef" />
+  <Message ref="$messageRef" />
   <view class="flex flex-col container">
     <view
       class="flex flex-col justify-center items-center mb-4 radius-4 avatar-warper"
@@ -68,7 +68,7 @@ const tools: TTool[] = [
   {
     imageURL: exam,
     title: "我的考试",
-    to: "",
+    to: "/pages/exam/index",
   },
   {
     imageURL: mark,
@@ -83,7 +83,7 @@ const getQQGroupNumber = () => {
   uni.setClipboardData({
     data: QQ_GROUP_NUMBER,
     showToast: false,
-    success: function () {
+    success: () => {
       $messageRef.value?.success("群号已复制到剪切板");
     },
   });

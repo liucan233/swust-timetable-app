@@ -55,7 +55,7 @@ const usernameRef = shallowRef<TLoginInputRef>(null);
 const passwordRef = shallowRef<TLoginInputRef>(null);
 const verifyRef = shallowRef<TLoginInputRef>(null);
 const remoteData = shallowRef({
-  //cookie: "",
+  cookie: "",
   captcha: "",
 });
 
