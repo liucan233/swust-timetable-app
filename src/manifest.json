@@ -81,11 +81,11 @@
         "uniStatistics" : {
             "enable" : true
         },
-        "statusbar" : {
-            "immersed" : "none",
-            "style" : "light",
-            "background" : "#RRGGBB"
-        },
+        // "statusbar" : {
+        //     "immersed" : "none",
+        //     "style" : "light",
+        //     "background" : "#RRGGBB"
+        // },
         "nvueLaunchMode" : ""
     },
     "quickapp" : {},

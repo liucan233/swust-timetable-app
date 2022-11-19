@@ -42,7 +42,7 @@ type TShowedItem = {
 const $showedArr = ref<TShowedItem[]>([]);
 
 /**多少毫秒后开始消失 */
-const showDuration = 1500;
+const showDuration = 2500;
 /**消失动画时间 */
 const animationDuration = 300;
 
@@ -138,7 +138,7 @@ onShow(() => {
   height: 50px;
   left: 50%;
   transform: translateX(-50%);
-  top: 5vh;
+  top: 8vh;
   max-width: 400px;
   pointer-events: v-bind("$showedArr.length?'auto':'none'");
 }

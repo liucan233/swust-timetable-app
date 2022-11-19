@@ -1,6 +1,6 @@
 {
   "easycom": {
-    "autoscan": true,
+    "autoscan": false,
     "custom": {
       "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
     }
@@ -22,7 +22,6 @@
       "style": {
         "app-plus": {
           "navigationBarTitleText": "登录",
-          "navigationStyle": "custom",
           "animationType": "slide-in-left",
           "animationDuration": 500
         }
@@ -31,14 +30,12 @@
     {
       "path": "pages/table/index",
       "style": {
-        "enablePullDownRefresh": true,
-        "app-plus": {
-          "navigationBarTitleText": "课表",
-          "navigationStyle": "custom",
-          "animationType": "slide-in-left",
-          "animationDuration": 500,
-          "bounce": "none"
-        }
+        "navigationBarBackgroundColor": "#FFFFFF",
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "课程表",
+        "animationType": "slide-in-left",
+        "animationDuration": 500,
+        "disableScroll":true
       }
     },
     {
@@ -56,11 +53,11 @@
     "color": "#7A7E83",
     "selectedColor": "#1296db",
     "borderStyle": "#efe7e7",
-    "backgroundColor": "#ffffff",
-    "height": "65px",
+    "height": "60px",
     "fontSize": "14px",
     "iconWidth": "30px",
     "position": "bottom",
+    "backgroundColor": "#FFFFFF",
     "list": [
       {
         "pagePath": "pages/table/index",
