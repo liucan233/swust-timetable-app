@@ -20,11 +20,10 @@
     {
       "path": "pages/login/index",
       "style": {
-        "app-plus": {
-          "navigationBarTitleText": "登录",
-          "animationType": "slide-in-left",
-          "animationDuration": 500
-        }
+        "navigationBarTitleText": "登录",
+        "animationType": "slide-in-left",
+        "animationDuration": 500,
+        "navigationStyle": "custom"
       }
     },
     {
@@ -35,7 +34,7 @@
         "navigationBarTitleText": "课程表",
         "animationType": "slide-in-left",
         "animationDuration": 500,
-        "disableScroll":true
+        "disableScroll": true
       }
     },
     {

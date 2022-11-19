@@ -20,7 +20,7 @@ type TPartialUniRequestOptionsOmit = Partial<TUniRequestOptionsOmit>;
 type TUniBody = TUniRequestOptions["data"];
 
 /**调用请求方法的返回结构 */
-interface IRequestTask<T> extends PromiseLike<T | null> {
+interface IRequestTask<T> extends Promise<T | null> {
   /**uni原始的方法 */
   task: UniNamespace.RequestTask;
 }
