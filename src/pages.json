@@ -52,8 +52,8 @@
       "style": {
         "app-plus": {
           "navigationBarTitleText": "我的考试",
-          "animationType": "slide-in-left",
-          "animationDuration": 500
+          "animationType": "slide-in-right",
+          "animationDuration": 300
         }
       }
     }

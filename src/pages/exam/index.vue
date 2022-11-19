@@ -74,6 +74,7 @@ onMounted(() => {
         return;
       }
       updatedFromRemoteFlag = true;
+      examInfo.setExamList(res.data.list);
       updateExamList(res.data.list);
     });
   // 从本地获取考试列表
