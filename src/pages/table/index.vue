@@ -1,4 +1,5 @@
 <template>
+  <!-- <image class="background-img" :src="tmpImg" /> -->
   <view class="table-header">
     <text class="table-time">{{ $termInfo.termName }}</text>
     <text class="table-time"
@@ -59,6 +60,7 @@ import {
 import Toast from "@src/components/Toast.vue";
 import refreshImg from "@static/image/refresh.png";
 import { info, success } from "@src/lib/toast";
+// import tmpImg from "@static/image/tmp.jpg";
 
 /**学期信息 */
 const $termInfo = ref({
@@ -170,7 +172,7 @@ const handleWeekChange = (w: number) => {
 const getAndCorrectCurWeek = () => {
   if ($termInfo.value.viewWeekNum >= $termInfo.value.weekNum) {
     uni.showModal({
-      title: `当前是第${$termInfo.value.viewWeekNum}周`,
+      title: "结课提醒",
       content: `本学期${$courseData.value.length}周起你就没课咯。`,
       showCancel: false,
     });
@@ -309,13 +311,26 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.background-img {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  opacity: 0.2;
+  object-fit: cover;
+  object-position: center;
+  /* background-color: #FBFBF1; */
+  /* background-image: linear-gradient(0deg, #fff 30%, #2298f8); */
+}
 .table-header {
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
   box-sizing: border-box;
-  padding: var(--status-bar-height) 16px 10px;
+  padding: calc(5px + var(--status-bar-height)) 22px 10px 16px;
   font-size: 18px;
   touch-action: none;
 }
@@ -338,20 +353,23 @@ onMounted(() => {
 }
 /*  #ifndef  APP-PLUS  */
 .table-main {
+  margin: 0 auto;
   width: 100%;
   position: relative;
+  padding: 0 16px;
   box-sizing: border-box;
-  height: calc(100vh - 45px - var(--status-bar-height) - var(--tab-bar-height));
+  height: calc(100vh - 41px - var(--status-bar-height) - var(--tab-bar-height));
 }
 /*  #endif  */
 
 /*  #ifdef  APP-PLUS  */
 .table-main {
+  margin: 0 auto;
   position: relative;
   width: 100%;
-  padding: 0 6px;
+  padding: 0 16px;
   box-sizing: border-box;
-  height: calc(100vh - 45px - var(--status-bar-height));
+  height: calc(100vh - 41px - var(--status-bar-height));
 }
 /*  #endif  */
 .refresh-btn {

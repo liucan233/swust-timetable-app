@@ -25,6 +25,7 @@
       <view class="counter">{{ item.description }}</view>
     </view>
   </uni-card>
+  <Toast />
 </template>
 
 <script setup lang="ts">
@@ -34,6 +35,8 @@ import dayjs from "@lib/dayjs";
 import { onMounted, shallowRef } from "vue";
 import Loading from "@src/components/Loading.vue";
 import emptyImg from "@static/image/finished.png";
+import Toast from "@src/components/Toast.vue";
+import { error, info } from "@src/lib/toast";
 
 type TExamItem = {
   hasPassed: boolean;
@@ -56,13 +59,16 @@ const updateExamList = (arr: TExam[]) => {
       raw: e,
     };
   });
-  result.sort((a, b) => (a.dayjsInstance.isBefore(b.dayjsInstance) ? 1 : -1));
+  result.sort((a, b) => {
+    if (a.hasPassed === false && a.hasPassed === false) {
+      return a.dayjsInstance.isAfter(b.dayjsInstance) ? 1 : -1;
+    }
+    return a.dayjsInstance.isBefore(b.dayjsInstance) ? 1 : -1;
+  });
   $examList.value = result;
 };
 
 onMounted(() => {
-  /**是否已经从服务器获取到了数据 */
-  let updatedFromRemoteFlag = false;
   // 从教务处获取考试列表
   credentials
     .getCasCookie()
@@ -70,19 +76,27 @@ onMounted(() => {
       return getExamInfo(casCookie);
     })
     .then(res => {
-      if (!res) {
-        return;
+      if (!res || res.code !== 200) {
+        error({
+          title: "获取考试列表失败",
+          content: "服务端响应数据不正确",
+        });
+        uni.report("NETWORK_ERROR", res);
+        throw new Error("获取考试列表出错");
       }
-      updatedFromRemoteFlag = true;
       examInfo.setExamList(res.data.list);
       updateExamList(res.data.list);
+    })
+    .catch(() => {
+      // 出错尝试渲染本地考试数据
+      examInfo.getExamList().then(res => {
+        updateExamList(res);
+        info({
+          title: "已显示上次的获取的考试信息",
+          content: "当前显示的考试列表可能不是最新的",
+        });
+      });
     });
-  // 从本地获取考试列表
-  examInfo.getExamList().then(res => {
-    if (!updatedFromRemoteFlag) {
-      updateExamList(res);
-    }
-  });
 });
 </script>
 

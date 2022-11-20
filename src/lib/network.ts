@@ -51,6 +51,7 @@ export class Network {
       try {
         this.onErr(error);
         resolve(null);
+        console.log('resolve')
       } catch (e) {
         reject(e);
       }

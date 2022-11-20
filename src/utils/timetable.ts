@@ -12,6 +12,7 @@ export interface IAppCourse {
   over: number;
   task: string;
   day: number;
+  color: string;
 }
 
 /**解析被-分隔的两个数字 */
@@ -60,6 +61,7 @@ export const flatCourse = (arr: ICommonCourse[]) => {
               over: parsedSection[1],
               task: t,
               day: d,
+              color: "",
             });
             start++;
           }
@@ -78,6 +80,7 @@ export const flatCourse = (arr: ICommonCourse[]) => {
           over: parsedSection[1],
           task: t,
           day: d,
+          color: "",
         });
       }
     }
@@ -295,6 +298,14 @@ export const organizeCourse = (arr: IAppCourse[][]): TOrganizedCourse => {
   return result;
 };
 
+/**获得课程的唯一key，不同课程不一样 */
+const getUniqueKey = (c: IAppCourse) => {
+  if (c.code) {
+    return c.code + c.week + c.day + c.begin;
+  }
+  return `${c.week}:${c.day}:${c.teacher}:${c.begin}:${c.over}`;
+};
+
 /**去除相同的课程 */
 const filterDuplication = (arr: IAppCourse[]) => {
   const set = new Set<string>(),
@@ -303,7 +314,7 @@ const filterDuplication = (arr: IAppCourse[]) => {
     c.name = c.name.trim();
     c.teacher = c.teacher.trim();
     c.place = c.place.trim();
-    const unique = `${c.week}:${c.day}:${c.teacher}:${c.begin}:${c.over}`;
+    const unique = getUniqueKey(c);
     if (set.has(unique)) {
       console.warn("存在相同课程：", c);
       continue;
@@ -315,12 +326,76 @@ const filterDuplication = (arr: IAppCourse[]) => {
   return result;
 };
 
-/**整理将服务端返回的课程 */
+/**给课程添加背景颜色 */
+const giveBackgroundColor = (arr: IAppCourse[]): IAppCourse[] => {
+  const colorArr = [
+    "#ff461f",
+    "#70f3ff",
+    "#a88462",
+    "#ff2d51",
+    "#44cef6",
+    "#896c39",
+    "#f36838",
+    "#3eede7",
+    "#827100",
+    "#1685a9",
+    "#177cb0",
+    "#ffb3a7",
+    "#4b5cc4",
+    "#a1afc9",
+    "#c93756",
+    "#ffc773",
+    "#16a951",
+    "#426666",
+    "#21a675",
+    "#425066",
+    "#8d4bbb",
+    "#815463",
+    "#ff4c00",
+    "#eedeb0",
+    "#d3b17d",
+    "#bacac6",
+    "#a78e44",
+    "#6b6882",
+    "#ae7000",
+    "#a98175",
+    "#cb3a56",
+    "#4c8dae",
+    "#b0a4e3",
+    "#7fecad",
+    "#b35c44",
+    "#c32136",
+    "#549688",
+    "#789262",
+    "#bf242a",
+    "#afdd22",
+  ];
+  let curIndex = 0;
+  const map = new Map<string, string>();
+  for (let c of arr) {
+    const unique = c.code + c.name + c.teacher,
+      color = map.get(unique);
+    if (color) {
+      c.color = colorArr[curIndex];
+    } else {
+      c.color = colorArr[curIndex++];
+      map.set(unique, c.color);
+      if (curIndex >= colorArr.length) {
+        curIndex = 0;
+        console.info("课程数量超出已提供的颜色数量");
+      }
+    }
+  }
+  return arr;
+};
+
+/**整理从服务端拿到的课程 */
 export const putCourseInOrder = (arr: ICommonCourse[], currentWeek: number) => {
   const flattedCourse = flatCourse(arr);
   const correctCourse = fixCourseArr(flattedCourse, currentWeek);
   const noDuplication = filterDuplication(correctCourse);
-  const weekCourse = covertToWeek(noDuplication);
+  const colorGivenCourse = giveBackgroundColor(noDuplication);
+  const weekCourse = covertToWeek(colorGivenCourse);
   return organizeCourse(weekCourse);
 };
 

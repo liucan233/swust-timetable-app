@@ -26,7 +26,7 @@ network.onErr = err => {
     duration: 1500,
     icon: "error",
   });
-  uni.report("REQUEST_ERROR", err);
+  uni.report("REQUEST_ERROR", err instanceof Error ? err.message : err);
 };
 
 network.onRes = res => {
@@ -45,6 +45,6 @@ manualNetwork.onErr = err => {
     duration: 1500,
     icon: "error",
   });
-  uni.report("REQUEST_ERROR", err);
+  uni.report("REQUEST_ERROR", err instanceof Error ? err.message : err);
 };
 manualNetwork.onRes = res => res.data;

@@ -33,8 +33,7 @@
         "navigationStyle": "custom",
         "navigationBarTitleText": "课程表",
         "animationType": "slide-in-left",
-        "animationDuration": 500,
-        "disableScroll": true
+        "animationDuration": 500
       }
     },
     {
