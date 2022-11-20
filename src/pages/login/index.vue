@@ -91,6 +91,7 @@ const refreshCookieAndCaptchaUrl = () => {
         title: "获取验证码失败",
         content: "服务端返回数据不正确",
       });
+      uni.report("REQUEST_ERROR", response);
     }
   });
 };
@@ -157,16 +158,18 @@ const handleClick = async () => {
       // 返回的msg有两种，"验证码错误" "用户名或密码错误"
       if (res.msg.includes("验证码")) {
         verifyRef.value?.warning(text.code.errorText);
+        refreshCookieAndCaptchaUrl();
       } else if (res.msg.includes("密码")) {
         usernameRef.value?.warning(text.username.errorText);
         passwordRef.value?.warning(text.password.errorText);
+        refreshCookieAndCaptchaUrl();
       } else {
         error({
           title: "登录失败",
           content: res.msg,
         });
+        uni.report("LOGIN_ERROR", res);
       }
-      refreshCookieAndCaptchaUrl();
       return;
     }
     /**登录成功后存储到uni storage中 */

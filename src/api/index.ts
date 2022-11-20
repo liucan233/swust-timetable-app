@@ -7,7 +7,7 @@ import { Network } from "@lib/network";
  */
 export const network = new Network({
   url: BACKEND_PREFIX,
-  timeout: 10000,
+  timeout: 5000,
 });
 
 /**
@@ -17,15 +17,16 @@ export const network = new Network({
  */
 export const manualNetwork = new Network({
   url: BACKEND_PREFIX,
-  timeout: 10000,
+  timeout: 5000,
 });
 
-network.onErr = () => {
+network.onErr = err => {
   uni.showToast({
-    title: "网络错误，请检查网络",
+    title: "网络错误",
     duration: 1500,
     icon: "error",
   });
+  uni.report("REQUEST_ERROR", err);
 };
 
 network.onRes = res => {
@@ -33,16 +34,17 @@ network.onRes = res => {
   if (statusCode < 200 || (statusCode > 299 && statusCode !== 304)) {
     throw new Error("HTTP状态码为" + statusCode);
   }
-  if (res.data && (res.data as any).code !== 200) {
-    throw new Error((res.data as any).msg || "服务器发生未知错误");
+  if ((res.data as any).code !== 200) {
+    throw new Error((res.data as any).msg || "接口状态码不正确");
   }
   return res.data;
 };
-manualNetwork.onErr = () => {
+manualNetwork.onErr = err => {
   uni.showToast({
-    title: "网络错误，请检查网络",
+    title: "网络错误",
     duration: 1500,
     icon: "error",
   });
+  uni.report("REQUEST_ERROR", err);
 };
 manualNetwork.onRes = res => res.data;
